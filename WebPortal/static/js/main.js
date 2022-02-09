@@ -7,7 +7,6 @@ $(document).ready(function() {
       // remove the first column (depends on the given data set)
       delete result['Unnamed: 0'];
       let num_rows = Object.keys(result[Object.keys(result)[0]]).length;
-      console.log(result);
       // display header to the table
       for(var i = 0; i < Object.keys(result).length; i++) {
         var header_field = $('<th>' + Object.keys(result)[i] + '</th>');
@@ -44,11 +43,13 @@ $(document).ready(function() {
         type: 'heatmap',
         hoverongraphs:false
       }];
-      Plotly.newPlot(document.getElementById('data_plot'), information);
+      var layout = {
+        title: 'Heatmap of gene expression level in different patients',
+      };
+      Plotly.newPlot(document.getElementById('data_plot'), information, layout);
     },
     error: function (e) {
       alert('Request Failed')
     }
-
   })
 });

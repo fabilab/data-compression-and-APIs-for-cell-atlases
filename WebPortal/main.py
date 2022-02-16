@@ -1,5 +1,5 @@
 from base64 import decode
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory,request
 from flask_restful import Resource, Api
 from flask_cors import CORS
 import pandas as pd
@@ -49,9 +49,16 @@ class H5GeneExpression(Resource):
         df.index = new_index
         df.columns = new_columns
 
-        # Select 5 genes of interest:
-        plot_df = df.filter(items = ['Car4','Vwf', 'Col1a1', 'Ptprc', 'Ms4a1'], axis=0)
+        # # Select 5 genes of interest:
+        # plot_df = df.filter(items = ['Car4','Vwf', 'Col1a1', 'Ptprc', 'Ms4a1'], axis=0)
+        # plot_data = plot_df.to_json()
+        
+        # get the name of genes input by the web user
+        gene_names = request.args.get('gene_names')
+        a_gene_names = gene_names.split(",")
+        plot_df = df.filter(items = a_gene_names,axis=0)
         plot_data = plot_df.to_json()
+
         return json.loads(plot_data)
 
 # this is an API endpoint (return data)

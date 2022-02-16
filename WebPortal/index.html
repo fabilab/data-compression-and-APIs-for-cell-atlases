@@ -10,12 +10,14 @@
     <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
   </head>
   <body>
-  <section class="section">
+  <section class="section" id="navbar">
     <div class="container">
         <h1 class="title">
         Hello World !
         </h1>
     </div>
+    <input class="input" id="searchGeneName" type="text" placeholder="Search gene of interest (separate them by ',')">
+    <button class="button is-success is-light" id="searchOnClick">Search</button>
   </section>
   <section class="section" id="dataDisplay">
     <table class="table is-hoverable" id="data_table">
@@ -26,6 +28,6 @@
       
     </div>   
   </section>
-  <script src="/js/h5_plot.js"></script>
+  <script src="/js/gene_search.js"></script>
   </body>
 </html>

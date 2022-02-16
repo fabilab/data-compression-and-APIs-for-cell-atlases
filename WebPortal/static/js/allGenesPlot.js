@@ -4,9 +4,9 @@ $(document).ready(function() {
         url:'http://127.0.0.1:5000/data',
         dataType:'json',
         success: function (result) {
-            // x-axis: 5 genes of interest
+            // x-axis: genes of interest
             let x_axis = Object.keys(result[Object.keys(result)[0]]);
-            // y-axis:41 cell types
+            // y-axis: 41 cell types
             let y_axis = Object.keys(result);
             let data_content = [];
             for (var i = 0; i < Object.keys(result).length; i++) {

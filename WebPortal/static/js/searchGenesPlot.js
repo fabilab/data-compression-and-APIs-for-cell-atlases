@@ -1,5 +1,9 @@
 // gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
+// Col1a1,Fsd1l
 $( "#searchOnClick" ).click(function() {
+  if(! $('#scatter_plot').is('empty')) {
+    $('#scatter_plot').empty();
+  }
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
   const gene_array = gene_name.split(",")
@@ -31,78 +35,67 @@ $( "#searchOnClick" ).click(function() {
         var layout = {
             xaxis: {
                 title: {
-                    text: result['gene1_name']+' &nbsp expression',
-                    font: {
-                        family: 'Courier New, monospace',
-                        size: 18,
-                        color: '#7f7f7f'
-                    }
+                  text: result['gene1_name']+' expression',
                 },
-                range: [ 0, 3 ]
+                range: [ 0, 5 ]
             },
             yaxis: {
                 title: {
-                    text: result['gene1_name']+'&nbsp expression',
-                    font: {
-                        family: 'Courier New, monospace',
-                        size: 18,
-                        color: '#7f7f7f'
-                    }
-                },
-                range: [0, 6]
+                  text: result['gene2_name']+' expression',
+              },
+              range: [0, 5]
             },
-            title:'Average expression level of 2 selected gene in different cell types'
+            title:'Correlation between ' + result['gene1_name'] + ' and ' + result['gene2_name']
         };
         
         Plotly.newPlot(document.getElementById('scatter_plot'), data, layout);
       }
     });
-  } else {
-    // sent gene names to the API
-    $.ajax({
-      type:'GET',
-      url:'http://127.0.0.1:5000/data',
-      data: "gene_names=" + gene_name,
-      success: function(result){
-        console.log(result)
-        // x-axis: 5 genes of interest
-        let x_axis = Object.keys(result[Object.keys(result)[0]]);
-        // y-axis:41 cell types
-        let y_axis = Object.keys(result);
-        let data_content = [];
-        for (var i = 0; i < Object.keys(result).length; i++) {
-            cell_type = Object.keys(result)[i] // get the cell_type name as a string
-            all_gene_expression = result[cell_type]         // find it from the dictionary as a key
-            data_content.push(Object.values(all_gene_expression))
-        }
-        var data = [
-            {
-                z: data_content,
-                x: x_axis,
-                y: y_axis,
-                type: 'heatmap',
-                hoverongaps: false
-            }
-          ];
-        var layout = {
-            title: 'Heatmap of gene expression level in selected cell types',
-            xaixs: {
-                title: {
-                    text: 'Genes of interest',
-                    standoff: 20
-                }},
-            yaxis: {
-                title: {
-                    text: 'Cell types',
-                    standoff: 40
-                }},
-        };
-          
-          Plotly.newPlot(document.getElementById('h5_data_plot'), data,layout);  
-      },
-      error: function (e) {
-        alert('Request data Failed')
-      }
-    });
   }
+    // sent gene names to the API
+  $.ajax({
+    type:'GET',
+    url:'http://127.0.0.1:5000/data',
+    data: "gene_names=" + gene_name,
+    success: function(result){
+      console.log(result)
+      // x-axis: 5 genes of interest
+      let x_axis = Object.keys(result[Object.keys(result)[0]]);
+      // y-axis:41 cell types
+      let y_axis = Object.keys(result);
+      let data_content = [];
+      for (var i = 0; i < Object.keys(result).length; i++) {
+          cell_type = Object.keys(result)[i] // get the cell_type name as a string
+          all_gene_expression = result[cell_type]         // find it from the dictionary as a key
+          data_content.push(Object.values(all_gene_expression))
+      }
+      var data = [
+          {
+              z: data_content,
+              x: x_axis,
+              y: y_axis,
+              type: 'heatmap',
+              hoverongaps: false
+          }
+        ];
+      var layout = {
+          title: 'Heatmap of gene expression level in selected cell types',
+          xaixs: {
+              title: {
+                  text: 'Genes of interest',
+                  standoff: 20
+              }},
+          yaxis: {
+              title: {
+                  text: 'Cell types',
+                  standoff: 40
+              }},
+      };
+        
+        Plotly.newPlot(document.getElementById('h5_data_plot'), data,layout);  
+    },
+    error: function (e) {
+      alert('Request data Failed')
+    }
+    });
 });

@@ -6,6 +6,8 @@ import pandas as pd
 import h5py
 import numpy as np
 import json
+from scipy.cluster.hierarchy import linkage,leaves_list
+from scipy.spatial.distance import pdist
 
 app = Flask(__name__, static_url_path='/static')
 api = Api(app)
@@ -56,13 +58,21 @@ class H5GeneExpression(Resource):
         # get the name of genes input by the web user
         gene_names = request.args.get('gene_names')
         if gene_names is None:
-            plot_data = df.to_json()
+            plot_data = df.T
         else:
             a_gene_names = gene_names.split(",")
             plot_df = df.filter(items = a_gene_names,axis=0)
-            plot_data = plot_df.to_json()
+            plot_data = plot_df.T
+        plot_data = np.log10(0.1+plot_data)
 
-        return json.loads(plot_data)
+        # Hierachical Clustering
+        distance = pdist(plot_data.values)
+        Z = linkage(distance,optimal_ordering=True)
+
+        new_order = leaves_list(Z)
+        plot_data = plot_data.iloc[new_order]
+
+        return json.loads(plot_data.to_json())
 
 class plotsForSeachGenes(Resource):
     def get(self):

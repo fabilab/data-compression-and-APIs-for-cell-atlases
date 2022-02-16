@@ -55,9 +55,12 @@ class H5GeneExpression(Resource):
         
         # get the name of genes input by the web user
         gene_names = request.args.get('gene_names')
-        a_gene_names = gene_names.split(",")
-        plot_df = df.filter(items = a_gene_names,axis=0)
-        plot_data = plot_df.to_json()
+        if gene_names is None:
+            plot_data = df.to_json()
+        else:
+            a_gene_names = gene_names.split(",")
+            plot_df = df.filter(items = a_gene_names,axis=0)
+            plot_data = plot_df.to_json()
 
         return json.loads(plot_data)
 

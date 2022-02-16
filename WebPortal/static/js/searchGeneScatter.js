@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/data2',
+        url:'http://127.0.0.1:5000/data',
         dataType:'json',
         success: function (result) {
             // compare the expression level of 2 specific genes across all cell types

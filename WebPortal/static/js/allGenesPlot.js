@@ -24,7 +24,7 @@ $(document).ready(function() {
                 }
               ];
             var layout = {
-                title: 'Heatmap of gene expression level in different cell types',
+                title: 'Heatmap of gene expression level in all cell types',
                 xaixs: {
                     title: {
                         text: 'Genes of interest',

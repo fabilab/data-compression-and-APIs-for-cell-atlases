@@ -1,3 +1,4 @@
+// gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
 $( "#searchOnClick" ).click(function() {
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
@@ -29,7 +30,7 @@ $( "#searchOnClick" ).click(function() {
           }
         ];
       var layout = {
-          title: 'Heatmap of gene expression level in different cell types',
+          title: 'Heatmap of gene expression level in selected cell types',
           xaixs: {
               title: {
                   text: 'Genes of interest',

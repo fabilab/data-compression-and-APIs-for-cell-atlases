@@ -1,5 +1,4 @@
 function HeatMap(result) {
-    console.log(result)
         // x-axis: 5 genes of interest
         let x_axis = Object.keys(result[Object.keys(result)[0]]);
         // y-axis:41 cell types
@@ -23,15 +22,14 @@ function HeatMap(result) {
         var layout = {
             title: 'Heatmap of gene expression level in selected cell types',
             xaxis: {
-                title: {
-                    text: 'Cell types',
-                    standoff: 20
-                }},
+                title: 'Cell types',
+                automargin: true,
+                tickangle: 35,
+            },
             yaxis: {
-                title: {
-                    text: 'Genes',
-                    standoff: 40
-                }},
+                title: 'Genes',
+                automargin: true,
+            },
         };
             
             Plotly.newPlot(document.getElementById('h5_data_plot'), data,layout); 

@@ -10,6 +10,7 @@
     <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
   </head>
   <body>
+  <!-- Navigation Bar -->
   <nav class="navbar has-shadow is-spaced">
     <div class="navbar-brand">
       <h1 class="title">Single Cell Compressed Atlas of the Neonatal Lung</h1>
@@ -27,6 +28,21 @@
       </div>
     </div>
   </nav>
+  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
+  <div class="tabs is-toggle is-centered">
+    <ul>
+      <li id="originalTab" class="is-active">
+        <a id="originalOnClick">Original</a>
+      </li>
+      <li id="logTab">
+        <a id="log10OnClick">Log10</a>
+      </li>
+      <li id="hierachicalTab">
+        <a id="hClusterOnClick">Hierachical Clustered</a>
+      </li>
+    </ul>
+  </div>
+  <!-- Plots below -->
   <div class="container" id="dataDisplay">
     <div id="h5_data_plot">
 
@@ -38,6 +54,9 @@
   <script src="/js/scatterPlot.js"></script>
   <script src="/js/heatMap.js"></script>
   <script src="/js/searchGenesPlot.js"></script>
-  <script src="/js/allGenesPlot.js"></script>
+  <script src="/js/defaultHeatMap.js"></script>
+  <script src="/js/heatMapOriginal.js"></script>
+  <script src="/js/heatMapLog10.js"></script>
+  <script src="/js/heatMapHCluster.js"></script>
   </body>
 </html>

@@ -21,7 +21,7 @@ $( "#searchOnClick" ).click(function() {
     // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data',
+    url:'http://127.0.0.1:5000/dataOrigin',
     data: "gene_names=" + gene_name,
     success: HeatMap,
     error: function (e) {

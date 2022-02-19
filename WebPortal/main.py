@@ -8,6 +8,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
+from helper import data_preprocessing
 
 app = Flask(__name__, static_url_path='/static')
 api = Api(app)
@@ -30,32 +31,26 @@ def helloworld():
     return response
 
 # use Carsten's h5 data
-class H5GeneExpression(Resource):
+class geneExpOriginal(Resource):
     def get(self):
-        h5_data = h5py.File('./static/scData/condensed_lung_atlas.h5',"r")
-        df = pd.DataFrame(data=np.array(h5_data['cell_type']\
-            ['gene_expression_average']['block0_values']),\
-            index=np.array(h5_data['cell_type']['gene_expression_average']['axis1'])\
-            ,columns=np.array(h5_data['cell_type']['gene_expression_average']['axis0'])).T
-        
-        # current index in the dataframe is writtern as binary string.
-        # We need to convert it into normal string
-        new_index=[]
-        for i in df.index:
-            new_index.append(i.decode('utf-8'))
-        # Similarly for columns name
-        new_columns=[]
-        for i in df.columns:
-            new_columns.append(i.decode('utf-8'))
-
-        df.index = new_index
-        df.columns = new_columns
-
         # # Select 5 genes of interest:
         # plot_df = df.filter(items = ['Car4','Vwf', 'Col1a1', 'Ptprc', 'Ms4a1'], axis=0)
-        # plot_data = plot_df.to_json()
-        
+
         # get the name of genes input by the web user
+        df = data_preprocessing()
+        gene_names = request.args.get('gene_names')
+        if gene_names is None:
+            plot_data = df.T
+        else:
+            a_gene_names = gene_names.split(",")
+            plot_df = df.filter(items = a_gene_names,axis=0)
+            plot_data = plot_df.T
+
+        return json.loads(plot_data.to_json())
+
+class geneExpLog(Resource):
+    def get(self):
+        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
         if gene_names is None:
             plot_data = df.T
@@ -65,34 +60,32 @@ class H5GeneExpression(Resource):
             plot_data = plot_df.T
         plot_data = np.log10(0.1+plot_data)
 
+        return json.loads(plot_data.to_json())
+
+class geneExpHieracical(Resource):
+    def get(self):
+        df = data_preprocessing()
+        gene_names = request.args.get('gene_names')
+        if gene_names is None:
+            plot_data = df.T
+        else:
+            a_gene_names = gene_names.split(",")
+            plot_df = df.filter(items = a_gene_names,axis=0)
+            plot_data = plot_df.T
+        
+        plot_data = np.log10(0.1+plot_data)
         # Hierachical Clustering
         distance = pdist(plot_data.values)
         Z = linkage(distance,optimal_ordering=True)
 
         new_order = leaves_list(Z)
         plot_data = plot_data.iloc[new_order]
-
         return json.loads(plot_data.to_json())
 
 class plotsForSeachGenes(Resource):
     def get(self):
-        h5_data = h5py.File('./static/scData/condensed_lung_atlas.h5',"r")
-        df = pd.DataFrame(data=np.array(h5_data['cell_type']\
-            ['gene_expression_average']['block0_values']),\
-            index=np.array(h5_data['cell_type']['gene_expression_average']['axis1'])\
-            ,columns=np.array(h5_data['cell_type']['gene_expression_average']['axis0'])).T
-        
-        new_index=[]
-        for i in df.index:
-            new_index.append(i.decode('utf-8'))
-        # Similarly for columns name
-        new_columns=[]
-        for i in df.columns:
-            new_columns.append(i.decode('utf-8'))
 
-        df.index = new_index
-        df.columns = new_columns
-
+        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
         a_gene_names = gene_names.split(",")
         if len(a_gene_names) == 2:
@@ -113,7 +106,9 @@ class plotsForSeachGenes(Resource):
         return result
 
 # this is an API endpoint (return data)
-api.add_resource(H5GeneExpression, '/data')
+api.add_resource(geneExpOriginal, '/dataOrigin')
+api.add_resource(geneExpLog, '/dataLog')
+api.add_resource(geneExpHieracical, '/dataHierachical')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 
 if __name__ == '__main__':

@@ -13,16 +13,19 @@
   <!-- Navigation Bar -->
   <nav class="navbar has-shadow is-spaced">
     <div class="navbar-brand">
-      <h1 class="title">Single Cell Compressed Atlas of the Neonatal Lung</h1>
+      <h1 class="title is-4">Single Cell Compressed Atlas of the Neonatal Lung</h1>
     </div>
     <div class="navbar-end">
       <div class="field is-grouped">
         <div class="control is-expanded">
           <input class="input" id="searchGeneName" type="text" placeholder="gene1,gene2,gene3">
         </div>
-        <div class="control">
-          <a class="button is-info is-light" id="searchOnClick">
+        <div class="control has-addons">
+          <a class="button is-info is-outlined" id="searchOnClick">
             Search
+          </a>
+          <a class="button is-danger is-outlined" id="resetOnClick">
+            Reset
           </a>
         </div>
       </div>
@@ -55,6 +58,7 @@
   <script src="/js/heatMap.js"></script>
   <script src="/js/searchGenesPlot.js"></script>
   <script src="/js/defaultHeatMap.js"></script>
+  <script src="/js/resetPage.js"></script>
   <script src="/js/heatMapOriginal.js"></script>
   <script src="/js/heatMapLog10.js"></script>
   <script src="/js/heatMapHCluster.js"></script>

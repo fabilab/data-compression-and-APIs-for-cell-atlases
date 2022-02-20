@@ -6,3 +6,18 @@
     margin-top: 30px;
     text-align: center;
 }
+
+.navbar {
+    background-color: rgb(25,62,90);
+}
+
+.title {
+    color: white;
+}
+
+.button.is-ghost {
+    color:white;
+}
+.button.is-ghost:hover {
+    color:white;
+}

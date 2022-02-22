@@ -37,56 +37,46 @@ class geneExpOriginal(Resource):
         # plot_df = df.filter(items = ['Car4','Vwf', 'Col1a1', 'Ptprc', 'Ms4a1'], axis=0)
 
         # get the name of genes input by the web user
-        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
-        if gene_names is None:
-            plot_data = df.T
-        else:
-            a_gene_names = gene_names.split(",")
-            plot_df = df.filter(items = a_gene_names,axis=0)
-            plot_data = plot_df.T
-
-        return json.loads(plot_data.to_json())
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
+        return json.loads(df.to_json())
 
 class geneExpLog(Resource):
     def get(self):
-        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
-        if gene_names is None:
-            plot_data = df.T
-        else:
-            a_gene_names = gene_names.split(",")
-            plot_df = df.filter(items = a_gene_names,axis=0)
-            plot_data = plot_df.T
-        plot_data = np.log10(0.1+plot_data)
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
+        log_data = np.log10(0.1+df)
 
-        return json.loads(plot_data.to_json())
+        return json.loads(log_data.to_json())
 
 class geneExpHieracical(Resource):
     def get(self):
-        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
-        if gene_names is None:
-            plot_data = df.T
-        else:
-            a_gene_names = gene_names.split(",")
-            plot_df = df.filter(items = a_gene_names,axis=0)
-            plot_data = plot_df.T
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
         
-        plot_data = np.log10(0.1+plot_data)
+        hierachical_data = np.log10(0.1+df)
         # Hierachical Clustering
-        distance = pdist(plot_data.values)
+        distance = pdist(hierachical_data.values)
         Z = linkage(distance,optimal_ordering=True)
 
         new_order = leaves_list(Z)
-        plot_data = plot_data.iloc[new_order]
-        return json.loads(plot_data.to_json())
+        hierachical_data = hierachical_data.iloc[new_order]
+        return json.loads(hierachical_data.to_json())
 
 class plotsForSeachGenes(Resource):
     def get(self):
 
-        df = data_preprocessing()
         gene_names = request.args.get('gene_names')
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
+        df = df.T
         a_gene_names = gene_names.split(",")
         if len(a_gene_names) == 2:
             result = {}

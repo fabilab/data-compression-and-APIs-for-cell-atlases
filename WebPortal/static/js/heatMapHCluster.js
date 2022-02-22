@@ -17,4 +17,5 @@ $("#hClusterOnClick" ).click(function() {
     $("#logTab").removeClass('is-active');
     $("#originalTab").removeClass('is-active');
     $("#hierachicalTab").addClass('is-active');
+    $("#dendrogramTab").removeClass('is-active');
 });

@@ -20,5 +20,6 @@ $("#log10OnClick" ).click(function() {
     $("#logTab").addClass('is-active');
     $("#originalTab").removeClass('is-active');
     $("#hierachicalTab").removeClass('is-active');
+    $("#dendrogramTab").removeClass('is-active');
     
 });

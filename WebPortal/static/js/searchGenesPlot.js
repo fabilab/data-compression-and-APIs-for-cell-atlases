@@ -40,7 +40,7 @@ $( "#searchOnClick" ).click(function() {
     data: "gene_names=" + gene_name,
     success: HeatMap,
     error: function (e) {
-      alert('Request data Failed')
+      alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
     }
     });
 });

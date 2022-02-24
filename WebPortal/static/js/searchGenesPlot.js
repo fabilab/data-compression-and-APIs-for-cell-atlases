@@ -1,26 +1,30 @@
 // gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
 // Col1a1,Fsd1l
-$( "#searchOnClick" ).click(function() {
+function AssembleAjaxRequest() {
   if(! $('#scatter_plot').is('empty')) {
     $('#scatter_plot').empty();
   }
 
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
   //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
-  current_class = $(".is-active").attr('id');
-  switch(current_class) {
-    case "originalTab":
-      var path_name = "dataOrigin"
-      break;
-    case "logTab":
-      var path_name = "dataLog"
-      break;
-    case "hierachicalTab":
-      var path_name = "dataHierachical"
+  cpm_is_active = $("#cpmTab").hasClass('is-active');
+  orginal_is_active = $("#originalOrderTab").hasClass('is-active')
+  if (cpm_is_active && orginal_is_active) {
+    var path_name = "dataOrigin";
+  } else if (cpm_is_active) {
+    var path_name = "dataHierachicalOriginal"
+  } else if (orginal_is_active) {
+    var path_name = "dataLog"
+  } else {
+    var path_name = "dataHierachical"
   }
-
+  
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
+  if (gene_name === '') {
+    gene_name = "Car4,Vwf,Col1a1,Ptprc,Ms4a1";
+  }
+
   const gene_array = gene_name.split(",")
   if (gene_array.length == 2) {
     $.ajax({
@@ -43,4 +47,5 @@ $( "#searchOnClick" ).click(function() {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
     }
     });
-});
+  }
+$("#searchOnClick" ).click(AssembleAjaxRequest)

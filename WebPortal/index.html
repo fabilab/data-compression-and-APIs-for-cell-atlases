@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ying's Web</title>
+    <title>Single Cell Compressed Atlas Webportal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -37,17 +37,28 @@
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
   <div class="tabs is-toggle is-centered">
     <ul>
-      <li id="originalTab">
-        <a id="originalOnClick">Original</a>
+      <li id="cpmTab" class="is-active">
+        <a id="CPMOnClick">CPM(count/million)</a>
       </li>
       <li id="logTab">
         <a id="log10OnClick">Log10</a>
       </li>
-      <li id="hierachicalTab">
+      <!-- <li id="hierachicalTab">
         <a id="hClusterOnClick">Hierachical Clustered</a>
       </li>
       <li id="dendrogramTab">
         <a id="denOnClick">Dendrogram</a>
+      </li> -->
+    </ul>
+  </div>
+  <!-- Tab set 2 -->
+  <div class="tabs is-toggle is-centered">
+    <ul>
+      <li id="originalOrderTab" class="is-active">
+        <a id="originalOnClick">Original</a>
+      </li>
+      <li id="hierachicalTab">
+        <a id="hClusterOnClick">Hierachical Clustered</a>
       </li>
     </ul>
   </div>
@@ -65,8 +76,6 @@
   <script src="/js/searchGenesPlot.js"></script>
   <script src="/js/defaultHeatMap.js"></script>
   <script src="/js/resetPage.js"></script>
-  <script src="/js/heatMapOriginal.js"></script>
   <script src="/js/heatMapLog10.js"></script>
-  <script src="/js/heatMapHCluster.js"></script>
   </body>
 </html>

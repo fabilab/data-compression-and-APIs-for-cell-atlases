@@ -69,6 +69,22 @@ class geneExpHieracical(Resource):
         hierachical_data = hierachical_data.iloc[new_order]
         return json.loads(hierachical_data.to_json())
 
+class geneExpHieracicalOriginal(Resource):
+    def get(self):
+        gene_names = request.args.get('gene_names')
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
+        
+        hierachical_data = df
+        # Hierachical Clustering
+        distance = pdist(hierachical_data.values)
+        Z = linkage(distance,optimal_ordering=True)
+
+        new_order = leaves_list(Z)
+        hierachical_data = hierachical_data.iloc[new_order]
+        return json.loads(hierachical_data.to_json())
+
 class plotsForSeachGenes(Resource):
     def get(self):
 
@@ -99,6 +115,7 @@ class plotsForSeachGenes(Resource):
 api.add_resource(geneExpOriginal, '/dataOrigin')
 api.add_resource(geneExpLog, '/dataLog')
 api.add_resource(geneExpHieracical, '/dataHierachical')
+api.add_resource(geneExpHieracicalOriginal, '/dataHierachicalOriginal')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 
 if __name__ == '__main__':

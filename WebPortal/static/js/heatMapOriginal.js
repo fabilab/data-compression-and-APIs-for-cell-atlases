@@ -16,5 +16,4 @@ $("#originalOnClick" ).click(function() {
     $("#logTab").removeClass('is-active');
     $("#originalTab").addClass('is-active');
     $("#hierachicalTab").removeClass('is-active');
-    $("#dendrogramTab").removeClass('is-active');
 })

@@ -30,6 +30,29 @@ def helloworld():
         response = f.read()
     return response
 
+class geneExp(Resource):
+    def get(self):
+        gene_names = request.args.get('gene_names')
+        plot_type = request.args.get('plot_type')
+        data_type = request.args.get('data_type')
+        # print(plot_type)
+        # print(data_type)
+        
+        df = data_preprocessing(gene_names)
+        if df is None:
+            return None
+        
+        if data_type == "log10":
+            df = np.log10(0.1+df)
+        
+        if plot_type == 'hieracical':
+            distance = pdist(df.values)
+            Z = linkage(distance,optimal_ordering=True)
+            new_order = leaves_list(Z)
+            df = df.iloc[new_order]
+        
+        return json.loads(df.to_json())
+
 # use Carsten's h5 data
 class geneExpOriginal(Resource):
     def get(self):
@@ -112,6 +135,7 @@ class plotsForSeachGenes(Resource):
         return result
 
 # this is an API endpoint (return data)
+api.add_resource(geneExp, '/data')
 api.add_resource(geneExpOriginal, '/dataOrigin')
 api.add_resource(geneExpLog, '/dataLog')
 api.add_resource(geneExpHieracical, '/dataHierachical')

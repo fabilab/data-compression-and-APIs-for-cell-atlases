@@ -9,14 +9,15 @@ function AssembleAjaxRequest() {
   //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
   cpm_is_active = $("#cpmTab").hasClass('is-active');
   orginal_is_active = $("#originalOrderTab").hasClass('is-active')
-  if (cpm_is_active && orginal_is_active) {
-    var path_name = "dataOrigin";
-  } else if (cpm_is_active) {
-    var path_name = "dataHierachicalOriginal"
-  } else if (orginal_is_active) {
-    var path_name = "dataLog"
-  } else {
-    var path_name = "dataHierachical"
+  var plot_type = 'original';
+  var data_type = 'original';
+  
+  if (!cpm_is_active) {
+    data_type = 'log10';
+  } 
+  
+  if (!orginal_is_active) {
+    plot_type = "hieracical";
   }
   
   // action here when clicking the search button
@@ -40,8 +41,8 @@ function AssembleAjaxRequest() {
     // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/' + path_name,
-    data: "gene_names=" + gene_name,
+    url:'http://127.0.0.1:5000/data',
+    data: "gene_names=" + gene_name + "&plot_type=" + plot_type + "&data_type=" + data_type,
     success: HeatMap,
     error: function (e) {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')

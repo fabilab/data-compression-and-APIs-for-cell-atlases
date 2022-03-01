@@ -5,8 +5,8 @@ $("#originalOnClick" ).click(function() {
     }
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/dataOrigin',
-        data: "gene_names=" + gene_name,
+        url:'http://127.0.0.1:5000/data',
+        data: "gene_names=" + gene_name + "&plot_type=original&data_type=original",
         dataType:'json',
         success: HeatMap,
         error: function (e) {

@@ -1,4 +1,4 @@
-function HeatMap(result) {
+function HeatMap(result, html_element_id) {
         if (!result) {
             alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
         } else {
@@ -35,6 +35,6 @@ function HeatMap(result) {
                 },
             };
                 
-                Plotly.newPlot(document.getElementById('h5_data_plot'), data,layout); 
+            Plotly.newPlot(document.getElementById(html_element_id), data,layout); 
         };
     } 

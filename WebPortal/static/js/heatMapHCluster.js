@@ -7,9 +7,11 @@ $("#hClusterOnClick" ).click(function() {
     $.ajax({
         type:'GET',
         url:'http://127.0.0.1:5000/data',
-        data: "gene_names=" + gene_name + '&plot_type=hieracical&data_type=original',
+        data: "gene_names=" + gene_name + '&plot_type=hieracical&data_type=original&data_set=celltype',
         dataType:'json',
-        success: HeatMap,
+        success: function(result) {
+            HeatMap(result, "h5_data_plot");
+        },
         error: function (e) {
         alert('Request data Failed')
         }

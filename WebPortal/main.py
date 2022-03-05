@@ -30,13 +30,26 @@ def helloworld():
         response = f.read()
     return response
 
+@app.route('/multiple_heatmaps',methods=['GET'])
+def page2():
+    with open('page2.html') as f:
+        response = f.read()
+    return response
+
 class geneExp(Resource):
     def get(self):
         gene_names = request.args.get('gene_names')
         plot_type = request.args.get('plot_type')
         data_type = request.args.get('data_type')
+        data_set = request.args.get('data_set')
+        df = None
+        if data_set == 'celltype':
+            df = data_preprocessing(gene_names)[0]
+        elif data_set == 'celltype_dataset':
+            df = data_preprocessing(gene_names)[1]
+        elif data_set == 'celltype_dataset_timepoint':
+            df = data_preprocessing(gene_names)[2]
         
-        df = data_preprocessing(gene_names)
         if df is None:
             return None
         
@@ -55,7 +68,7 @@ class plotsForSeachGenes(Resource):
     def get(self):
 
         gene_names = request.args.get('gene_names')
-        df = data_preprocessing(gene_names)
+        df = data_preprocessing(gene_names)[0]
         if df is None:
             return None
         df = df.T

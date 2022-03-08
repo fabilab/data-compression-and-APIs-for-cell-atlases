@@ -8,67 +8,69 @@
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
   </head>
   <body>
   <!-- Navigation Bar -->
-  <nav class="navbar is-fixed-top has-shadow is-spaced">
+  <nav class="navbar is-fixed-top has-shadow is-spaced is-light">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://fabilab.org/">
-        <h1 class="title is-4">Single Cell Compressed Atlas of the Neonatal Lung</h1>
+      <a class="navbar-item">
+        <h1 class="title is-5">Single Cell Compressed Atlas of the Neonatal Lung</h1>
       </a>
     </div>
     <div class="navbar-start">
-      <a href="http://127.0.0.1:5000/" class="navbar-item">
+      <a href="http://127.0.0.1:5000/" class="button is-ghost has-text-info ">
         Home
       </a>
-      <a href="http://127.0.0.1:5000/multiple_heatmaps" class="navbar-item">
-          Multi-Heatmaps
+      <a href="http://127.0.0.1:5000/multiple_heatmaps" class="button is-ghost has-text-grey-darker">
+          Heatmaps by Timepoint
         </a>
   </div>
     <div class="navbar-end">
-      <div class="field is-grouped">
-        <div class="control is-expanded">
-          <input class="input" id="searchGeneName" type="text" placeholder="gene1,gene2,gene3">
+      <div class="field has-addons">
+        <div class="control">
+          <input class="input is-info" id="searchGeneName" type="text" placeholder="gene1,gene2,gene3">
         </div>
-        <div class="control has-addons">
-          <a class="button is-info is-inverted" id="searchOnClick">
-            Search
-          </a>
-          <a class="button is-ghost" id="resetOnClick">
-            Reset
+        <div class="control">
+          <a class="button is-info" id="searchOnClick">
+            <i class="fas fa-search"></i>
           </a>
         </div>
       </div>
     </div>
   </nav>
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
-  <div class="tabs is-toggle is-centered">
-    <ul>
-      <li id="cpmTab" class="is-active">
-        <a id="CPMOnClick">CPM(count/million)</a>
-      </li>
-      <li id="logTab">
-        <a id="log10OnClick">Log10</a>
-      </li>
-      <!-- <li id="hierachicalTab">
-        <a id="hClusterOnClick">Hierachical Clustered</a>
-      </li>
-      <li id="dendrogramTab">
-        <a id="denOnClick">Dendrogram</a>
-      </li> -->
-    </ul>
-  </div>
-  <!-- Tab set 2 -->
-  <div class="tabs is-toggle is-centered">
-    <ul>
-      <li id="originalOrderTab" class="is-active">
-        <a id="originalOnClick">Original</a>
-      </li>
-      <li id="hierachicalTab">
-        <a id="hClusterOnClick">Hierachical Clustered</a>
-      </li>
-    </ul>
+  <div class="columns is-mobile is-centered tab-area">
+    <div class="field column is-one-quarter">
+      <label class="label">Data values</label>
+      <div class="control">
+        <div class="tabs is-toggle is-centered">
+          <ul>
+            <li id="cpmTab" class="is-active">
+              <a id="CPMOnClick">CPM(count/million)</a>
+            </li>
+            <li id="logTab">
+              <a id="log10OnClick">Log10</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="field column is-one-quarter">
+      <label class="label">Cell type ordering</label>
+      <div class="control">
+        <div class="tabs is-toggle is-centered">
+          <ul>
+            <li id="originalOrderTab" class="is-active">
+              <a id="originalOnClick">Original</a>
+            </li>
+            <li id="hierachicalTab">
+              <a id="hClusterOnClick">Hierachical Clustered</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- Plots below -->
   <div class="container" id="dataDisplay">

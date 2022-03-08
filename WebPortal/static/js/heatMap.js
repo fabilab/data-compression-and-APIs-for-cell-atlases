@@ -27,7 +27,7 @@ function HeatMap(result, html_element_id) {
                 xaxis: {
                     title: 'Cell types',
                     automargin: true,
-                    tickangle: 35,
+                    tickangle: 45,
                 },
                 yaxis: {
                     title: 'Genes',

@@ -8,7 +8,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from helper import data_preprocessing
+from helper import data_preprocessing, dataset_by_timepoint
 
 app = Flask(__name__, static_url_path='/static')
 api = Api(app)
@@ -36,20 +36,21 @@ def page2():
         response = f.read()
     return response
 
+# new end point for timepoint dataset:
+class geneExpTime(Resource):
+    def get(self):
+        genename = request.args.get('gene')
+        data = dataset_by_timepoint(genename)
+        return data
+
 class geneExp(Resource):
     def get(self):
         gene_names = request.args.get('gene_names')
         plot_type = request.args.get('plot_type')
         data_type = request.args.get('data_type')
-        data_set = request.args.get('data_set')
         df = None
-        if data_set == 'celltype':
-            df = data_preprocessing(gene_names)[0]
-        elif data_set == 'celltype_dataset':
-            df = data_preprocessing(gene_names)[1]
-        elif data_set == 'celltype_dataset_timepoint':
-            df = data_preprocessing(gene_names)[2]
-        
+        print(gene_names)
+        df = data_preprocessing(gene_names)[0]
         if df is None:
             return None
         
@@ -93,6 +94,7 @@ class plotsForSeachGenes(Resource):
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')
 api.add_resource(plotsForSeachGenes, '/2_genes')
+api.add_resource(geneExpTime, '/data_timepoint')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -23,5 +23,5 @@ $(document).ready(function() {
         alert('Request data Failed')
         }
     });
-    // $("#originalTab").addClass('is-active');
+    $("#originalTab").addClass('is-active');
 })

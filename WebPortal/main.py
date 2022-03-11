@@ -30,7 +30,7 @@ def helloworld():
         response = f.read()
     return response
 
-@app.route('/multiple_heatmaps',methods=['GET'])
+@app.route('/heatmap_by_timepoints',methods=['GET'])
 def page2():
     with open('page2.html') as f:
         response = f.read()
@@ -40,7 +40,22 @@ def page2():
 class geneExpTime(Resource):
     def get(self):
         genename = request.args.get('gene')
+        plot_type = request.args.get('plot_type')
+        data_type = request.args.get('data_type')
+        data = None
         data = dataset_by_timepoint(genename)
+        if data is None:
+            return None
+        
+        if data_type == "log10":
+            data = np.log10(0.1+data)
+        
+        if plot_type == 'hieracical':
+            distance = pdist(data.values)
+            Z = linkage(distance,optimal_ordering=True)
+            new_order = leaves_list(Z)
+            data = data.iloc[new_order]
+
         return data
 
 class geneExp(Resource):
@@ -49,7 +64,6 @@ class geneExp(Resource):
         plot_type = request.args.get('plot_type')
         data_type = request.args.get('data_type')
         df = None
-        print(gene_names)
         df = data_preprocessing(gene_names)[0]
         if df is None:
             return None

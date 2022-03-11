@@ -25,12 +25,12 @@ function HeatMapTimepoint(result, html_element_id,dataset_name) {
         var layout = {
             title: 'dataset: '+ dataset_name,
             xaxis: {
-                title: 'Cell types',
+                title: '<b>Cell types<b>',
                 automargin: true,
                 tickangle: 45,
             },
             yaxis: {
-                title: 'Timepoint',
+                title: '<b>Timepoint<b>',
                 automargin: true,
             },
         };

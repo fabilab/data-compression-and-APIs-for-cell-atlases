@@ -9,7 +9,7 @@
 #### 05/03/2022
 
 - Create a new page that displays 3 heat map at different timepoints:
-  -  (data, dataset,dataset_timepoint)
+  -  (data, dataset,dataset_timepoint) 
 - Try to move everything to react (using a new git branch)
 - Start Intrim Report:
   - 2-3 pages of Literature Review (single cell paper given by Givanna)
@@ -19,3 +19,11 @@
   - Schematic view of the web application (how different entities connect with each other)
   - Screen shot of my codes
 
+
+
+#### 11/03/2022
+
+- Create a new page: heatmap by timepoints ✅
+- adding a ? Info button next to each heatmap, display a small user menu when clicked.
+- Enable gene search for the heatmap by timepoints.
+- 

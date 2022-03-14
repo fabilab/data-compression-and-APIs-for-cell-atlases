@@ -40,22 +40,10 @@ def page2():
 class geneExpTime(Resource):
     def get(self):
         genename = request.args.get('gene')
-        plot_type = request.args.get('plot_type')
-        data_type = request.args.get('data_type')
-        data = None
-        data = dataset_by_timepoint(genename)
-        if data is None:
-            return None
+        datatype = request.args.get('datatype')
+        plottype = request.args.get('plottype')
         
-        if data_type == "log10":
-            data = np.log10(0.1+data)
-        
-        if plot_type == 'hieracical':
-            distance = pdist(data.values)
-            Z = linkage(distance,optimal_ordering=True)
-            new_order = leaves_list(Z)
-            data = data.iloc[new_order]
-
+        data = dataset_by_timepoint(genename,datatype,plottype)
         return data
 
 class geneExp(Resource):

@@ -3,6 +3,8 @@ import h5py
 import numpy as np
 import pandas as pd
 import json
+from scipy.cluster.hierarchy import linkage,leaves_list
+from scipy.spatial.distance import pdist
 
 def read_file():
     h5_data = h5py.File('./static/scData/condensed_lung_atlas.h5',"r")
@@ -61,27 +63,38 @@ def data_preprocessing(gene_names=None):
 #  function that get the cell type dataset timepoint as a dictionary
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
-def dataset_by_timepoint(genename):
-    data = read_file()[2]
+def dataset_by_timepoint(genename,datatype,plottype):
+    df = read_file()[2]
     # convert index from binary to string
     new_index = []
-    for i in data.index:
+    for i in df.index:
         new_index.append(i.decode('utf-8'))
     # convert column name from binary to string
     new_column_name = []
-    for i in data.columns:
+    for i in df.columns:
         new_column_name.append(i.decode('utf-8'))
-    data.index=new_index
-    data.columns=new_column_name
+    df.index=new_index
+    df.columns=new_column_name
 
-    data=data.filter(items = [genename], axis=0)
-    datasets = set([name.split("_")[1] for name in data.columns])
+    df_filtered=df.filter(items = [genename], axis=0)
+    print(df_filtered)
+    # modify data base on the selected datatype and plottype (cpm?log10?hierachical?)
+    if datatype == "log10":
+        df_filtered = np.log10(0.1+df_filtered)
+    
+    if plottype == 'hieracical':
+        distance = pdist(df_filtered.values)
+        Z = linkage(distance,optimal_ordering=True)
+        new_order = leaves_list(Z)
+        df_filtered = df_filtered.iloc[new_order]
+
+    datasets = set([name.split("_")[1] for name in df_filtered.columns])
     result = {}
     # for each dataset, we give it a unique heatmap:
     # ACZ, Hurskainen2021, TMS ...
     for dataset in datasets:
         result[dataset] = {}
-        current_data = data.filter(regex=dataset, axis=1)
+        current_data = df_filtered.filter(regex=dataset, axis=1)
         celltypes = set([name.split("_")[0] for name in current_data.columns])
         timepoints = set([name.split("_")[2] for name in current_data.columns])
         for timepoint in timepoints:
@@ -94,5 +107,5 @@ def dataset_by_timepoint(genename):
                     result[dataset][timepoint][cell] = 0
                 else:
                     result[dataset][timepoint][cell] = float(celltype_data.values[0][0])
-    
+
     return result

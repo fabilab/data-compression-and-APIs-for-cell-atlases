@@ -7,20 +7,6 @@
     text-align: center;
 }
 
-a:active {
-    color: yellow;
-  }
-/* .navbar {
-    background-color: rgb(25,62,90);
-} */
-
-/* .title {
-    color: white;
+.timepoint_info {
+    margin: 30px;
 }
-
-.button.is-ghost {
-    color:white;
-}
-.button.is-ghost:hover {
-    color:white;
-} */

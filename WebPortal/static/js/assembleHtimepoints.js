@@ -27,7 +27,7 @@ function AssembleAjaxRequestTimepoint() {
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data_timepoint',
-    data: "gene=" + gene_name + "&plot_type=" + plot_type + "&data_type=" + data_type,
+    data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
     success: function(result) {
         num = 1
         for (key in Object.keys(result)) {
@@ -36,10 +36,9 @@ function AssembleAjaxRequestTimepoint() {
             HeatMapTimepoint(result[dataset], div_id,dataset);
             num++
         }
-
     },
     error: function (e) {
-        alert('Request data Failed')
+        alert('Request data Failed(in assemble timepoint)')
     }
     });
   }

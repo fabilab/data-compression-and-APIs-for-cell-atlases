@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Single Cell Compressed Atlas Webportal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <!-- <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">   -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   </head>
   <body>
   <!-- Navigation Bar -->
@@ -29,7 +31,7 @@
     <div class="navbar-end">
       <div class="field has-addons">
         <div class="control">
-          <input class="input is-info" id="searchGeneName" type="text" placeholder="gene name">
+          <input class="input is-info" id="searchGeneName" type="text" placeholder="search a genename">
         </div>
         <div class="control">
           <a class="button is-info" id="searchOnClick">
@@ -73,13 +75,21 @@
     </div>
   </div>
   <!-- Plots below -->
+  
   <div class="container" id="dataDisplay">
-    <div class="timepoint_info">
-      <!-- <i class="fas fa-info-circle" style="color:#1684d4"> Timepoints</i> -->
-      <i class="fas fa-question-circle" style="color:#1684d4"> Timepoints</i>
-    </div>
+    <button class="timepoint_info button is-ghost" id="timepoint_info">
+      <span class="icon">
+        <i class="fas fa-question-circle"></i>
+      </span>
+      <span class="has-tooltip-bottom has-tooltip-info" data-tooltip="P:postnatal day,  E:embrioic day, m:months">Timepoints:</span>
+    </button>
+    <button class="timepoint_info button is-ghost" id="timepoint_info">
+      <span class="icon">
+        <i class="fas fa-info-circle"></i>
+      </span>
+      <span>Learn More</span>
+    </button>
     <div id="dataset_1">
-
     </div>
     <div id="dataset_2">
 
@@ -94,5 +104,6 @@
   <script src="/js/timepointPlot.js"></script>
   <script src="/js/assembleHtimepoints.js"></script>
   <script src="/js/eventsTimepoint.js"></script>
+  <script src="/js/showTimepointInfo.js"></script>
   </body>
 </html>

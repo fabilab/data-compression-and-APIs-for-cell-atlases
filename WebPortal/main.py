@@ -61,7 +61,9 @@ class geneExp(Resource):
             df = np.log10(0.1+df)
         
         if plot_type == 'hieracical':
+            print(df.values.shape)  #(41x5)
             distance = pdist(df.values)
+            # print(distance)
             Z = linkage(distance,optimal_ordering=True)
             new_order = leaves_list(Z)
             df = df.iloc[new_order]

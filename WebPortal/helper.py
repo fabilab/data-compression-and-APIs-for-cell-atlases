@@ -77,16 +77,17 @@ def dataset_by_timepoint(genename,datatype,plottype):
     df.columns=new_column_name
 
     df_filtered=df.filter(items = [genename], axis=0)
-    print(df_filtered)
     # modify data base on the selected datatype and plottype (cpm?log10?hierachical?)
     if datatype == "log10":
         df_filtered = np.log10(0.1+df_filtered)
     
     if plottype == 'hieracical':
-        distance = pdist(df_filtered.values)
-        Z = linkage(distance,optimal_ordering=True)
-        new_order = leaves_list(Z)
-        df_filtered = df_filtered.iloc[new_order]
+        print(df_filtered.values.shape) #df_filtered.values.shape should have (331x3)
+        # distance = pdist(df_filtered.values)
+        #  print(distance)
+        # Z = linkage(distance,optimal_ordering=True)
+        # new_order = leaves_list(Z)
+        # df_filtered = df_filtered.iloc[new_order]
 
     datasets = set([name.split("_")[1] for name in df_filtered.columns])
     result = {}

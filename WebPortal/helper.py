@@ -64,49 +64,46 @@ def data_preprocessing(gene_names=None):
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
 def dataset_by_timepoint(genename,datatype,plottype):
-    df = read_file()[2]
-    # convert index from binary to string
+    # select and pre-preprocessing data
+    df_tp = read_file()[2]
     new_index = []
-    for i in df.index:
+    for i in df_tp.index:
         new_index.append(i.decode('utf-8'))
-    # convert column name from binary to string
     new_column_name = []
-    for i in df.columns:
+    for i in df_tp.columns:
         new_column_name.append(i.decode('utf-8'))
-    df.index=new_index
-    df.columns=new_column_name
+    df_tp.index=new_index
+    df_tp.columns=new_column_name
 
-    df_filtered=df.filter(items = [genename], axis=0)
-    # modify data base on the selected datatype and plottype (cpm?log10?hierachical?)
-    if datatype == "log10":
-        df_filtered = np.log10(0.1+df_filtered)
-    
-    if plottype == 'hieracical':
-        print(df_filtered.values.shape) #df_filtered.values.shape should have (331x3)
-        # distance = pdist(df_filtered.values)
-        #  print(distance)
-        # Z = linkage(distance,optimal_ordering=True)
-        # new_order = leaves_list(Z)
-        # df_filtered = df_filtered.iloc[new_order]
-
+    # select data for a given gene name
+    df_filtered=df_tp.filter(items = [genename], axis=0)
+    # for each dataset name, we construct a new dataframe for it (celltypes x timepoints)
     datasets = set([name.split("_")[1] for name in df_filtered.columns])
-    result = {}
-    # for each dataset, we give it a unique heatmap:
-    # ACZ, Hurskainen2021, TMS ...
-    for dataset in datasets:
-        result[dataset] = {}
-        current_data = df_filtered.filter(regex=dataset, axis=1)
-        celltypes = set([name.split("_")[0] for name in current_data.columns])
-        timepoints = set([name.split("_")[2] for name in current_data.columns])
-        for timepoint in timepoints:
-            timepoint_data = current_data.filter(regex=timepoint, axis=1)
-            result[dataset][timepoint] = {}
-            for cell in celltypes:
-                celltype_data = timepoint_data.filter(regex="^{}_".format(cell), axis=1)
-                # if the cell is missing tin thsi time point
-                if len(celltype_data.values[0]) == 0:
-                    result[dataset][timepoint][cell] = 0
-                else:
-                    result[dataset][timepoint][cell] = float(celltype_data.values[0][0])
+    dic_per_dataset = {}
 
-    return result
+    for i in datasets:
+        dataset_name = df_filtered.filter(regex=i, axis=1)
+        timepoints = set([name.split("_")[2] for name in dataset_name.columns])
+        celltypes = set([name.split("_")[0] for name in dataset_name.columns])
+
+        # create a new empty dataframe for each dataset   
+        gene_exp_df = pd.DataFrame(np.eye(len(celltypes),len(timepoints)), columns=timepoints, index=celltypes)
+        for tp in timepoints:
+            for ct in celltypes:
+                regex = '_'.join([ct,i,tp])
+                gene_expression = dataset_name.filter(regex=regex,axis=1)
+                if gene_expression.empty:
+                    gene_expression = 0
+                else:
+                    gene_exp_df[tp][ct] = gene_expression = gene_expression.iloc[0,0] # same as getting the gene_expression value
+        if datatype == "log10":
+            gene_exp_df = np.log10(0.1+gene_exp_df)  
+        if plottype == 'hieracical':
+            distance = pdist(gene_exp_df.values)
+            # print(distance)
+            Z = linkage(distance,optimal_ordering=True)
+            new_order = leaves_list(Z)
+            gene_exp_df = gene_exp_df.iloc[new_order]
+        dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
+    return dic_per_dataset
+    # for each of the dataframe in dic_per_dataset, we convert it into json format

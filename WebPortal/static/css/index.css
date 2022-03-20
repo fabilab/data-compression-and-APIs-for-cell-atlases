@@ -7,7 +7,11 @@
     text-align: center;
 }
 
-.timepoint_info {
+#timepoint_info {
     margin: 30px;
     cursor: pointer;
+}
+
+.P:hover,.E:hover,.m:hover {
+    color:rgb(22,132,212);
 }

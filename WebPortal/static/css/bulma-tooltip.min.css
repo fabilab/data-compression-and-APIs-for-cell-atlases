@@ -1859,9 +1859,7 @@
 }
 
 /* line 129, src/sass/app.sass */
-span[data-tooltip] {
-  border-bottom: 1px dashed #dbdbdb;
-}
+
 
 /* line 134, src/sass/app.sass */
 span[data-tooltip].has-tooltip-white {

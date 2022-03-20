@@ -107,3 +107,6 @@ def dataset_by_timepoint(genename,datatype,plottype):
         dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
     return dic_per_dataset
     # for each of the dataframe in dic_per_dataset, we convert it into json format
+    
+
+# def dataset_by_timepoint():

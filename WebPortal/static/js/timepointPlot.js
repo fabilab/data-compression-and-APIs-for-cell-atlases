@@ -23,14 +23,14 @@ function HeatMapTimepoint(result, html_element_id,dataset_name) {
             }
             ];
         var layout = {
-            title: 'dataset: '+ dataset_name,
+            title: 'belongs to dataset: '+ dataset_name,
             xaxis: {
-                title: '<b>Cell types<b>',
+                title: '<b>Celltypes<b>',
                 automargin: true,
                 tickangle: 45,
             },
             yaxis: {
-                title: '<b>Timepoint<b>',
+                title: '<b>Timepoints<b>',
                 automargin: true,
             },
         };

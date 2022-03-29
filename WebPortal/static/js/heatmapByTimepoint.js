@@ -1,7 +1,7 @@
 // action here when clicking the search button
 var gene_name = $('#searchGeneName').val();
 if (gene_name === '') {
-  gene_name = "Col1a1";
+  gene_name = "Car4";
 }
 
 $(document).ready(function() {

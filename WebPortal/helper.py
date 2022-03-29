@@ -3,77 +3,57 @@ import h5py
 import numpy as np
 import pandas as pd
 import json
+import re
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
 
-def read_file():
-    h5_data = h5py.File('./static/scData/condensed_lung_atlas.h5',"r")
-
-    # Dataset 1:
-    df = pd.DataFrame(data=np.array(h5_data['cell_type']\
+# gives the name of dataset we want as an input
+# celltype / celltype_dataset / celltype_dataset_timepoint
+def read_file(df_type):
+    h5_data = h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r")
+    
+    df = pd.DataFrame(data=np.array(h5_data[df_type]\
     ['gene_expression_average']['block0_values']),\
-    index=np.array(h5_data['cell_type']['gene_expression_average']['axis1'])\
-    ,columns=np.array(h5_data['cell_type']['gene_expression_average']['axis0'])).T
+    index=np.array(h5_data[df_type]['gene_expression_average']['axis1'])\
+    ,columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'])).T
 
-    # Dataset 2:
-    df_2 = pd.DataFrame(data=np.array(h5_data['cell_type_dataset']\
-    ['gene_expression_average']['block0_values']),\
-    index=np.array(h5_data['cell_type_dataset']['gene_expression_average']['axis1'])\
-    ,columns=np.array(h5_data['cell_type_dataset']['gene_expression_average']['axis0'])).T
+    new_index = []
+    for i in df.index:
+        new_index.append(i.decode('utf-8'))
+    # convert column name from binary to string
+    new_column_name = []
+    for i in df.columns:
+        new_column_name.append(i.decode('utf-8'))
+    df.index=new_index
+    df.columns=new_column_name
+    df = df.astype(np.float32)
+    
+    return df
 
-    # Dataset 3:
-    df_3 = pd.DataFrame(data=np.array(h5_data['cell_type_dataset_timepoint']\
-    ['gene_expression_average']['block0_values']),\
-    index=np.array(h5_data['cell_type_dataset_timepoint']['gene_expression_average']['axis1'])\
-    ,columns=np.array(h5_data['cell_type_dataset_timepoint']['gene_expression_average']['axis0'])).T
+# this function is used when more multiple gene names are searched by the user
+# always run the read_file() to get dataframe in the right format before running this 
+def data_preprocessing(input_gene_names,df_type):
+    df = read_file(df_type)
+    df_genes = df.index # all the genes that available in the current dataframe
+    for search_gene in input_gene_names.split(","):
+        if search_gene not in df_genes:
+            return None
 
-    return [df,df_2,df_3]
-
-def data_preprocessing(gene_names=None):
-    data = read_file()
-    plot_data_sets = []
-    for df in data:
-    # current index in the dataframe is writtern as binary string.
-    # We need to convert it into normal string
-        new_index=[]
-        for i in df.index:
-            new_index.append(i.decode('utf-8'))
-        # Similarly for columns name
-        new_columns=[]
-        for i in df.columns:
-            new_columns.append(i.decode('utf-8'))
-
-        df.index = new_index
-        df.columns = new_columns
-
-        all_genes = df.index
-        for user_gene in gene_names.split(","):
-            if user_gene not in all_genes:
-                return None
-
-        if gene_names is None:
-            plot_data = df.T
-        else:
-            a_gene_names = gene_names.split(",")
-            plot_df = df.filter(items = a_gene_names,axis=0)
-            plot_data = plot_df.T
-        plot_data_sets.append(plot_data)
-    return plot_data_sets
+    # if user does not search for any specific genes, then plot everything
+    if input_gene_names is None:
+        plot_data = df.T
+    else:
+        a_gene_names = input_gene_names.split(",")
+        plot_df = df.filter(items = a_gene_names,axis=0)
+        plot_data = plot_df.T
+    return plot_data
 
 #  function that get the cell type dataset timepoint as a dictionary
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
-def dataset_by_timepoint(genename,datatype,plottype):
+def dataset_by_timepoint(genename,df_type,datatype,plottype):
     # select and pre-preprocessing data
-    df_tp = read_file()[2]
-    new_index = []
-    for i in df_tp.index:
-        new_index.append(i.decode('utf-8'))
-    new_column_name = []
-    for i in df_tp.columns:
-        new_column_name.append(i.decode('utf-8'))
-    df_tp.index=new_index
-    df_tp.columns=new_column_name
+    df_tp = read_file(df_type)
 
     # select data for a given gene name
     df_filtered=df_tp.filter(items = [genename], axis=0)
@@ -91,11 +71,15 @@ def dataset_by_timepoint(genename,datatype,plottype):
         for tp in timepoints:
             for ct in celltypes:
                 regex = '_'.join([ct,i,tp])
+                # celltype Car4+ cappilaries can not be recognized, as it contains a + sign. which means one or more 4 in regex
+                # replace regex '+' with string '\+'
+                regex = re.sub('\+', '\+', regex)
                 gene_expression = dataset_name.filter(regex=regex,axis=1)
                 if gene_expression.empty:
-                    gene_expression = 0
+                    gene_exp_df[tp][ct] = 0
                 else:
-                    gene_exp_df[tp][ct] = gene_expression = gene_expression.iloc[0,0] # same as getting the gene_expression value
+                    gene_exp_df[tp][ct] = gene_expression.iloc[0,0] # same as getting the gene_expression value
+        
         if datatype == "log10":
             gene_exp_df = np.log10(0.1+gene_exp_df)  
         if plottype == 'hieracical':
@@ -108,5 +92,3 @@ def dataset_by_timepoint(genename,datatype,plottype):
     return dic_per_dataset
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
-
-# def dataset_by_timepoint():

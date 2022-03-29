@@ -1,0 +1,5 @@
+# want to ignore all the h5ad file
+*.h5ad
+*.eni
+*.enl
+*.h5

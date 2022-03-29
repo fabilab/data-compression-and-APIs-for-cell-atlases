@@ -44,7 +44,7 @@ class geneExpTime(Resource):
         datatype = request.args.get('datatype')
         plottype = request.args.get('plottype')
         
-        data = dataset_by_timepoint(genename,datatype,plottype)
+        data = dataset_by_timepoint(genename,'celltype_dataset_timepoint',datatype,plottype)
         return data
 
 class geneExp(Resource):
@@ -53,7 +53,7 @@ class geneExp(Resource):
         plot_type = request.args.get('plot_type')
         data_type = request.args.get('data_type')
         df = None
-        df = data_preprocessing(gene_names)[0]
+        df = data_preprocessing(gene_names,'celltype')
         if df is None:
             return None
         
@@ -74,7 +74,7 @@ class plotsForSeachGenes(Resource):
     def get(self):
 
         gene_names = request.args.get('gene_names')
-        df = data_preprocessing(gene_names)[0]
+        df = data_preprocessing(gene_names,'celltype')
         if df is None:
             return None
         df = df.T

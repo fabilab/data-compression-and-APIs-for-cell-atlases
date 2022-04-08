@@ -23,7 +23,7 @@ PYTEST=${VENV_DIR}/bin/pytest
 if [ ! -d ${VENV_DIR} ]; then
     python -m venv ${VENV_DIR}
 fi
-${VENV_DIR}/bin/pip install -U flask flask-restful flask_cors pandas numpy h5py scipy
+${VENV_DIR}/bin/pip install -r requirements.txt
 
 
 if [ x$VERBOSE = x1 ]; then

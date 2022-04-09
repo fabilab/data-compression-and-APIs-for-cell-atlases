@@ -30,7 +30,7 @@ function AssembleAjaxRequest() {
   if (gene_array.length == 2) {
     $.ajax({
       type:'GET',
-      url:'http://127.0.0.1:5000/2_genes',
+      url:'/2_genes',
       data: "gene_names=" + gene_name,
       success: ScatterPlot,
       error: function (e) {
@@ -41,7 +41,7 @@ function AssembleAjaxRequest() {
     // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data',
+    url:'/data',
     data: "gene_names=" + gene_name + "&plot_type=" + plot_type + "&data_type=" + data_type,
     success: function(result) {  
       HeatMap(result, "h5_data_plot");

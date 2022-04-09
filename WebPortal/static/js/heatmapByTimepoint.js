@@ -7,7 +7,7 @@ if (gene_name === '') {
 $(document).ready(function() {
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/data_timepoint',
+        url:'/data_timepoint',
         data: "gene=" + gene_name,
         dataType:'json',
         success: function(result) {

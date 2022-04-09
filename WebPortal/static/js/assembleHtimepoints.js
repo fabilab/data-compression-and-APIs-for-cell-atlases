@@ -26,7 +26,7 @@ function AssembleAjaxRequestTimepoint() {
     // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data_timepoint',
+    url:'/data_timepoint',
     data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
     success: function(result) {
         num = 1

@@ -14,13 +14,15 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the content of the local src directory to the working directory
-# Flask app
+# Python/Flask backend
 COPY main.py .
-# Backend modules
 COPY helper.py .
+COPY ca_API.py .
+
 # HTML files
 COPY index.html .
-COPY page2.html .
+COPY heatmap_by_timepoint.html .
+
 # Static assets
 # FIXME: get rid of 10X data et similia
 ADD static static

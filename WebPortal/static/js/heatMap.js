@@ -4,10 +4,11 @@ function HeatMap(result, html_element_id) {
         } else {
             // x-axis: genes of interest
             var x_axis = Object.keys(result[Object.keys(result)[0]]);
-            var ngenes =  Object.keys(result)[0].length;
-            var graph_height = 300 + 44 * ngenes;
-            // y-axis:41 cell types
             var y_axis = Object.keys(result);
+            var ngenes =  y_axis.length;
+            var graph_width = 1300;
+            var graph_height = 370 + 26 * ngenes;
+            // y-axis:41 cell types
             var data_content = [];
             for (var i = 0; i < Object.keys(result).length; i++) {
                 cell_type = Object.keys(result)[i] // get the cell_type name as a string
@@ -26,18 +27,19 @@ function HeatMap(result, html_element_id) {
                 ];
             var layout = {
                 autosize: true,
+                width: graph_width,
                 height: graph_height,
                 title: 'Heatmap of gene expression level in selected cell types',
                 xaxis: {
                     title: 'Cell types',
                     automargin: true,
-                    tickangle: 45,
+                    tickangle: 60,
+                    scaleanchor: 'y',
+                    scaleratio: 1,
                 },
                 yaxis: {
                     title: 'Genes',
                     automargin: true,
-                    scaleanchor: 'x',
-                    scaleratio: 1,
                     autorange: "reversed",
                 },
             };

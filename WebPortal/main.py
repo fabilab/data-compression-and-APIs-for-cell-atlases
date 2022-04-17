@@ -7,6 +7,7 @@ from ca_API import (
     geneExp,
     geneExpTime,
     plotsForSeachGenes,
+    geneFriends,
 )
 
 
@@ -55,6 +56,7 @@ def favicon():
 api.add_resource(geneExp, '/data')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
+api.add_resource(geneFriends, '/gene_friends')
 
 
 # Main loop

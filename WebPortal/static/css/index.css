@@ -14,8 +14,15 @@
 
 #gene_suggestions {
     text-align: center;
-    text-weight: 500;
+    text-decoration: underline;
+    border-radius: 5px;
 }
+
+#gene_suggestions:hover {
+    color: #FFFFFF;
+    background-color: #485fc7;
+}
+
 
 .P:hover,.E:hover,.m:hover {
     color:rgb(22,132,212);

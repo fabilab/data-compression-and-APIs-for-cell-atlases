@@ -8,6 +8,7 @@ from ca_API import (
     geneExpTime,
     plotsForSeachGenes,
     geneFriends,
+    geneExpTimeUnified,
 )
 
 
@@ -17,7 +18,7 @@ api = Api(app)
 CORS(app)
 
 
-# HTML pages
+# Views
 @app.route('/', methods=['GET'])
 def index():
     '''Landing page'''
@@ -30,6 +31,14 @@ def index():
 def heatmap_by_timepoint():
     '''Heatmaps by timepoint (one per dataset)'''
     with open('heatmap_by_timepoint.html') as f:
+        response = f.read()
+    return response
+
+
+@app.route('/heatmap_unified', methods=['GET'])
+def heatmap_unified():
+    '''One large heatmap across development, one gene'''
+    with open('heatmap_unified.html') as f:
         response = f.read()
     return response
 
@@ -57,6 +66,7 @@ api.add_resource(geneExp, '/data')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
 api.add_resource(geneFriends, '/gene_friends')
+api.add_resource(geneExpTimeUnified, '/data_heatmap_unified')
 
 
 # Main loop

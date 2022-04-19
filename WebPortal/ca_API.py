@@ -9,9 +9,25 @@ import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
+import plotly
+
 
 # Helper functions
-from helper import data_preprocessing, dataset_by_timepoint, get_friends
+from helper import (
+        data_preprocessing,
+        dataset_by_timepoint,
+        get_big_heatmap,
+        get_friends,
+    )
+
+
+class geneExpTimeUnified(Resource):
+    def get(self):
+        gene = request.args.get("gene")
+        use_log = request.args.get("use_log") == '1'
+        use_hierarchical = request.args.get("use_hierarchical") == '1'
+        data = get_big_heatmap(gene, use_log, use_hierarchical)
+        return data
 
 
 class geneExpTime(Resource):

@@ -27,7 +27,6 @@ function onClickSuggestions() {
 function SuggestGenes(html_element_id) {
 
     // Fill div
-    // FIXME: improve aesthetics
     $("#"+html_element_id).empty();
     $("#"+html_element_id).text('Suggest similar genes');
 

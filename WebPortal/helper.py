@@ -8,26 +8,47 @@ from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
 
 
-def read_counts_from_file(df_type):
+fdn_data = "./static/scData/"
+fn_atlas = fdn_data + "condensed_lung_atlas_in_cpm.h5"
+
+
+def read_gene_order():
+    with h5py.File(fn_atlas, "r") as h5_data:
+        genes = np.array(h5_data['celltype']["gene_expression_average"]["axis0"].asstr())
+    gene_order = pd.Series(data=np.arange(len(genes)), index=genes)
+    return gene_order
+
+
+gene_order = read_gene_order()
+
+
+def read_counts_from_file(df_type, genes=None):
     '''Read the h5 file with the compressed atlas
 
     gives the name of dataset we want as an input
     celltype / celltype_dataset / celltype_dataset_timepoint
     '''
-    fn_atlas = "./static/scData/condensed_lung_atlas_in_cpm.h5"
     with h5py.File(fn_atlas, "r") as h5_data:
-        counts = np.array(
-            h5_data[df_type]["gene_expression_average"]["block0_values"],
-            ).astype(np.float32)
-        index = np.array(h5_data[df_type]["gene_expression_average"]["axis0"].asstr())
         columns = np.array(h5_data[df_type]["gene_expression_average"]["axis1"].asstr())
+        counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
+        if genes is not None:
+            index = genes
+            idx = gene_order.loc[genes].values
+            counts = counts[:, idx]
+        else:
+            index = gene_order.index
+        counts = np.array(counts).astype(np.float32)
+        # NOTE: this is the same as gene order
+        #index = np.array(h5_data[df_type]["gene_expression_average"]["axis0"].asstr())
 
-    # Fix this gene that has "inf" counts: CT010467.1
-    counts[:, 5370] = 0
-    counts = 1e6 * (counts.T / counts.sum(axis=1))
+    # FIXME: fix this in the h5 file...
+    #Fix this gene that has "inf" counts: CT010467.1
+    if genes is None:
+        counts[:, 5370] = 0
+        counts = 1e6 * (counts.T / counts.sum(axis=1)).T
 
     df = pd.DataFrame(
-            data=counts,
+            data=counts.T,
             index=index,
             columns=columns,
             )
@@ -36,7 +57,6 @@ def read_counts_from_file(df_type):
 
 def read_number_cells_from_file(df_type):
     '''Read the number of cells per time point per dataset from file'''
-    fn_atlas = "./static/scData/condensed_lung_atlas_in_cpm.h5"
     with h5py.File(fn_atlas) as f:
         dic = f[df_type]
 
@@ -76,36 +96,22 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
     for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes
     select and pre-preprocessing data
     '''
-    df_tp = read_counts_from_file(df_type)
+    df_filtered = read_counts_from_file(df_type, genes=[genename]).iloc[0]
 
-    # select data for a given gene name
-    df_filtered = df_tp.filter(items=[genename], axis=0)
+    # split into separate unstacked dataframes using a multi-index
+    df_filtered.index = df_filtered.index.str.split('_', expand=True).swaplevel(0, 1)
+
     # for each dataset name, we construct a new dataframe for it (celltypes x timepoints)
-    datasets = set([name.split("_")[1] for name in df_filtered.columns])
+    datasets = set(df_filtered.index.get_level_values(0))
     dic_per_dataset = {}
-
+    timepoint_order = {
+        'ACZ': ['E18.5', 'P1', 'P7', 'P21'],
+        'TMS': ['3m', '18m', '24m'],
+        'Hurskainen2021': ['P3', 'P7', 'P14'],
+    }
     for i in datasets:
-        dataset_name = df_filtered.filter(regex=i, axis=1)
-        timepoints = set([name.split("_")[2] for name in dataset_name.columns])
-        celltypes = set([name.split("_")[0] for name in dataset_name.columns])
-
-        # create a new empty dataframe for each dataset
-        gene_exp_df = pd.DataFrame(
-            np.eye(len(celltypes), len(timepoints)), columns=timepoints, index=celltypes
-        )
-        for tp in timepoints:
-            for ct in celltypes:
-                regex = "_".join([ct, i, tp])
-                # celltype Car4+ cappilaries can not be recognized, as it contains a + sign. which means one or more 4 in regex
-                # replace regex '+' with string '\+'
-                regex = re.sub("\+", "\+", regex)
-                gene_expression = dataset_name.filter(regex=regex, axis=1)
-                if gene_expression.empty:
-                    gene_exp_df[tp][ct] = 0
-                else:
-                    gene_exp_df[tp][ct] = gene_expression.iloc[
-                        0, 0
-                    ]  # same as getting the gene_expression value
+        gene_exp_df = df_filtered.loc[i].unstack(1, fill_value=-1)
+        gene_exp_df = gene_exp_df.loc[:, timepoint_order[i][::-1]]
 
         if datatype == "log10":
             gene_exp_df = np.log10(0.1 + gene_exp_df)
@@ -115,6 +121,7 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
             Z = linkage(distance, optimal_ordering=True)
             new_order = leaves_list(Z)
             gene_exp_df = gene_exp_df.iloc[new_order]
+
         dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
     return dic_per_dataset
     # for each of the dataframe in dic_per_dataset, we convert it into json format
@@ -127,11 +134,10 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
     and see what we can do. The positive is that a bunch of computations
     happen on the server... wait, is that good?
     '''
-    from plotly import graph_objects as go
     from plotly import colors as pcolors
 
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
-    countg = read_counts_from_file('celltype_dataset_timepoint').loc[gene]
+    countg = read_counts_from_file('celltype_dataset_timepoint', genes=[gene]).iloc[0]
 
     if use_log:
         countg = np.log10(0.1 + countg)
@@ -149,16 +155,20 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
     ncells.sort_values(['timepoint_order', 'dataset_order'], inplace=True)
     countg.index = countg.index.str.split('_', 1, expand=True)
     countg = countg.unstack(0, fill_value=-1).loc[ncells.index]
-    ncells = ncells.loc[:, countg.columns]
 
     # Sort the columns
     if use_hierarchical:
-        # TODO
-        pass
+        distance = pdist(countg.T.values)
+        # print(distance)
+        Z = linkage(distance, optimal_ordering=True)
+        new_order = leaves_list(Z)
+        countg = countg.iloc[:, new_order]
+
+    ncells = ncells.loc[:, countg.columns]
 
     # NOTE: this is the part that we could outsource to the frontend
     # Construct data structures (lists) for plotly
-    plot_data = {'x': [], 'y': [], 'z': [], 'marker': {'color': [], 'size': [], 'opacity': []}}
+    plot_data = {'x': [], 'y': [], 'text': [], 'marker': {'color': [], 'size': [], 'opacity': []}}
     colormax = countg.values.max()
     color_steps = pcolors.colorbrewer.Reds
     ncolors = len(color_steps)
@@ -166,9 +176,9 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
         for j, celltype in enumerate(countg.columns):
             nc = ncells.at[label, celltype]
             ge = countg.at[label, celltype]
-            plot_data['x'].append(j)
-            plot_data['y'].append(i)
-            plot_data['z'].append(float(ge))
+            plot_data['x'].append(celltype)
+            plot_data['y'].append(label)
+            plot_data['text'].append(str(ge))
             if nc < 5:
                 ms = 1
                 opacity = 0.1
@@ -187,25 +197,27 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
     plot_data['marker_symbol'] = 'square'
 
     xticks = list(countg.columns)
-    yticks = []
+    yticks = list(ncells.index)
+    yticktext = []
     for i, label in enumerate(ncells.index):
         tp = label.split('_')[1]
-        if (i == 0) or (tp != yticks[-1]):
-            yticks.append(tp)
+        if (i == 0) or (tp != yticktext[-1]):
+            yticktext.append(tp)
         else:
-            yticks.append('')
+            yticktext.append('')
 
     return {
         'data': plot_data,
         'xticks': xticks,
         'yticks': yticks,
+        'yticktext': yticktext,
         }
 
 
 def get_friends(genes):
     '''Get genes that are "friends" (correlated) with a list of genes'''
     friends = []
-    with h5py.File("./static/scData/gene_friends.h5", "r") as h5_data:
+    with h5py.File(fdn_data + "gene_friends.h5", "r") as h5_data:
         for gene in genes:
             friends.append(gene)
             if gene not in h5_data.keys():

@@ -27,18 +27,17 @@ function plotHeatmapUnified(gene_name, result) {
             xanchor: 'center',
         },
         xaxis: {
-            //title: 'Cell subtype',
-            ticktext: xticks,
-            tickvals: range(0, nx),
             tickangle: 60,
             automargin: true,
+            linewidth: 0,
+            type: 'category',
         },
         yaxis: {
-            ticktext: yticks,
-            tickvals: range(0, ny),
             //automargin: true,
-            //title: 'Time',
             autorange: 'reversed',
+            type: 'category',
+            tickvals: result['yticks'],
+            ticktext: result['yticktext'],
         },
     };
 

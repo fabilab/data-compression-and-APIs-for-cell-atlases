@@ -28,6 +28,9 @@
     background-color: #485fc7;
 }
 
+#FAQs {
+ margin-left: 150px;
+}
 
 .P:hover,.E:hover,.m:hover {
     color:rgb(22,132,212);

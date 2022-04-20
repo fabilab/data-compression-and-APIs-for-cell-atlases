@@ -18,6 +18,11 @@
     border-radius: 5px;
 }
 
+#AudioRecordButton {
+    text-align: center;
+    margin: 150px;
+}
+
 #gene_suggestions:hover {
     color: #FFFFFF;
     background-color: #485fc7;

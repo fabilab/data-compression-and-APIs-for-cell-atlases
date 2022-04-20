@@ -43,6 +43,14 @@ def heatmap_unified():
     return response
 
 
+@app.route('/voice_control', methods=['GET'])
+def voice_control():
+    '''Name says it all'''
+    with open('voice_control.html') as f:
+        response = f.read()
+    return response
+
+
 # Static assets (JS/CSS)
 @app.route('/js/<path:path>')
 def send_js(path):

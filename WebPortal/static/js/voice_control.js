@@ -11,6 +11,7 @@ var audioContext; //audio context to help us record
 
 //add events to the button
 $("#recordButton").mousedown(function() {
+    $(window).off();
     $(window).mouseup(stopRecording);
     console.log("recordButton clicked");
 
@@ -71,7 +72,7 @@ function stopRecording() {
     console.log("recordButton released");
 
     // Remove the mouseup event handler
-    $(window).off("mouseup", "**");
+    $(window).off();
 
     // enable the record button back to signal the user we got the message
     $("#recordButton").attr("src", "/static/images/rec_button.png")

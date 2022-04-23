@@ -38,7 +38,7 @@
 
   <!-- experiments with voice control -->
   <div id="AudioRecordButton">
-    <img id="RecButton" src="/static/images/rec_button.png" alt="rec button" width="300" height="300">
+    <img id="recordButton" src="/static/images/rec_button.png" alt="rec button" width="100" height="100">
   </div>
 
   <div id="FAQs">
@@ -49,31 +49,8 @@
     </ul>
   </div>
 
-  <script>
-    // switch the button
-    $("#RecButton").click(function() {
-        if ($("#RecButton").hasClass("is-active")) {
-            $("#RecButton").attr("src", "/static/images/rec_button.png");
-            $("#RecButton").attr("alt", "rec button");
-            $("#RecButton").removeClass("is-active");
-        } else {
-            $("#RecButton").attr("src", "/static/images/rec_button_recording.png")
-            $("#RecButton").attr("alt", "stop button")
-            $("#RecButton").addClass("is-active");
-        }
-    });
-
-  //  // https://blog.softwaremill.com/how-to-use-googles-speech-to-text-in-a-web-application-working-example-a4b64c61f133
-  //  const sampleRate = 16000
-  //  const stream = navigator.mediaDevices.getUserMedia({
-  //    audio: {
-  //      deviceId: "default",
-  //      sampleRate: sampleRate,
-  //      sampleSize: 16,
-  //      channelCount: 1
-  //    },
-  //    video: false
-  //  })
-  </script>
+  <!-- unmaintained, but useful -->
+  <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+  <script src="/js/voice_control.js"></script>
   </body>
 </html>

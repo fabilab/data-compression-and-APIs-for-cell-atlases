@@ -10,13 +10,13 @@ set -e
 CLEAN=0
 VENV_DIR=.venv
 VERBOSE=0
-MAIN_FLASK_FILE=main.py
+MAIN_FLASK_FILE=app.py
 
 if [ x$CLEAN = x1 ]; then
     rm -rf ${VENV_DIR}
 fi
 
-PYTHON=${VENV_DIR}/bin/python
+FLASK=${VENV_DIR}/bin/flask
 PIP=${VENV_DIR}/bin/pip
 PYTEST=${VENV_DIR}/bin/pytest
 
@@ -27,6 +27,7 @@ ${VENV_DIR}/bin/pip install -r requirements.txt
 
 
 if [ x$VERBOSE = x1 ]; then
-  echo "${VENV_DIR}/bin/${PYTHON} ${MAIN_FLASK_FILE}"
+  echo "${FLASK} run --cert=adhoc"
 fi
-${PYTHON} ${MAIN_FLASK_FILE}
+
+${FLASK} run --cert=adhoc

@@ -15,7 +15,7 @@ RUN pip install -r requirements.txt
 
 # Copy the content of the local src directory to the working directory
 # Python/Flask backend
-COPY main.py .
+COPY app.py .
 COPY helper.py .
 COPY ca_API.py .
 
@@ -28,4 +28,4 @@ COPY heatmap_by_timepoint.html .
 ADD static static
 
 # Specify the command to run on container start
-CMD [ "python", "./main.py" ]
+CMD [ "python", "./app.py" ]

@@ -1,5 +1,6 @@
 from base64 import decode
-from flask import Flask, send_from_directory, request
+import json
+from flask import Flask, send_from_directory, request, redirect, url_for
 from flask_restful import Api
 from flask_cors import CORS
 
@@ -10,6 +11,7 @@ from ca_API import (
     geneFriends,
     geneExpTimeUnified,
 )
+from voice_control import mod as voice_control_blueprint
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -75,6 +77,11 @@ api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
 api.add_resource(geneFriends, '/gene_friends')
 api.add_resource(geneExpTimeUnified, '/data_heatmap_unified')
+
+
+# Blueprints
+app.register_blueprint(voice_control_blueprint)
+
 
 
 # Main loop

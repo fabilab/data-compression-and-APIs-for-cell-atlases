@@ -12,3 +12,7 @@ def text_to_url(text):
 
     Of course ML would be useful here, but we just do a few rules for now.
     '''
+    print(type(text))
+
+    # Default answer raises an alert in the frontend
+    return ''

@@ -18,26 +18,35 @@ def check_ensure_gcloud_credentials():
 
 
 def convert_audio_blob_to_text(audio_blob):
+    from io import BytesIO
+    import soundfile as sf
+    import librosa
+    from playsound import playsound
+
+    audio_bytes = audio_blob.read()
+    audio = speech_v1.RecognitionAudio(
+            content=audio_bytes,
+    )
+
+    # FIXME: debug: play audio blob
+    #audio_tmp_file = '/tmp/audio.wav'
+    #with open(audio_tmp_file, 'wb') as f:
+    #    f.write(audio_bytes)
+    #playsound(audio_tmp_file)
 
     # convert the input audio into whatever the client requires
     config = speech_v1.RecognitionConfig(
         language_code="en-US",
-        encoding='FLAC',
-    )
-
-    # FIXME: we have to convert the blob: <FileStorage: 'blob' ('audio/webm')>
-    # into bytes for google cloud
-    audio_bytes = audio_blob.read()
-    audio = speech_v1.RecognitionAudio(
-            content=audio_bytes,
+        audio_channel_count=2,
+        # Seems like we can skip these ones
+        #encoding='WAV',
+        #sample_rate_hertz=16000,
     )
 
     request = speech_v1.RecognizeRequest(
         config=config,
         audio=audio,
     )
-
-    print('got here, ensuring credentials')
 
     check_ensure_gcloud_credentials()
     client = speech_v1.SpeechClient()

@@ -10,35 +10,23 @@ from flask import (
         Flask, send_from_directory, request, redirect, url_for,
         Blueprint,
         )
+from .speech_to_text import convert_audio_blob_to_text
+from .interpret_text import text_to_url
 
 
 mod = Blueprint('voice_control_blueprint', __name__)
 
 
-@mod.route('/voicesocket', methods=['POST'])
+@mod.route('/submit_audio', methods=['POST'])
 def voice_control():
+    # Extract audio Blob
     audio_data = request.files['audio_data']
-    
-    # FIXME: debugging
-    with open('/tmp/audio.wav', 'wb') as audio:
-        audio_data.save(audio)
-    print('file uploaded successfully')
 
-    return ''
+    # Call Google API Speech To Text
+    text = convert_audio_blob_to_text(audio_data)
 
-    ## Talk to Google via supposed Python API of STT
-    #speechClient = SpeechClient.create()
-    #text_stream = speechClient.magicFromGoogle(audio_data)
+    print('Google replied:', text)
 
-    ## Needed?
-    #speechClient.close()
-
-    #actual_request = interpret_text_request(text_stream)
-    #if actual_request is None:
-    #    return {
-    #        'data': '',
-    #        'error': 'Request not understood',
-    #    }
-
-    ## Redirect to the correct endpoint
-    #return redirect(url_for(actual_request))
+    # Redirect to the correct endpoint
+    url = text_to_url(text)
+    return url

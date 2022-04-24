@@ -1,3 +1,6 @@
+# secret API keys
+zaninilab_key.json
+
 # want to ignore all the h5ad file
 *.h5ad
 *.eni

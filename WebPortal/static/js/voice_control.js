@@ -1,16 +1,9 @@
-(function() {
-
-// from https://github.com/arkochatterjee/flask-audio-recorder/blob/main/static/js/app.js
-var gumStream;                      //stream from getUserMedia()
-var rec;                            //Recorder.js object
-var input;                          //MediaStreamAudioSourceNode we'll be recording
-
-// shim for AudioContext when it's not avb. 
-var AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext; //audio context to help us record
+let chunks = [];
+var rec;
+var stream;
 
 //add events to the button
-$("#recordButton").mousedown(function() {
+$("#recordButton").mousedown(() => {
     $(window).off();
     $(window).mouseup(stopRecording);
     console.log("recordButton clicked");
@@ -24,39 +17,26 @@ $("#recordButton").mousedown(function() {
         https://addpipe.com/blog/audio-constraints-getusermedia/
     */
     var constraints = { audio: true, video:false };
+    navigator.mediaDevices.getUserMedia(constraints).then(localStream => {
+        console.log("getUserMedia() success, stream created, ready for recording ...");
 
-    /*
-        We're using the standard promise based getUserMedia() 
-        https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
-    */
+        // make stream and recorder global
+        stream = localStream;
+        rec = new MediaRecorder(stream, { mimeType: "audio/flac" });
 
-    navigator.mediaDevices.getUserMedia({audio: true, video:false}).then(function(stream) {
-        console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        // start recording
+        rec.start();
+        
+        rec.ondataavailable = (e) => {
+            // Push the recorded media data to the chunks array
+            chunks.push(e.data);
+        };
 
-        /*
-            create an audio context after getUserMedia is called
-            sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
-            the sampleRate defaults to the one set in your OS for your playback device
-        */
-        audioContext = new AudioContext();
-
-        //update the format 
-        //document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
-
-        /*  assign to gumStream for later use  */
-        gumStream = stream;
-
-        /* use the stream */
-        input = audioContext.createMediaStreamSource(stream);
-
-        /* 
-            Create the Recorder object and configure to record mono sound (1 channel)
-            Recording 2 channels  will double the file size
-        */
-        rec = new Recorder(input,{numChannels:1});
-
-        //start the recording process
-        rec.record();
+        rec.onstop = () => {
+            const blob = new Blob(chunks, {type: "audio/flac"});
+            chunks = [];
+            postAudio(blob);
+        }
 
         console.log("Recording started");
 
@@ -79,13 +59,13 @@ function stopRecording() {
                       .attr("alt", "rec button");
 
     //tell the recorder to stop the recording
-    rec.stop();
+    //rec.stop();
 
     //stop microphone access
-    gumStream.getAudioTracks()[0].stop();
+    // this triggers the onstop callback
+    stream.getAudioTracks().forEach(track => track.stop());
 
-//    //create the wav blob and pass it on to createDownloadLink
-//    rec.exportWAV(postAudio);
+    console.log("end of stopRecording");
 }
 
 
@@ -95,17 +75,21 @@ function postAudio(blob) {
     var xhr=new XMLHttpRequest();
     xhr.onload=function(e) {
         if(this.readyState === 4) {
-            console.log("Server returned: ", e.target.responseText);
+            //FIXME
+            var response = e.target.responseText;
+            console.log("Server returned: ", response);
+            if (response != "") {
+              window.location.href = response;
+            } else {
+                alert("Voice command not understood.");
+            }
         }
     };
 
-    // This uses a form with POST, I guess one could make an API call
-    // or does that become insecure?
-    var fd=new FormData();
-    fd.append("audio_data", blob, filename);
-    xhr.open("POST","/voice_control",true);
+    // This uses a form with POST
+    var fd = new FormData();
+    fd.append("audio_data", blob);
+    xhr.open("POST","/submit_audio", true);
     xhr.send(fd);
 
 }
-
-}());

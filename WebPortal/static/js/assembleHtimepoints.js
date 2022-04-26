@@ -1,4 +1,3 @@
-
 function AssembleAjaxRequestTimepoint() {
 
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,

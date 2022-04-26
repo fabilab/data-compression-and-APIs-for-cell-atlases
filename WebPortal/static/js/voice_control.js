@@ -67,24 +67,63 @@ function stopRecording() {
 }
 
 
+function clarifyResponse(response) {
+    // Gene string unclear, open an input popup asking to correct spelling
+    if (response['question'] === 'gene_string') {
+        let genestr = response['gene_string'];
+
+        // Open popup
+        genestr = window.prompt("Confirm or correct gene names:", genestr);
+        if (genestr == null || genestr == "") {
+            return;
+        }
+
+        // Validate new gene string
+        $.ajax({
+            type:'GET',
+            url:'/check_genenames',
+            data: "gene_names="+genestr,
+            success: function(result) {
+                if (result['outcome'] == 'fail') {
+                    console.log("check for genestring found no match");
+                    return;
+                }
+
+                let url = response['url_prefix'] + result['genenames'];
+                window.location.href = url;
+            },
+            error: function (e) {
+               console.log("check for genestring failed");
+            }
+        });
+    }
+}
+
 
 function postAudio(blob) {
     // Do this with jQuery?
     var xhr=new XMLHttpRequest();
     xhr.onload=function(e) {
         if(this.readyState === 4) {
-            //FIXME
-            var response = e.target.responseText;
+            var response = JSON.parse(e.target.responseText);
             console.log("Server returned: ", response);
-            if (response != "") {
-              window.location.href = response;
-            } else {
+
+            // Empty response, failed
+            if (response['outcome'] == "fail") {
                 alert("Voice command not understood.");
+
+            // Request for clarification from the user
+            } else if (response['outcome'] == "question") {
+                clarifyResponse(response);
+
+            // Successful response, go there
+            } else {
+                window.location.href = response;
             }
         }
     };
 
-    // This uses a form with POST
+    // This uses a form with POST, a little dangerous...
     var fd = new FormData();
     fd.append("audio_data", blob);
     xhr.open("POST","/submit_audio", true);

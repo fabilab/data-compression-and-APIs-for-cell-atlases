@@ -28,5 +28,5 @@ def voice_control():
     print('Google replied:', text)
 
     # Redirect to the correct endpoint
-    url = text_to_url(text)
-    return url
+    response = text_to_url(text)
+    return response

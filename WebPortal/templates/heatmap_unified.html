@@ -38,7 +38,7 @@
     <div class="navbar-end">
       <div class="field has-addons">
         <div class="control">
-          <input class="input is-info" id="searchGeneName" type="text" placeholder="Gene" value="Car4">
+          <input class="input is-info" id="searchGeneName" type="text" placeholder="Gene" value="{{searchstring}}">
         </div>
         <div class="control">
           <a class="button is-info" id="searchOnClick">
@@ -100,17 +100,12 @@
       </span>
     </div>
 
-    <div id="dataset_ACZ">
-    </div>
-
-    <div id="dataset_Hurskainen2021">
-    </div>
-
-    <div id="dataset_TMS">
+    <div id="heatmap_unified">
     </div>
 
   </div>
-  <script src="/js/heatmapByTimepoint.js"></script>
-  <script src="/js/eventsTimepoint.js"></script>
+  <script src="/js/heatmapUnified.js"></script>
+  <script src="/js/events.js"></script>
+
   </body>
 </html>

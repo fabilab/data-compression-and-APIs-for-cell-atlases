@@ -1,3 +1,4 @@
+// Plot heatmap by celltype as a callback for the AJAX request
 function HeatMap(result, html_element_id) {
         if (!result) {
             alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
@@ -22,7 +23,8 @@ function HeatMap(result, html_element_id) {
                     x: x_axis,
                     y: y_axis,
                     type: 'heatmap',
-                    hoverongaps: false
+                    hoverongaps: false,
+                    colorscale: 'Reds',
                 }
                 ];
             var layout = {

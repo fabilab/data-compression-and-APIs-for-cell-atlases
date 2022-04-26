@@ -109,9 +109,9 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
         'TMS': ['3m', '18m', '24m'],
         'Hurskainen2021': ['P3', 'P7', 'P14'],
     }
-    for i in datasets:
-        gene_exp_df = df_filtered.loc[i].unstack(1, fill_value=-1)
-        gene_exp_df = gene_exp_df.loc[:, timepoint_order[i][::-1]]
+    for dsname in datasets:
+        gene_exp_df = df_filtered.loc[dsname].unstack(1, fill_value=-1)
+        gene_exp_df = gene_exp_df.loc[:, timepoint_order[dsname][::-1]]
 
         if datatype == "log10":
             gene_exp_df = np.log10(0.1 + gene_exp_df)
@@ -122,9 +122,9 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
             new_order = leaves_list(Z)
             gene_exp_df = gene_exp_df.iloc[new_order]
 
-        dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
+        # convert dataframe into json format
+        dic_per_dataset[dsname] = json.loads(gene_exp_df.to_json())
     return dic_per_dataset
-    # for each of the dataframe in dic_per_dataset, we convert it into json format
 
 
 def get_big_heatmap(gene, use_log, use_hierarchical):

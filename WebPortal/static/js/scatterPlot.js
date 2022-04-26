@@ -19,17 +19,19 @@ function ScatterPlot(result) {
     var data = [ trace1 ];
     
     var layout = {
+        height: 800,
+        width: 800,
         xaxis: {
             title: {
               text: result['gene1_name']+' expression',
             },
-            range: [ 0, 8 ]
+            //range: [0, 8]
         },
         yaxis: {
             title: {
               text: result['gene2_name']+' expression',
           },
-          range: [0, 8]
+          //range: [0, 8]
         },
         title:'Correlation between ' + result['gene1_name'] + ' and ' + result['gene2_name']
     };

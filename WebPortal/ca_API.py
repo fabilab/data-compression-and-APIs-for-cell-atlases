@@ -19,6 +19,7 @@ from helper import (
         get_big_heatmap,
         get_friends,
     )
+from voice_control.interpret_text import validate_correct_genestr
 
 
 class geneExpTimeUnified(Resource):
@@ -104,3 +105,18 @@ class geneFriends(Resource):
         genenames = genenames.replace(" ", "").split(",")
         data = get_friends(genenames)
         return data
+
+
+class checkGenenames(Resource):
+    def get(self):
+        genenames = request.args.get("gene_names")
+        genenames_validated = validate_correct_genestr(genenames)
+        if genenames_validated is None:
+            return {
+                'outcome': 'fail',
+                }
+        else:
+            return {
+                'outcome': 'success',
+                'genenames': genenames_validated,
+                }

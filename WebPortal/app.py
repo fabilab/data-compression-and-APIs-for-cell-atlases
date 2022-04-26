@@ -28,15 +28,38 @@ api = Api(app)
 CORS(app)
 
 
+##############################
 # Views
+##############################
+# Default redirects
 @app.route("/", methods=["GET"])
 def index():
     """Landing page"""
-    with open("index.html") as f:
-        response = f.read()
-    return response
+    return redirect(url_for(
+        'heatmap_by_celltype_genes',
+        genestring='Col1a1,Col2a1,Adh1,Col13a1,Col14a1,Tgfbi,Pdgfrb,Ptprc,Cd3e,Cd19,Pecam1,Gja5,Vwf,Car8,Car4'),
+    )
 
 
+@app.route("/heatmap_by_timepoint", methods=["GET"])
+def heatmap_by_timepoint():
+    """Heatmaps by timepoint (one per dataset)"""
+    return redirect(url_for(
+        'heatmap_by_timepoint_genes',
+        genestring="Car4"),
+    )
+
+
+@app.route("/heatmap_unified", methods=["GET"])
+def heatmap_unified():
+    """One large heatmap across development, one gene"""
+    return redirect(url_for(
+        'heatmap_unified_genes',
+        genestring='Car4'),
+    )
+
+
+# Generic views
 @app.route("/celltype/<genestring>", methods=['GET'])
 def heatmap_by_celltype_genes(genestring):
     searchstring = genestring.replace(" ", "")
@@ -46,20 +69,13 @@ def heatmap_by_celltype_genes(genestring):
             )
 
 
-@app.route("/heatmap_by_timepoints", methods=["GET"])
-def heatmap_by_timepoint():
-    """Heatmaps by timepoint (one per dataset)"""
-    with open("heatmap_by_timepoint.html") as f:
-        response = f.read()
-    return response
-
-
-@app.route("/heatmap_unified", methods=["GET"])
-def heatmap_unified():
-    """One large heatmap across development, one gene"""
-    with open("heatmap_unified.html") as f:
-        response = f.read()
-    return response
+@app.route("/heatmap_by_timepoint/<genestring>", methods=['GET'])
+def heatmap_by_timepoint_genes(genestring):
+    searchstring = genestring.replace(" ", "")
+    return render_template(
+            "heatmap_by_timepoint.html",
+            searchstring=searchstring,
+            )
 
 
 @app.route("/heatmap_unified/<genestring>", methods=['GET'])
@@ -71,6 +87,7 @@ def heatmap_unified_genes(genestring):
             )
 
 
+# Additional views
 @app.route("/voice_control", methods=["GET"])
 def voice_control():
     """Name says it all"""

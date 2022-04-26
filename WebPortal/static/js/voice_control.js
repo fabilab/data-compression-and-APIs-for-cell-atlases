@@ -12,7 +12,7 @@ $("#recordButton").mousedown(() => {
     console.log("recordButton clicked");
 
     // Switch to stop button until we hear back from getUserMedia
-    $("#recordButton").attr("src", "/static/images/stop_button.png")
+    $("#recordButton").attr("src", "/static/images/stop_button_navbar.png")
                       .attr("alt", "stop button");
 
     //// Create audio context and processor to resample at 16kHz, to make google happy
@@ -40,7 +40,7 @@ $("#recordButton").mousedown(() => {
 
     }).catch(function(err) {
         //enable the record button if getUserMedia() fails
-        $("#recordButton").attr("src", "/static/images/rec_button.png")
+        $("#recordButton").attr("src", "/static/images/rec_button_navbar.png")
                           .attr("alt", "rec button");
     });
 });
@@ -53,7 +53,7 @@ function stopRecording() {
     $(window).off();
 
     // enable the record button back to signal the user we got the message
-    $("#recordButton").attr("src", "/static/images/rec_button.png")
+    $("#recordButton").attr("src", "/static/images/rec_button_navbar.png")
                       .attr("alt", "rec button");
 
     //tell the recorder to stop the recording

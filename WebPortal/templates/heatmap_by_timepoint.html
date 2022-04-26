@@ -1,53 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Single Cell Compressed Atlas Webportal</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
-    <link rel="stylesheet" href="/css/index.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
-    <!-- <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">   -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-  </head>
-  <body>
-  <!-- Navigation Bar -->
-  <nav class="navbar is-fixed-top has-shadow is-spaced is-light">
-    <div class="navbar-brand">
-      <a class="navbar-item">
-        <h1 class="title is-5">Single Cell Compressed Atlas of the Lung</h1>
-      </a>
-    </div>
-    <div class="navbar-start">
-      <a href="/" class="button is-ghost has-text-grey-darker ">
-        Home
-      </a>
-      <a href="/heatmap_by_timepoints" class="button is-ghost has-text-info">
-          Heatmaps by Timepoint
-      </a>
-      <a href="/heatmap_unified" class="button is-ghost has-text-info">
-          Heatmap unified
-      </a>
-      <a href="/voice_control" class="button is-ghost has-text-info">
-          Ask a question
-      </a>
+{% extends 'base.html' %}
+{% block content %}
 
-  </div>
-    <div class="navbar-end">
-      <div class="field has-addons">
-        <div class="control">
-          <input class="input is-info" id="searchGeneName" type="text" placeholder="Gene" value="Car4">
-        </div>
-        <div class="control">
-          <a class="button is-info" id="searchOnClick">
-            <i class="fas fa-search"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
   <div class="columns is-mobile is-centered tab-area">
     <div class="field column is-one-quarter">
@@ -112,5 +65,5 @@
   </div>
   <script src="/js/heatmapByTimepoint.js"></script>
   <script src="/js/eventsTimepoint.js"></script>
-  </body>
-</html>
+
+{% endblock %}

@@ -25,14 +25,16 @@ function HeatMap(result, html_element_id) {
             var layout = {
                 title: 'Heatmap of gene expression level in selected cell types',
                 xaxis: {
-                    title: 'Cell types',
+                    title: '<b>Cell types<b>',
                     automargin: true,
                     tickangle: 45,
                 },
                 yaxis: {
-                    title: 'Genes',
-                    automargin: true,
+                    title: '<b>Genes<b>',
+                    automargin: true
                 },
+                with: 700,
+                height: 500,
             };
                 
             Plotly.newPlot(document.getElementById(html_element_id), data,layout); 

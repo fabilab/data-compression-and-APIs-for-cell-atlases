@@ -8,7 +8,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from helper import data_preprocessing, dataset_by_timepoint
+from helper import data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -37,6 +37,12 @@ def page2():
         response = f.read()
     return response
 
+@app.route('/heatmap_by_timepoints_datasets',methods=['GET'])
+def page3():
+    with open('page3.html') as f:
+        response = f.read()
+    return response
+
 # new end point for timepoint dataset:
 class geneExpTime(Resource):
     def get(self):
@@ -46,6 +52,7 @@ class geneExpTime(Resource):
         
         data = dataset_by_timepoint(genename,'celltype_dataset_timepoint',datatype,plottype)
         return data
+
 
 class geneExp(Resource):
     def get(self):
@@ -96,10 +103,18 @@ class plotsForSeachGenes(Resource):
 
         return result
 
+class geneExpDatasetTime(Resource):
+    def get(self):
+        genename = request.args.get('gene')
+        datatype = request.args.get('datatype')
+        plottype = request.args.get('plottype')
+        return dataset_by_timepoint_dataset(genename, datatype, plottype)
+
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
+api.add_resource(geneExpDatasetTime, '/data_timepoint_dataset')
 
 if __name__ == '__main__':
     app.run(debug=True)

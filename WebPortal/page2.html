@@ -26,7 +26,10 @@
       </a>
       <a href="http://127.0.0.1:5000/heatmap_by_timepoints" class="button is-ghost has-text-info">
           Heatmaps by Timepoint
-        </a>
+      </a>
+      <a href="http://127.0.0.1:5000/heatmap_by_timepoints_datasets" class="button is-ghost has-text-grey-darker">
+        Heatmaps by Timepoint and Dataset
+      </a>
   </div>
     <div class="navbar-end">
       <div class="field has-addons">
@@ -67,7 +70,7 @@
               <a id="originalOnClick">Original</a>
             </li>
             <li id="hierachicalTab">
-              <a id="hClusterOnClick">Hierachical Clustered</a>
+              <a id="hClusterOnClick">Hierarchical Clustered</a>
             </li>
           </ul>
         </div>
@@ -79,13 +82,13 @@
   <div class="container" id="dataDisplay">
     <div id="timepoint_info">
       <span class="has-text-weight-bold">Timepoints:&nbsp&nbsp</span>
-      <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
-        <i class=" far fa-question-circle"></i>
-        <span>P&nbsp&nbsp&nbsp</span>
-      </span>
       <span class="E has-tooltip-bottom" data-tooltip="Embrioic Day">
         <i class="far fa-question-circle"></i>
         <span>E&nbsp&nbsp&nbsp</span>
+      </span>
+      <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
+        <i class=" far fa-question-circle"></i>
+        <span>P&nbsp&nbsp&nbsp</span>
       </span>
       <span class="m has-tooltip-bottom" data-tooltip="Months">
         <i class="far fa-question-circle"></i>

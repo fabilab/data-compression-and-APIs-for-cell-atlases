@@ -26,4 +26,11 @@
 - Create a new page: heatmap by timepoints ✅
 - adding a ? Info button next to each heatmap, display a small user menu when clicked.
 - Enable gene search for the heatmap by timepoints.
+
+
+
+#### 10/04/2022
+
+- Create new dataset for the 3rd heatmap (combined heatmap with all cell types over different timepoints)
+- Complete most part of the Interim report by 14/04/2022
 - 

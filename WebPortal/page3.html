@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Single Cell Compressed Atlas Webportal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <!-- <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">   -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   </head>
   <body>
   <!-- Navigation Bar -->
@@ -19,20 +21,20 @@
       </a>
     </div>
     <div class="navbar-start">
-      <a href="http://127.0.0.1:5000/" class="button is-ghost has-text-info ">
+      <a href="http://127.0.0.1:5000/" class="button is-ghost has-text-grey-darker ">
         Home
       </a>
       <a href="http://127.0.0.1:5000/heatmap_by_timepoints" class="button is-ghost has-text-grey-darker">
-          Heatmaps by Timepoint
+        Heatmaps by Timepoint
       </a>
-      <a href="http://127.0.0.1:5000/heatmap_by_timepoints_datasets" class="button is-ghost has-text-grey-darker">
-        Heatmaps by Timepoint and Dataset
+      <a href="http://127.0.0.1:5000/heatmap_by_timepoints_datasets" class="button is-ghost has-text-info">
+        Heatmap by Timepoint and Dataset
       </a>
   </div>
     <div class="navbar-end">
       <div class="field has-addons">
         <div class="control">
-          <input class="input is-info" id="searchGeneName" type="text" placeholder="gene1,gene2,gene3">
+          <input class="input is-info" id="searchGeneName" type="text" placeholder="Car4">
         </div>
         <div class="control">
           <a class="button is-info" id="searchOnClick">
@@ -68,7 +70,7 @@
               <a id="originalOnClick">Original</a>
             </li>
             <li id="hierachicalTab">
-              <a id="hClusterOnClick">Hierarchical Clustered</a>
+              <a id="hClusterOnClick">Hierachical Clustered</a>
             </li>
           </ul>
         </div>
@@ -76,19 +78,30 @@
     </div>
   </div>
   <!-- Plots below -->
+  
   <div class="container" id="dataDisplay">
-    <div id="h5_data_plot">
-
-    </div>   
-    <div id="scatter_plot">
-
+    <div id="timepoint_info">
+      <span class="has-text-weight-bold">Timepoints:&nbsp&nbsp</span>
+      <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
+        <i class=" far fa-question-circle"></i>
+        <span>P&nbsp&nbsp&nbsp</span>
+      </span>
+      <span class="E has-tooltip-bottom" data-tooltip="Embrioic Day">
+        <i class="far fa-question-circle"></i>
+        <span>E&nbsp&nbsp&nbsp</span>
+      </span>
+      <span class="m has-tooltip-bottom" data-tooltip="Months">
+        <i class="far fa-question-circle"></i>
+        <span>m</span>
+      </span>
     </div>
+    <div id="bigHeatMap">
+    </div>
+
   </div>
-  <script src="/js/scatterPlot.js"></script>
+  <script src="/js/bigHeatmap.js"></script>
   <script src="/js/heatMap.js"></script>
-  <script src="/js/assembleHcellType.js"></script>
-  <script src="/js/defaultHeatMap.js"></script>
-  <script src="/js/resetPage.js"></script>
-  <script src="/js/events.js"></script>
+  <script src="/js/eventsTimepoint.js"></script>
+  <script src="/js/showTimepointInfo.js"></script>
   </body>
 </html>

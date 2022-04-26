@@ -6,6 +6,7 @@ function HeatMapTimepoint(result, html_element_id,dataset_name) {
         let x_axis = Object.keys(result[Object.keys(result)[0]]);
         // y-axis:41 cell types
         let y_axis = Object.keys(result);
+        console.log(y_axis);
         let data_content = [];
         for (var i = 0; i < Object.keys(result).length; i++) {
             cell_type = Object.keys(result)[i] // get the cell_type name as a string

@@ -72,7 +72,7 @@ function clarifyResponse(response) {
     if (response['question'] === 'gene_string') {
         let genestr = response['gene_string'];
 
-        // Open popup
+        // Open confirmation popup
         genestr = window.prompt("Confirm or correct gene names:", genestr);
         if (genestr == null || genestr == "") {
             return;
@@ -86,6 +86,33 @@ function clarifyResponse(response) {
             success: function(result) {
                 if (result['outcome'] == 'fail') {
                     console.log("check for genestring found no match");
+                    return;
+                }
+
+                let url = response['url_prefix'] + result['genenames'];
+                window.location.href = url;
+            },
+            error: function (e) {
+               console.log("check for genestring failed");
+            }
+        });
+    } else if (response['question'] === 'celltype_string') {
+        let ctstr = response['celltype_string'];
+
+        // Open confirmation popup
+        ctstr = window.prompt("Confirm or correct cell type names:", ctstr);
+        if (ctstr == null || ctstr == "") {
+            return;
+        }
+
+        // Validate new cell type string
+        $.ajax({
+            type:'GET',
+            url:'/marker_genes',
+            data: "celltype_names="+ctstr,
+            success: function(result) {
+                if (result['outcome'] == 'fail') {
+                    console.log("check for ctstr found no match");
                     return;
                 }
 
@@ -118,7 +145,7 @@ function postAudio(blob) {
 
             // Successful response, go there
             } else {
-                window.location.href = response;
+                window.location.href = response['url'];
             }
         }
     };

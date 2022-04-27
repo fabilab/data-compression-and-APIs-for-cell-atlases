@@ -7,7 +7,11 @@ content:    Interpret text from Google TTS into a redirect URL.
 import numpy as np
 import pandas as pd
 # FIXME: Absolute import??
-from helper import gene_order
+from helper import (
+    gene_order,
+    celltypes as celltypes_all,
+    get_marker_genes,
+    )
 genes_idx = gene_order.index
 gene_matrix = (pd.Series(gene_order.index)
                  .str
@@ -31,6 +35,7 @@ phrase_dict = {
             'show the expression of',
             'show the gene expression of',
         ],
+        'suffix_type': 'genestring',
         'url_func': lambda sfx: f'/celltype/{sfx}'
     },
     'expression_unified_heatmap': {
@@ -46,6 +51,7 @@ phrase_dict = {
             'show the developmental expression of',
             'show the developmental gene expression of',
         ],
+        'suffix_type': 'genestring',
         'url_func': lambda sfx: f'/heatmap_unified/{sfx}'
     },
     'gene_friends': {
@@ -57,14 +63,65 @@ phrase_dict = {
             'show gene friends of',
             'show correlates of',
         ],
+        'suffix_type': 'genestring',
         'url_func': 'TODO',  # TODO
     },
+    'marker_genes': {
+        'prefixes': [
+            'what are the markers of',
+            'what are markers of',
+            'what are marker genes of',
+            'markers for',
+            'markers of',
+            'marker genes of',
+            'marker genes for',
+            'show markers of',
+            'show markers for',
+            'show marker genes of',
+            'show marker genes for',
+            'show the markers of',
+            'show the markers for',
+            'show the marker genes of',
+            'show the marker genes for',
+        ],
+        'suffix_type': 'celltypestring',
+        'url_func': lambda sfx: '/celltype/'+get_marker_genes(sfx)
+    }
 }
 phrase_dict_inv = {}
 for key, val in phrase_dict.items():
     for prefix in val['prefixes']:
         phrase_dict_inv[prefix] = key
 
+
+def validate_correct_celltypestr(celltypestr):
+    '''Validate cell type names and correct misspellings if possible'''
+    # TODO: check punctuation more accurately
+    celltypes = celltypestr.replace('.', ',').replace(';', ',').split(',')
+
+    # Capitalization is not great, lowercase check
+    celltypes = [x.lower() for x in celltypes]
+    celltypesd = {x.lower(): x for x in celltypes_all}
+
+    # Validate
+    celltypesv = []
+    for celltype in celltypes:
+        if celltype in celltypesd:
+            celltypesv.append(celltypesd[celltype])
+            continue
+
+        # Cut plural if it is found
+        if celltype.endswith('s'):
+            celltype = celltype[:-1]
+            if celltype in celltypesd:
+                celltypesv.append(celltypesd[celltype])
+                continue
+
+        # TODO: implement more spelling correction
+        return None
+
+    celltypestr = ','.join(celltypesv)
+    return celltypestr
 
 
 def validate_correct_genestr(genestr):
@@ -76,7 +133,7 @@ def validate_correct_genestr(genestr):
     # Murine genes are capitalized
     genes = [x.capitalize() for x in genes]
 
-    # Validate and check
+    # Validate
     genesv = []
     for gene in genes:
         if gene in genes_idx:
@@ -105,7 +162,7 @@ def validate_correct_genestr(genestr):
             # At least one gene was not understood, ask for a written confirmation
             return None
 
-    genestr = ','.join(genes)
+    genestr = ','.join(genesv)
     return genestr
 
 
@@ -119,19 +176,26 @@ def text_to_url(text):
 
     for prefix, category in phrase_dict_inv.items():
         if text.startswith(prefix):
-            genestr = text[len(prefix):].replace(' ', '')
+            suffix = text[len(prefix):].replace(' ', '')
 
-            genestr_corrected = validate_correct_genestr(genestr)
+            if phrase_dict[category]['suffix_type'] == 'genestring':
+                suffix_corrected = validate_correct_genestr(suffix)
+                question = 'gene_string'
+            elif phrase_dict[category]['suffix_type'] == 'celltypestring':
+                suffix_corrected = validate_correct_celltypestr(suffix)
+                question = 'celltype_string'
+            else:
+                raise ValueError('Category not implemented')
 
-            if genestr_corrected is None:
+            if suffix_corrected is None:
                 return {
                     'outcome': 'question',
-                    'question': 'gene_string',
-                    'gene_string': genestr,
+                    'question': question,
+                    question: suffix,
                     'url_prefix': phrase_dict[category]['url_func'](''),
                 }
 
-            url = phrase_dict[category]['url_func'](genestr_corrected)
+            url = phrase_dict[category]['url_func'](suffix_corrected)
             return {
                 'outcome': 'success',
                 'url': url,

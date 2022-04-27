@@ -19,7 +19,15 @@ def read_gene_order():
     return gene_order
 
 
+def read_cell_types():
+    with h5py.File(fn_atlas, "r") as h5_data:
+        celltypes = np.array(h5_data['celltype']["gene_expression_average"]["axis1"].asstr())
+    return celltypes
+
+
+
 gene_order = read_gene_order()
+celltypes = read_cell_types()
 
 
 def read_counts_from_file(df_type, genes=None):
@@ -220,6 +228,8 @@ def get_friends(genes):
     with h5py.File(fdn_data + "gene_friends.h5", "r") as h5_data:
         for gene in genes:
             friends.append(gene)
+            # We only took decently expressed genes, but this might appear
+            # as a bug if we are not careful...
             if gene not in h5_data.keys():
                 continue
             friends_i = [x.decode() for x in h5_data[gene]]
@@ -229,3 +239,25 @@ def get_friends(genes):
                 if (friend not in friends) and (friend not in genes):
                     friends.append(friend)
     return ",".join(friends)
+
+
+def get_marker_genes(celltypes):
+    '''Get markers for cell types'''
+    # Sometimes we get a string
+    if isinstance(celltypes, str):
+        celltypes = celltypes.split(',')
+
+    markers = []
+    with h5py.File(fdn_data + "marker_genes.h5", "r") as h5_data:
+        group = h5_data['celltype']
+        for celltype in celltypes:
+            if celltype not in group:
+                return ''
+            genes_i = list(np.array(group[celltype].asstr()))
+            for gene in genes_i:
+                if gene not in markers:
+                    markers.append(gene)
+
+    return ",".join(markers)
+    
+

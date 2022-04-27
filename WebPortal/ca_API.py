@@ -18,8 +18,12 @@ from helper import (
         dataset_by_timepoint,
         get_big_heatmap,
         get_friends,
+        get_marker_genes,
     )
-from voice_control.interpret_text import validate_correct_genestr
+from voice_control.interpret_text import (
+        validate_correct_genestr,
+        validate_correct_celltypestr,
+    )
 
 
 class geneExpTimeUnified(Resource):
@@ -109,14 +113,31 @@ class geneFriends(Resource):
 
 class checkGenenames(Resource):
     def get(self):
-        genenames = request.args.get("gene_names")
-        genenames_validated = validate_correct_genestr(genenames)
-        if genenames_validated is None:
+        names = request.args.get("gene_names")
+        names_validated = validate_correct_genestr(names)
+        if names_validated is None:
             return {
                 'outcome': 'fail',
                 }
         else:
             return {
                 'outcome': 'success',
-                'genenames': genenames_validated,
+                'genenames': names_validated,
                 }
+
+
+class markerGenes(Resource):
+    def get(self):
+        names = request.args.get("celltype_names")
+        names_validated = validate_correct_celltypestr(names)
+        if names_validated is None:
+            return {
+                'outcome': 'fail',
+                }
+        else:
+            genenames = get_marker_genes(names_validated)
+            return {
+                'outcome': 'success',
+                'genenames': genenames,
+                }
+

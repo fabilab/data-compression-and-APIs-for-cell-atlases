@@ -38,7 +38,14 @@ def index():
     """Landing page"""
     return redirect(url_for(
         'heatmap_by_celltype_genes',
-        genestring='Col1a1,Col2a1,Adh1,Col13a1,Col14a1,Tgfbi,Pdgfrb,Ptprc,Cd3e,Cd19,Pecam1,Gja5,Vwf,Car8,Car4'),
+        genestring=','.join([
+            'Col1a1,Col2a1',
+            'Adh1,Col13a1,Col14a1',
+            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
+            'Pecam1,Gja5,Vwf,Car8,Car4',
+            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
+            'Epcam',
+            ])),
     )
 
 

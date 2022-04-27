@@ -7,6 +7,8 @@ import re
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
 
+from data_quirks.celltypes import adjust_celltypes
+
 
 fdn_data = "./static/scData/"
 fn_atlas = fdn_data + "condensed_lung_atlas_in_cpm.h5"
@@ -22,8 +24,8 @@ def read_gene_order():
 def read_cell_types():
     with h5py.File(fn_atlas, "r") as h5_data:
         celltypes = np.array(h5_data['celltype']["gene_expression_average"]["axis1"].asstr())
+    celltypes, _ = adjust_celltypes(celltypes)
     return celltypes
-
 
 
 gene_order = read_gene_order()
@@ -38,6 +40,7 @@ def read_counts_from_file(df_type, genes=None):
     '''
     with h5py.File(fn_atlas, "r") as h5_data:
         columns = np.array(h5_data[df_type]["gene_expression_average"]["axis1"].asstr())
+        columns, idx_cols = adjust_celltypes(columns)
         counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
         if genes is not None:
             index = genes
@@ -46,8 +49,6 @@ def read_counts_from_file(df_type, genes=None):
         else:
             index = gene_order.index
         counts = np.array(counts).astype(np.float32)
-        # NOTE: this is the same as gene order
-        #index = np.array(h5_data[df_type]["gene_expression_average"]["axis0"].asstr())
 
     # FIXME: fix this in the h5 file...
     #Fix this gene that has "inf" counts: CT010467.1
@@ -56,7 +57,7 @@ def read_counts_from_file(df_type, genes=None):
         counts = 1e6 * (counts.T / counts.sum(axis=1)).T
 
     df = pd.DataFrame(
-            data=counts.T,
+            data=counts[idx_cols].T,
             index=index,
             columns=columns,
             )

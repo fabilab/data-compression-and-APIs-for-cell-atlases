@@ -83,6 +83,9 @@ phrase_dict = {
             'show the markers for',
             'show the marker genes of',
             'show the marker genes for',
+            'upregulated in',
+            'upregulated genes in',
+            'genes upregulated in',
         ],
         'suffix_type': 'celltypestring',
         'url_func': lambda sfx: '/celltype/'+get_marker_genes(sfx)

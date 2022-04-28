@@ -14,7 +14,7 @@ import plotly
 
 # Helper functions
 from helper import (
-        data_preprocessing,
+        read_counts_from_file,
         dataset_by_timepoint,
         get_big_heatmap,
         get_friends,
@@ -26,13 +26,31 @@ from voice_control.interpret_text import (
     )
 
 
-class geneExpTimeUnified(Resource):
+class geneExp(Resource):
+    '''API for the compressed atlas data, to be visualized as a heatmap'''
     def get(self):
-        gene = request.args.get("gene")
-        use_log = request.args.get("use_log") == '1'
-        use_hierarchical = request.args.get("use_hierarchical") == '1'
-        data = get_big_heatmap(gene, use_log, use_hierarchical)
-        return data
+        genestring = request.args.get("gene_names")
+        plot_type = request.args.get("plot_type")
+        data_type = request.args.get("data_type")
+
+        gene_names = genestring.replace(' ', '').split(',')
+        try:
+            df = read_counts_from_file("celltype", genes=gene_names).T
+        except KeyError:
+            return None
+
+        if data_type == "log10":
+            df = np.log10(0.1 + df)
+
+        if plot_type == "hierachical":
+            print(df.values.shape)  # (41x5)
+            distance = pdist(df.values)
+            # print(distance)
+            Z = linkage(distance, optimal_ordering=True)
+            new_order = leaves_list(Z)
+            df = df.iloc[new_order]
+
+        return json.loads(df.to_json())
 
 
 class geneExpTime(Resource):
@@ -50,44 +68,28 @@ class geneExpTime(Resource):
         return data
 
 
-class geneExp(Resource):
-    '''API for the compressed atlas data, to be visualized as a heatmap'''
+class geneExpTimeUnified(Resource):
     def get(self):
-        gene_names = request.args.get("gene_names")
-        plot_type = request.args.get("plot_type")
-        data_type = request.args.get("data_type")
-        df = data_preprocessing(gene_names, "celltype")
-        if df is None:
-            return None
-
-        if data_type == "log10":
-            df = np.log10(0.1 + df)
-
-        if plot_type == "hierachical":
-            print(df.values.shape)  # (41x5)
-            distance = pdist(df.values)
-            # print(distance)
-            Z = linkage(distance, optimal_ordering=True)
-            new_order = leaves_list(Z)
-            df = df.iloc[new_order]
-
-        return json.loads(df.to_json())
+        gene = request.args.get("gene")
+        use_log = request.args.get("use_log") == '1'
+        use_hierarchical = request.args.get("use_hierarchical") == '1'
+        data = get_big_heatmap(gene, use_log, use_hierarchical)
+        return data
 
 
 class plotsForSeachGenes(Resource):
     def get(self):
-        gene_names = request.args.get("gene_names")
-        df = data_preprocessing(gene_names, "celltype")
-
-        if df is None:
+        genestring = request.args.get("gene_names")
+        gene_names = genestring.replace(' ', '').split(",")
+        try:
+            df = read_counts_from_file("celltype", genes=gene_names).T
+        except KeyError:
             return None
 
-        df = df.T
-        a_gene_names = gene_names.split(",")
 
-        if len(a_gene_names) == 2:
+        if len(gene_names) == 2:
             result = {}
-            plot_df = df.filter(items=a_gene_names, axis=0)
+            plot_df = df.filter(items=gene_names, axis=0)
             gene1 = plot_df.index[0]
             gene2 = plot_df.index[1]
 

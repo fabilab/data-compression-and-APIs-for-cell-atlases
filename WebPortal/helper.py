@@ -43,9 +43,23 @@ def read_counts_from_file(df_type, genes=None):
         columns, idx_cols = adjust_celltypes(columns)
         counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
         if genes is not None:
-            index = genes
-            idx = gene_order.loc[genes].values
-            counts = counts[:, idx]
+            index = []
+            for gene in genes:
+                candidates = gene_order.index[gene_order.index.str.match(gene)]
+                if len(candidates) == 0:
+                    raise KeyError('Gene match not found: '+gene)
+                for cand in candidates:
+                    if cand not in index:
+                        index.append(cand)
+                
+            idx = gene_order.loc[index].values
+            # Slices of h5 must be ordered...
+            tmp = pd.Series(idx, index=np.arange(len(idx))).to_frame(name='idx')
+            tmp = tmp.sort_values('idx')
+            tmp['new_order'] = np.arange(len(tmp))
+            counts = np.array(counts[:, tmp['idx'].values])
+            # ... now reorder them according to the user's needs
+            counts = counts[:, tmp.sort_index()['new_order'].values]
         else:
             index = gene_order.index
         counts = np.array(counts).astype(np.float32)
@@ -74,28 +88,6 @@ def read_number_cells_from_file(df_type):
         ncells = pd.Series(data=values, index=labels)
 
     return ncells
-
-
-def data_preprocessing(input_gene_names, df_type):
-    '''Preprocess compressed atlas data
-
-    this function is used when more multiple gene names are searched by the user
-    always run the read_counts_from_file() to get dataframe in the right format before running this
-    '''
-    df = read_counts_from_file(df_type)
-    df_genes = df.index  # all the genes that available in the current dataframe
-    for search_gene in input_gene_names.split(","):
-        if search_gene not in df_genes:
-            return None
-
-    # if user does not search for any specific genes, then plot everything
-    if input_gene_names is None:
-        plot_data = df.T
-    else:
-        a_gene_names = input_gene_names.split(",")
-        plot_df = df.filter(items=a_gene_names, axis=0)
-        plot_data = plot_df.T
-    return plot_data
 
 
 def dataset_by_timepoint(genename, df_type, datatype, plottype):

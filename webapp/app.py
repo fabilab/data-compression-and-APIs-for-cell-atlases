@@ -11,6 +11,7 @@ from flask import (
 from flask_restful import Api
 from flask_cors import CORS
 
+from validation.genes import validate_correct_genestr
 from ca_API import (
     geneExp,
     geneExpTime,
@@ -67,6 +68,22 @@ def heatmap_unified():
     )
 
 
+@app.route("/heatmap_differential", methods=["GET"])
+def heatmap_differential():
+    """A sort of heatmap with differential expression"""
+    return redirect(url_for(
+        'heatmap_differential_genes',
+        genestring=','.join([
+            'Col1a1,Col2a1',
+            'Adh1,Col13a1,Col14a1',
+            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
+            'Pecam1,Gja5,Vwf,Car8,Car4',
+            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
+            'Epcam',
+            ])),
+    )
+
+
 # Generic views
 @app.route("/celltype/<genestring>", methods=['GET'])
 def heatmap_by_celltype_genes(genestring):
@@ -91,6 +108,16 @@ def heatmap_unified_genes(genestring):
     searchstring = genestring.replace(" ", "")
     return render_template(
             "heatmap_unified.html",
+            searchstring=searchstring,
+            )
+
+
+@app.route("/heatmap_differential/<genestring>", methods=["GET"])
+def heatmap_differential_genes(genestring):
+    """A sort of heatmap with differential expression"""
+    searchstring = genestring.replace(" ", "")
+    return render_template(
+            "heatmap_differential.html",
             searchstring=searchstring,
             )
 

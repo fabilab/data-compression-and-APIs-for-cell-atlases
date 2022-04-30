@@ -7,7 +7,7 @@ import re
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
 
-from data_quirks.celltypes import adjust_celltypes
+from validation.celltypes import adjust_celltypes
 
 
 fdn_data = "./static/scData/"

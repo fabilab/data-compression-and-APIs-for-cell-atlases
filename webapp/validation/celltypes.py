@@ -72,3 +72,35 @@ def adjust_celltypes(celltypes_raw):
 
     return np.array(ct_adj), np.array(idx)
 
+
+def validate_correct_celltypestr(celltypestr):
+    '''Validate cell type names and correct misspellings if possible'''
+    # TODO: check punctuation more accurately
+    celltypes = celltypestr.replace('.', ',').replace(';', ',').split(',')
+
+    # Capitalization is not great, lowercase check
+    celltypes = [x.lower() for x in celltypes]
+    celltypesd = {x.lower(): x for x in celltypes_all}
+
+    # Validate
+    celltypesv = []
+    for celltype in celltypes:
+        if celltype in celltypesd:
+            celltypesv.append(celltypesd[celltype])
+            continue
+
+        # Cut plural if it is found
+        if celltype.endswith('s'):
+            celltype = celltype[:-1]
+            if celltype in celltypesd:
+                celltypesv.append(celltypesd[celltype])
+                continue
+
+        # TODO: implement more spelling correction
+        return None
+
+    celltypestr = ','.join(celltypesv)
+    return celltypestr
+
+
+

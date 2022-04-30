@@ -13,14 +13,14 @@ import plotly
 
 
 # Helper functions
-from helper import (
+from models import (
         read_counts_from_file,
         dataset_by_timepoint,
         get_big_heatmap,
         get_friends,
         get_marker_genes,
     )
-from voice_control.interpret_text import (
+from validation import (
         validate_correct_genestr,
         validate_correct_celltypestr,
     )

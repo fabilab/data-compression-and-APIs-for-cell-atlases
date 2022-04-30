@@ -1,5 +1,5 @@
 # Web imports
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource, Api
 import json
 
@@ -19,6 +19,7 @@ from models import (
         get_big_heatmap,
         get_friends,
         get_marker_genes,
+        get_data_hyperoxia,
     )
 from validation import (
         validate_correct_genestr,
@@ -75,6 +76,37 @@ class geneExpTimeUnified(Resource):
         use_hierarchical = request.args.get("use_hierarchical") == '1'
         data = get_big_heatmap(gene, use_log, use_hierarchical)
         return data
+
+
+class geneExpHyperoxia(Resource):
+    '''API for the compressed atlas data, to be visualized as a heatmap'''
+    def get(self):
+        genestring = request.args.get("gene_names")
+        plot_type = request.args.get("plot_type")
+        data_type = request.args.get("data_type")
+
+        gene_names = genestring.replace(' ', '').split(',')
+        try:
+            result = get_data_hyperoxia(
+                    data_type=data_type,
+                    genes=gene_names)
+        except KeyError:
+            return None
+
+        if plot_type == "hierachical":
+            for item in result:
+                df = item['data'].T
+                distance = pdist(df.values)
+                # print(distance)
+                Z = linkage(distance, optimal_ordering=True)
+                new_order = leaves_list(Z)
+                df = df.iloc[new_order]
+                item['data'] = df.T
+
+        for item in result:
+            item['data'] = item['data'].to_dict()
+
+        return jsonify(result)
 
 
 class plotsForSeachGenes(Resource):

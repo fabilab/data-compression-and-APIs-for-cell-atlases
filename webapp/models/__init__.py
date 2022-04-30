@@ -11,12 +11,14 @@ from validation.celltypes import adjust_celltypes
 
 
 fdn_data = "./static/scData/"
+# FIXME
 fn_atlas = fdn_data + "condensed_lung_atlas_in_cpm.h5"
+fn_atlas = fdn_data + "condensed_lung_atlas_ordered.h5"
 
 
-def read_gene_order():
+def read_gene_order(data_type='celltype'):
     with h5py.File(fn_atlas, "r") as h5_data:
-        genes = np.array(h5_data['celltype']["gene_expression_average"]["axis0"].asstr())
+        genes = np.array(h5_data[data_type]["gene_expression_average"]["axis0"].asstr())
     gene_order = pd.Series(data=np.arange(len(genes)), index=genes)
     return gene_order
 
@@ -38,6 +40,8 @@ def read_counts_from_file(df_type, genes=None):
     gives the name of dataset we want as an input
     celltype / celltype_dataset / celltype_dataset_timepoint
     '''
+    gene_order = read_gene_order(data_type=df_type)
+
     with h5py.File(fn_atlas, "r") as h5_data:
         columns = np.array(h5_data[df_type]["gene_expression_average"]["axis1"].asstr())
         columns, idx_cols = adjust_celltypes(columns)
@@ -181,11 +185,11 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
             plot_data['y'].append(label)
             plot_data['text'].append(str(ge))
             if nc < 5:
-                ms = 1
-                opacity = 0.1
-            elif nc < 20:
                 ms = 8
                 opacity = 0.5
+            elif nc < 40:
+                ms = 13
+                opacity = 0.7
             else:
                 ms = 20
                 opacity = 0.9
@@ -253,4 +257,47 @@ def get_marker_genes(celltypes):
 
     return ",".join(markers)
     
+
+def get_data_hyperoxia(data_type, genes=None):
+    '''Get heatmap data for hyperoxia'''
+    df_ho = read_counts_from_file(
+        'celltype_dataset_timepoint_hyperoxia',
+        genes=genes,
+        )
+
+    if data_type == "log2FC":
+        df_normal = read_counts_from_file(
+                'celltype_dataset_timepoint',
+                genes=genes,
+            )
+        # Restrict to hyperoxia celltypes, datasets, and timepoints
+        # NOTE: no dataset took hyperoxia from a timepoint that has no normal.
+        # However, come cell types are hyperoxia specific
+        for key in df_ho:
+            if key not in df_normal.columns:
+                # Default to zero expression
+                df_normal[key] = 0
+        df_normal = df_normal.loc[df_ho.index, df_ho.columns]
+        df_ho = np.log2(df_ho + 0.5) - np.log2(df_normal + 0.5)
+
+    elif data_type == "log10":
+        df_ho = np.log10(df_ho + 0.5)
+
+    # Split by dataset and timepoint, and unstack
+    df_ho = df_ho.T
+    datasets = ['ACZ', 'Hurskainen2021']
+    timepointd = {'ACZ': ['P7'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
+    result = []
+    for ds in datasets:
+        for tp in timepointd[ds]:
+            item = {
+                'dataset': ds,
+                'timepoint': tp,
+                'data_scale': data_type,
+            }
+            dfi = df_ho.loc[df_ho.index.str.endswith(f'{ds}_{tp}')]
+            dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
+            item['data'] = dfi
+            result.append(item)
+    return result
 

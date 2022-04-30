@@ -18,6 +18,7 @@ from ca_API import (
     plotsForSeachGenes,
     geneFriends,
     geneExpTimeUnified,
+    geneExpHyperoxia,
     checkGenenames,
     markerGenes,
 )
@@ -155,6 +156,7 @@ api.add_resource(plotsForSeachGenes, "/2_genes")
 api.add_resource(geneExpTime, "/data_timepoint")
 api.add_resource(geneFriends, "/gene_friends")
 api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
+api.add_resource(geneExpHyperoxia, "/data_hyperoxia")
 api.add_resource(checkGenenames, "/check_genenames")
 api.add_resource(markerGenes, "/marker_genes")
 

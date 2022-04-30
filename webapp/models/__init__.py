@@ -297,6 +297,11 @@ def get_data_hyperoxia(data_type, genes=None):
             }
             dfi = df_ho.loc[df_ho.index.str.endswith(f'{ds}_{tp}')]
             dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
+
+            # Adjust cell type names and order
+            celltypes_adj, idx = adjust_celltypes(dfi.index)
+            dfi = dfi.iloc[idx]
+
             item['data'] = dfi
             result.append(item)
     return result

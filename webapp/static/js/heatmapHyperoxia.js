@@ -1,21 +1,25 @@
 // Plot heatmap by celltype as a callback for the AJAX request
-function HeatmapHyperoxia(result, html_element_id, title, dataScale) {
+function HeatmapHyperoxia(result, html_element_id, title) {
         if (!result) {
             alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
         } else {
-            // x-axis: genes of interest
-            var x_axis = Object.keys(result[Object.keys(result)[0]]);
-            var y_axis = Object.keys(result);
+            temp0 = result;
+
+            const dataScale = result['data_scale'];
+            var x_axis = result['celltypes'];
+            var y_axis = result['genes'];
             var ngenes =  y_axis.length;
             var graph_width = 1300;
             var graph_height = 370 + 26 * ngenes;
-            // y-axis:41 cell types
-            var data_content = [];
-            for (var i = 0; i < Object.keys(result).length; i++) {
-                cell_type = Object.keys(result)[i] // get the cell_type name as a string
-                all_gene_expression = result[cell_type]         // find it from the dictionary as a key
-                
-                data_content.push(Object.values(all_gene_expression))
+
+            let data_content = [];
+            let i = 0;
+            for (let gene in result['data']) {
+                data_content.push([])
+                for (let ct in result['data'][gene]) {
+                    data_content[i].push(result['data'][gene][ct]);
+                }
+                i+= 1;
             }
             var data = [
                 {
@@ -29,6 +33,7 @@ function HeatmapHyperoxia(result, html_element_id, title, dataScale) {
                 ];
             if (dataScale === "log2FC") {
                 data[0]['colorscale'] = 'RdBu';
+                data[0]['zmid'] = 0;
             }
 
             var layout = {
@@ -37,16 +42,18 @@ function HeatmapHyperoxia(result, html_element_id, title, dataScale) {
                 height: graph_height,
                 title: title,
                 xaxis: {
-                    title: 'Cell types',
+                    //title: 'Cell types',
                     automargin: true,
                     tickangle: 60,
                     scaleanchor: 'y',
                     scaleratio: 1,
+                    type: 'category',
                 },
                 yaxis: {
-                    title: 'Genes',
+                    //title: 'Genes',
                     automargin: true,
                     autorange: "reversed",
+                    type: 'category',
                 },
             };
                 
@@ -107,10 +114,9 @@ function AssembleAjaxRequest() {
 
                 // Plot inside DOM element
                 HeatmapHyperoxia(
-                      item['data'], 
+                      item, 
                       newId,
                       dataset+", "+timepoint,
-                      item['data_scale'],
                     );
             }
         },

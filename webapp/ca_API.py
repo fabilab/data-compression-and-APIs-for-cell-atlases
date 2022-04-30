@@ -93,15 +93,21 @@ class geneExpHyperoxia(Resource):
         except KeyError:
             return None
 
-        if plot_type == "hierachical":
-            for item in result:
-                df = item['data'].T
+        for item in result:
+            df = item['data']
+            item['genes'] = df.columns.tolist()
+            if plot_type == "original":
+                item['celltypes'] = df.index.tolist()
+            else:
                 distance = pdist(df.values)
                 # print(distance)
                 Z = linkage(distance, optimal_ordering=True)
                 new_order = leaves_list(Z)
                 df = df.iloc[new_order]
-                item['data'] = df.T
+                item['celltypes'] = df.index.tolist()
+                item['data'] = df
+
+                print(item['celltypes'])
 
         for item in result:
             item['data'] = item['data'].to_dict()

@@ -23,6 +23,7 @@ from ca_API import (
     markerGenes,
 )
 from voice_recognition import mod as voice_control_blueprint
+from text_recognition import mod as text_control_blueprint
 
 
 app = Flask(__name__, static_url_path="/static", template_folder="templates")
@@ -170,6 +171,7 @@ api.add_resource(markerGenes, "/marker_genes")
 
 
 # Blueprints
+app.register_blueprint(text_control_blueprint)
 app.register_blueprint(voice_control_blueprint)
 
 

@@ -25,6 +25,8 @@ def text_to_response(text_raw):
 
     # Redirect to the correct endpoint
     response = get_command_response(command_dict)
+
+    print(response)
     return response
 
 
@@ -33,6 +35,6 @@ mod = Blueprint('text_control_blueprint', __name__)
 
 @mod.route('/submit_text', methods=['GET'])
 def text_control():
-    # Extract audio Blob
     text_raw = request.args.get("text")
-    return text_to_response(text_raw)
+    response = text_to_response(text_raw)
+    return response

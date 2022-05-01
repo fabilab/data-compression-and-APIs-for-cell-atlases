@@ -8,7 +8,7 @@ function AssembleAjaxRequest() {
         dataType: 'json',
         success: function(result) {
             if (result['outcome'] === 'success') {
-                window.location.href = response['url'];
+                window.location.href = result['url'];
             } else {
                 console.log(result);
             }

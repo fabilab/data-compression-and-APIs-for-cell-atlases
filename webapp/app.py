@@ -28,6 +28,7 @@ from text_recognition import mod as text_control_blueprint
 
 app = Flask(__name__, static_url_path="/static", template_folder="templates")
 api = Api(app)
+
 # Note: this might be unsafe
 CORS(app)
 
@@ -38,6 +39,23 @@ CORS(app)
 @app.route("/")
 def index():
     return redirect(url_for('text_control'))
+
+
+# Control pages
+@app.route("/voice_control", methods=["GET"])
+def voice_control():
+    """Name says it all"""
+    return render_template(
+            "voice_control.html",
+            )
+
+
+@app.route("/text_control", methods=["GET"])
+def text_control():
+    """A single text bar to ask questions or post commands"""
+    return render_template(
+        "text_control.html",
+        )
 
 
 # Default redirects
@@ -129,23 +147,6 @@ def heatmap_differential_genes(genestring):
             )
 
 
-# Additional views
-@app.route("/voice_control", methods=["GET"])
-def voice_control():
-    """Name says it all"""
-    with open("voice_control.html") as f:
-        response = f.read()
-    return response
-
-
-@app.route("/text_control", methods=["GET"])
-def text_control():
-    """A single text bar to ask questions or post commands"""
-    return render_template(
-        "text_control.html",
-        )
-
-
 # Static assets (JS/CSS)
 @app.route("/js/<path:path>")
 def send_js(path):
@@ -164,6 +165,11 @@ def favicon():
     return send_from_directory("static", "favicon.ico")
 
 
+# Blueprints
+app.register_blueprint(text_control_blueprint)
+app.register_blueprint(voice_control_blueprint)
+
+
 # API endpoints
 api.add_resource(geneExp, "/data")
 api.add_resource(plotsForSeachGenes, "/2_genes")
@@ -173,11 +179,6 @@ api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 api.add_resource(geneExpHyperoxia, "/data_hyperoxia")
 api.add_resource(checkGenenames, "/check_genenames")
 api.add_resource(markerGenes, "/marker_genes")
-
-
-# Blueprints
-app.register_blueprint(text_control_blueprint)
-app.register_blueprint(voice_control_blueprint)
 
 
 # Main loop

@@ -11,7 +11,7 @@ from flask import (
         Blueprint,
         )
 from .speech_to_text import convert_audio_blob_to_text
-from .interpret_text import text_to_url
+from text_recognition import text_to_response
 
 
 mod = Blueprint('voice_control_blueprint', __name__)
@@ -24,9 +24,9 @@ def voice_control():
 
     # Call Google API Speech To Text
     text = convert_audio_blob_to_text(audio_data)
-
     print('Google replied:', text)
 
-    # Redirect to the correct endpoint
-    response = text_to_url(text)
+    # Use internal algos to convert a text command to a JSON response
+    response = text_to_response(text)
+
     return response

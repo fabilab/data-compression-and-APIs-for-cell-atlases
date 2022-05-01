@@ -11,7 +11,21 @@ from flask import (
         Blueprint,
         )
 from .interpret_text import interpret_text
-from .text_to_url import text_to_url
+from .command_urls import get_command_response
+
+
+def text_to_response(text_raw):
+    '''Convert a text into a JSON response'''
+
+    # Call Google API Speech To Text
+    command_dict = interpret_text(text_raw)
+
+    print('Text raw:', text_raw)
+    print('Command interpreted:', command_dict)
+
+    # Redirect to the correct endpoint
+    response = get_command_response(command_dict)
+    return response
 
 
 mod = Blueprint('text_control_blueprint', __name__)
@@ -20,14 +34,5 @@ mod = Blueprint('text_control_blueprint', __name__)
 @mod.route('/submit_text', methods=['GET'])
 def text_control():
     # Extract audio Blob
-    text_raw = request.args.get("text");
-
-    # Call Google API Speech To Text
-    text_int = interpret_text(text_raw)
-
-    print('Text raw:', text_raw)
-    print('Text interpreted:', text_int)
-
-    # Redirect to the correct endpoint
-    response = text_to_url(text_int)
-    return response
+    text_raw = request.args.get("text")
+    return text_to_response(text_raw)

@@ -22,7 +22,7 @@ from ca_API import (
     checkGenenames,
     markerGenes,
 )
-from voice_control import mod as voice_control_blueprint
+from voice_recognition import mod as voice_control_blueprint
 
 
 app = Flask(__name__, static_url_path="/static", template_folder="templates")
@@ -130,6 +130,14 @@ def voice_control():
     with open("voice_control.html") as f:
         response = f.read()
     return response
+
+
+@app.route("/text_control", methods=["GET"])
+def text_control():
+    """A single text bar to ask questions or post commands"""
+    return render_template(
+        "text_control.html",
+        )
 
 
 # Static assets (JS/CSS)

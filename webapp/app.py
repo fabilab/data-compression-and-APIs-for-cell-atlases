@@ -35,9 +35,14 @@ CORS(app)
 ##############################
 # Views
 ##############################
-# Default redirects
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
+    return redirect(url_for('text_control'))
+
+
+# Default redirects
+@app.route("/heatmap_by_celltype", methods=["GET"])
+def heatmap_by_celltype():
     """Landing page"""
     return redirect(url_for(
         'heatmap_by_celltype_genes',

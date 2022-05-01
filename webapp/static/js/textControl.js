@@ -1,20 +1,23 @@
 function AssembleAjaxRequest() {
-  var command = $('#textCommand').val();
-
-  $.ajax({
-      type: 'GET',
-      url: '/submit_text',
-      data: "text="+command,
-      dataType: 'json',
-      success: function(result) {
-          console.log(result);
-      },
-      error: function(e) {
-          console.log(e);
-          alert('Text command not understood');
-      }
-  })
-
+    var command = $('#textCommand').val();
+  
+    $.ajax({
+        type: 'GET',
+        url: '/submit_text',
+        data: "text="+command,
+        dataType: 'json',
+        success: function(result) {
+            if (result['outcome'] === 'success') {
+                window.location.href = response['url'];
+            } else {
+                console.log(result);
+            }
+        },
+        error: function(e) {
+            console.log(e);
+            alert('Text command not understood');
+        }
+    })
 }
 
 

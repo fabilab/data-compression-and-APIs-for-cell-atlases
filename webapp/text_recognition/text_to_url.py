@@ -29,6 +29,8 @@ phrase_dict = {
             'show gene expression of',
             'show the expression of',
             'show the gene expression of',
+            'exp of',
+            'e of',
         ],
         'suffix_type': 'genestring',
         'url_func': lambda sfx: f'/celltype/{sfx}'
@@ -45,6 +47,8 @@ phrase_dict = {
             'show developmental expression of',
             'show the developmental expression of',
             'show the developmental gene expression of',
+            'prog of',
+            'p of',
         ],
         'suffix_type': 'genestring',
         'url_func': lambda sfx: f'/heatmap_unified/{sfx}'
@@ -57,6 +61,8 @@ phrase_dict = {
             'show the gene friends of',
             'show gene friends of',
             'show correlates of',
+            'friends of',
+            'f of',
         ],
         'suffix_type': 'genestring',
         'url_func': 'TODO',  # TODO

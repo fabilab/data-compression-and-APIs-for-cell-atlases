@@ -7,7 +7,7 @@ content:    Interpret text from Google TTS into a redirect URL.
 import numpy as np
 import pandas as pd
 
-from models import get_marker_genes
+from models import get_marker_genes, get_degs
 
 
 
@@ -23,6 +23,15 @@ command_dict = {
     },
     'marker_genes': {
         'url_func': lambda sfx: '/celltype/'+get_marker_genes(sfx),
+    },
+    'differentially_expressed_genes': {
+        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='both'),
+    },
+    'upregulated_genes': {
+        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='up'),
+    },
+    'downregulated_genes': {
+        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='down'),
     },
 }
 

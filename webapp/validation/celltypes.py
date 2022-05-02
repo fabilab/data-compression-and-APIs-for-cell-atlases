@@ -103,4 +103,8 @@ def validate_correct_celltypestr(celltypestr):
     return celltypestr
 
 
+def validate_correct_celltypedatasettimepoint(suffix):
+    '''Validate celltype + dataset + timepoint'''
+    #TODO
+    return suffix
 

@@ -256,6 +256,33 @@ def get_marker_genes(celltypes):
                     markers.append(gene)
 
     return ",".join(markers)
+
+
+def get_degs(suffix, kind='both'):
+    '''Get differentially expressed, up- or downregulated genes
+
+    the special phease " in " separated the split (e.g. hyperoxia) from
+    the celltype/timepoint/dataset specification (e.g. basophil ACZ P7)
+    '''
+    divider = suffix.find(' in ')
+    split, condition = suffix[:divider], suffix[divider+4:]
+    split = split.strip(' ')
+    condition = condition.strip(' ')
+    # deal with the grammar of "in ACZ" and "at P7"
+    if ' in ' in condition:
+        divider = condition.find(' in ')
+        condition = condition[:divider] + condition[divider+3:]
+    if ' at ' in condition:
+        divider = condition.find(' at ')
+        condition = condition[:divider] + condition[divider+3:]
+
+    # Replace the last two spaces with _ like in the h5 file
+    condition = condition[::-1].replace(' ', '_', 2)[::-1]
+
+    with h5py.File(fdn_data + "degs.h5", "r") as h5_data:
+        genes = np.array(h5_data[split][condition][kind].asstr())
+
+    return ",".join(genes)
     
 
 def get_data_hyperoxia(data_type, genes=None):

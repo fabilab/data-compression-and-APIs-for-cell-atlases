@@ -14,6 +14,7 @@ from models import (
 from validation import (
     validate_correct_genestr,
     validate_correct_celltypestr,
+    validate_correct_celltypedatasettimepoint,
     )
 
 
@@ -80,15 +81,40 @@ phrase_dict = {
             'show marker genes of',
             'show marker genes for',
             'show the markers of',
-            'show the markers for',
+            'show the markers for','hyperoxia'
             'show the marker genes of',
             'show the marker genes for',
-            'upregulated in',
-            'upregulated genes in',
-            'genes upregulated in',
             '!m',
         ],
         'suffix_type': 'celltypestring',
+    },
+    'differentially_expressed_genes': {
+        'prefixes': [
+            'differentially expressed genes in',
+            'degs in',
+            '!d',
+        ],
+        'suffix_type': 'celltype_dataset_timepoint_string',
+    },
+    'upregulated_genes': {
+        'prefixes': [
+            'genes upregulated in',
+            'upregulated genes in',
+            'upregulated in',
+            'up in',
+            '!u',
+        ],
+        'suffix_type': 'celltype_dataset_timepoint_string',
+    },
+    'downregulated_genes': {
+        'prefixes': [
+            'genes downregulated in',
+            'downregulated genes in',
+            'downregulated in',
+            'down in',
+            '!d',
+        ],
+        'suffix_type': 'celltype_dataset_timepoint_string',
     }
 }
 phrase_dict_inv = {}
@@ -97,31 +123,37 @@ for key, val in phrase_dict.items():
         phrase_dict_inv[prefix] = key
 
 
-def infer_command_from_text(text):
+def infer_command_from_text(text_raw):
     '''Figure out category of command'''
-    for prefix, category in phrase_dict_inv.items():
-        if text.startswith(prefix):
-            # Cut prefix
-            suffix = text[len(prefix):]
+    text = text_raw.lower()
 
+    for prefix, category in phrase_dict_inv.items():
+        if not text.startswith(prefix):
+            continue
+
+        # Figure out type of suffix
+        suffix_type = phrase_dict[category]['suffix_type']
+
+        # Cut prefix
+        if suffix_type == 'celltype_dataset_timepoint_string':
+            suffix = text_raw[len(prefix):]
+        else:
+            suffix = text[len(prefix):]
             # Remove whitespace from suffix
-            # NOTE: is this general?
             suffix = suffix.replace(' ', '')
 
-            # Cut punctuation at the end of the command
-            suffix = suffix.rstrip('?!.')
+        # Cut punctuation at the end of the command
+        suffix = suffix.rstrip('?!.')
 
-            return {
-                'prefix': prefix,
-                'suffix': suffix,
-                'category': category,
-                }
+        return {
+            'prefix': prefix,
+            'suffix': suffix,
+            'category': category,
+            }
     return None
 
 
-def interpret_text(text_raw):
-    text = text_raw.lower()
-
+def interpret_text(text):
     inferred_dict = infer_command_from_text(text)
     if inferred_dict is None:
         return None
@@ -137,6 +169,9 @@ def interpret_text(text_raw):
     elif suffix_type == 'celltypestring':
         suffix_corrected = validate_correct_celltypestr(suffix)
         question = 'celltype_string'
+    elif suffix_type == 'celltype_dataset_timepoint_string':
+        suffix_corrected = validate_correct_celltypedatasettimepoint(suffix)
+        question = 'celltype_dataset_timepoint_string'
     else:
         raise ValueError('Category not implemented')
 

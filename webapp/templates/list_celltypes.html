@@ -1,69 +1,66 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
-  <!--
-  <div class="columns is-mobile is-centered tab-area">
-    <div class="field column is-one-quarter">
-      <label class="label">Data values</label>
-      <div class="control">
-        <div class="tabs is-toggle is-centered">
-          <ul>
-            <li id="cpmTab" class="is-active">
-              <a id="CPMOnClick">CPM(count/million)</a>
-            </li>
-            <li id="logTab">
-              <a id="log10OnClick">Log10</a>
-            </li>
-          </ul>
+  {% if kind == "qualitative" %}
+    <div class="columns is-mobile is-centered tab-area">
+      <div class="column">
+        <h1 class="title">{{timepoint}}</h1>
+        <div class="columns is-centered" style="padding-top: 0px;">
+          <div class="field column is-third">
+            <div class="cthead">
+            Major
+            </div>
+            {% for ct in celltypes['major'] %}
+              <li>{{ct}}</li>
+            {% endfor %}
+          </div>
+          <div class="field column is-third">
+            <div class="cthead">
+            Minor
+            </div>
+            {% for ct in celltypes['minor'] %}
+              <li>{{ct}}</li>
+            {% endfor %}
+          </div>
+          <div class="field column is-third">
+            <div class="cthead">
+            Rare
+            </div>
+            {% for ct in celltypes['rare'] %}
+              <li>{{ct}}</li>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
-    <div class="field column is-one-quarter">
-      <label class="label">Cell type ordering</label>
-      <div class="control">
-        <div class="tabs is-toggle is-centered">
-          <ul>
-            <li id="originalOrderTab" class="is-active">
-              <a id="originalOnClick">Original</a>
-            </li>
-            <li id="hierachicalTab">
-              <a id="hClusterOnClick">Hierachical Clustered</a>
-            </li>
-          </ul>
+  {% else %}
+    <div class="columns is-mobile is-centered tab-area">
+      <div class="field column is-one-quarter">
+        <label class="label">Data values</label>
+        <div class="control">
+          <div class="tabs is-toggle is-centered">
+            <ul>
+              <li id="cpmTab" class="is-active">
+                <a id="CPMOnClick">Percentage</a>
+              </li>
+              <li id="logTab">
+                <a id="log10OnClick">Log10[%]</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  -->
-  <!-- Plots below -->
-  {{timepoint}}
-  <div class="columns is-mobile is-centered tab-area">
-    <div class="field column is-third">
-      <div class="cthead">
-      Major
-      </div>
-      {% for ct in celltypes['major'] %}
-        <li>{{ct}}</li>
-      {% endfor %}
+
+    <!-- Plots below -->
+    <div class="container" id="dataDisplay">
+      <div id="h5_data_plot"></div>   
     </div>
-    <div class="field column is-third">
-      <div class="cthead">
-      Minor
-      </div>
-      {% for ct in celltypes['minor'] %}
-        <li>{{ct}}</li>
-      {% endfor %}
-    </div>
-    <div class="field column is-third">
-      <div class="cthead">
-      Rare
-      </div>
-      {% for ct in celltypes['rare'] %}
-        <li>{{ct}}</li>
-      {% endfor %}
-    </div>
-  </div>
+
+    <script>
+    </script>
+
+  {% endif %}
 
 
 {% endblock %}

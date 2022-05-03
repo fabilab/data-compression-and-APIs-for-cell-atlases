@@ -45,14 +45,6 @@ def index():
 
 
 # Control pages
-@app.route("/voice_control", methods=["GET"])
-def voice_control():
-    """Name says it all"""
-    return render_template(
-            "voice_control.html",
-            )
-
-
 @app.route("/text_control", methods=["GET"])
 def text_control():
     """A single text bar to ask questions or post commands"""
@@ -60,6 +52,12 @@ def text_control():
         "text_control.html",
         )
 
+@app.route("/voice_control", methods=["GET"])
+def voice_control():
+    """Name says it all"""
+    return render_template(
+            "voice_control.html",
+            )
 
 # Default redirects
 @app.route("/heatmap_by_celltype", methods=["GET"])
@@ -162,6 +160,7 @@ def list_celltypes_timepoint(timepoint):
             'list_celltypes.html',
             timepoint=timepoint,
             celltypes=celltype_dict,
+            kind='qualitative',
             )
 
 

@@ -11,6 +11,7 @@ CLEAN=0
 VENV_DIR=.venv
 VERBOSE=0
 MAIN_FLASK_FILE=app.py
+CERT=0
 
 if [ x$CLEAN = x1 ]; then
     rm -rf ${VENV_DIR}
@@ -25,9 +26,11 @@ if [ ! -d ${VENV_DIR} ]; then
 fi
 ${VENV_DIR}/bin/pip install -r requirements.txt
 
-
-if [ x$VERBOSE = x1 ]; then
-  echo "${FLASK} run --cert=adhoc"
+if [ x$CERT = x1 ]; then
+  if [ x$VERBOSE = x1 ]; then
+    echo "${FLASK} run --cert=adhoc"
+  fi
+  ${FLASK} run --cert=adhoc
+else
+  ${FLASK} run
 fi
-
-${FLASK} run --cert=adhoc

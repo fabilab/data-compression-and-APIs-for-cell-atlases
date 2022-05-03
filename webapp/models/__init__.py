@@ -7,7 +7,10 @@ import re
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
 
-from validation.celltypes import adjust_celltypes
+from validation.celltypes import (
+        adjust_celltypes,
+        rename_celltypes,
+        )
 
 
 fdn_data = "./static/scData/"
@@ -351,6 +354,9 @@ def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
 
     # Sort them naturally
     fracs.sort_values(ascending=False, inplace=True)
+
+    # Rename to pretty names
+    fracs.index = rename_celltypes(fracs.index)
 
     result = {
         'major': [],

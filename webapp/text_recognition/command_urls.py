@@ -33,6 +33,9 @@ command_dict = {
     'downregulated_genes': {
         'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='down'),
     },
+    'list_cell_types': {
+        'url_func': lambda sfx: f'/list_celltypes/{sfx}',
+    },
 }
 
 

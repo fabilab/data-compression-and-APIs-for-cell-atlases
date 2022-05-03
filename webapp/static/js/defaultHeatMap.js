@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $.ajax({
         type:'GET',
-        url:'/data',
+        url:'/data/by_celltype',
         data: "gene_names=Car4,Vwf,Col1a1,Ptprc,Ms4a1&plot_type=original&data_type=original",
         dataType:'json',
         success: function(result) {

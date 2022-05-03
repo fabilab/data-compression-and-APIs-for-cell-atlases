@@ -20,6 +20,7 @@ from models import (
         get_friends,
         get_marker_genes,
         get_data_hyperoxia,
+        get_celltype_abundances,
     )
 from validation import (
         validate_correct_genestr,
@@ -180,4 +181,15 @@ class markerGenes(Resource):
                 'outcome': 'success',
                 'genenames': genenames,
                 }
+
+
+class celltypeAbundance(Resource):
+    def get(self):
+        timepoint = request.args.get("timepoint")
+        kind = request.args.get("kind")
+
+        return {
+            'outcome': 'success',
+            'celltypeabundance': get_celltype_abundances(timepoint, kind=kind),
+            }
 

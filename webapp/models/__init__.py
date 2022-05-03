@@ -333,3 +333,40 @@ def get_data_hyperoxia(data_type, genes=None):
             result.append(item)
     return result
 
+
+def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
+    # TODO
+    ncells = read_number_cells_from_file('celltype_dataset_timepoint')
+
+    idx = ncells.index.str.contains('_'+dataset+'_'+timepoint)
+    ncells_tp = ncells[idx]
+
+    ncells_tp.index = [x.split('_')[0] for x in ncells_tp.index]
+
+    ntot = ncells_tp.sum()
+    fracs = 1.0 * ncells_tp / ntot
+
+    if kind == 'quantitative':
+        return fracs
+
+    # Sort them naturally
+    fracs.sort_values(ascending=False, inplace=True)
+
+    result = {
+        'major': [],
+        'minor': [],
+        'rare': [],
+        'missing': [],
+    }
+    for ct, fr in fracs.items():
+        if fr > 0.1:
+            result['major'].append(ct)
+        elif fr > 0.03:
+            result['minor'].append(ct)
+        elif fr > 0:
+            result['rare'].append(ct)
+        else:
+            result['missing'].append(ct)
+
+    return result
+

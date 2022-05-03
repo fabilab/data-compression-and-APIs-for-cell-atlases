@@ -21,7 +21,10 @@ from ca_API import (
     geneExpHyperoxia,
     checkGenenames,
     markerGenes,
+    celltypeAbundance,
 )
+# NOTE: modify this direct model import (e.g. blueprint, API)?
+from models import get_celltype_abundances
 from voice_recognition import mod as voice_control_blueprint
 from text_recognition import mod as text_control_blueprint
 
@@ -147,6 +150,21 @@ def heatmap_differential_genes(genestring):
             )
 
 
+@app.route("/celltype_abundance/<timepoint>", methods=["GET"])
+def list_celltypes_timepoint(timepoint):
+    '''List cell types and their abundances'''
+    celltype_dict = get_celltype_abundances(
+            timepoint,
+            kind='qualitative',
+            )
+
+    return render_template(
+            'list_celltypes.html',
+            timepoint=timepoint,
+            celltypes=celltype_dict,
+            )
+
+
 # Static assets (JS/CSS)
 @app.route("/js/<path:path>")
 def send_js(path):
@@ -171,14 +189,16 @@ app.register_blueprint(voice_control_blueprint)
 
 
 # API endpoints
-api.add_resource(geneExp, "/data")
-api.add_resource(plotsForSeachGenes, "/2_genes")
+api.add_resource(geneExp, "/data/by_celltype")
+# FIXME: this should not be a separate API endpoint
+api.add_resource(plotsForSeachGenes, "/data/by_celltype_2_genes")
 api.add_resource(geneExpTime, "/data_timepoint")
 api.add_resource(geneFriends, "/gene_friends")
 api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 api.add_resource(geneExpHyperoxia, "/data_hyperoxia")
 api.add_resource(checkGenenames, "/check_genenames")
 api.add_resource(markerGenes, "/marker_genes")
+api.add_resource(celltypeAbundance, "/data/celltype_abundance")
 
 
 # Main loop

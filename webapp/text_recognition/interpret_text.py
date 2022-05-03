@@ -15,6 +15,7 @@ from validation import (
     validate_correct_genestr,
     validate_correct_celltypestr,
     validate_correct_celltypedatasettimepoint,
+    validate_correct_timepoint,
     )
 
 
@@ -115,7 +116,18 @@ phrase_dict = {
             '!d',
         ],
         'suffix_type': 'celltype_dataset_timepoint_string',
-    }
+    },
+    'list_cell_types': {
+        'prefixes': [
+            'list cell types',
+            'what are the cell types',
+            'what cell types are there',
+            'what cell types are present',
+            'cell types',
+            '!ct',
+        ],
+        'suffix_type': 'timepoint',
+    },
 }
 phrase_dict_inv = {}
 for key, val in phrase_dict.items():
@@ -172,6 +184,9 @@ def interpret_text(text):
     elif suffix_type == 'celltype_dataset_timepoint_string':
         suffix_corrected = validate_correct_celltypedatasettimepoint(suffix)
         question = 'celltype_dataset_timepoint_string'
+    elif suffix_type == 'timepoint':
+        suffix_corrected = validate_correct_timepoint(suffix)
+        question = 'timepoint'
     else:
         raise ValueError('Category not implemented')
 

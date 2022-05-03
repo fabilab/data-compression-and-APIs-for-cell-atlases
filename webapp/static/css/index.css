@@ -44,6 +44,11 @@
  padding: 10px;
 }
 
+.cthead {
+ font-weight: bolder;
+ padding: 10px;
+}
+
 .P:hover,.E:hover,.m:hover {
     color:rgb(22,132,212);
 }

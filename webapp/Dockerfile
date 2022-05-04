@@ -16,12 +16,14 @@ RUN pip install -r requirements.txt
 # Copy the content of the local src directory to the working directory
 # Python/Flask backend
 COPY app.py .
-COPY helper.py .
 COPY ca_API.py .
+ADD models models
+ADD text_recognition text_recognition
+ADD validation validation
+ADD voice_recognition voice_recognition
 
-# HTML files
-COPY index.html .
-COPY heatmap_by_timepoint.html .
+# Templates
+ADD templates templates
 
 # Static assets
 # FIXME: get rid of 10X data et similia

@@ -24,44 +24,41 @@ def convert_numbers_in_gene_name(gene):
     '''Convert numbers in gene name into digits'''
     from text_recognition.assets import numbers
 
+    # It's typical for gene names to end with a number (e.g. Car4)
     endswithdigit = False
-
-    # Check if we end with digits already
     for i in range(len(gene)):
         tail = gene[len(gene) - 1 - i:]
         if tail.isdigit():
             endswithdigit = True
             continue
         break
+
     if endswithdigit:
         # No gene name is purely a number, this should be fine
         tail = tail[1:]
         ndigit = int(tail)
     else:
-        # It's typical for gene names to end with a number (e.g. Car4)
+        # Check if we can convert the end to a digit
         for ntext, ndigit in numbers[::-1]:
             if gene.endswith(ntext):
                 gene = gene[:-len(ntext)]+str(ndigit)
                 endswithdigit = True
                 break
 
-    # If there are no digits at the end, no numbers will be converted
+    # If there are no convertible-to-digits at the end, we are done
     # FIXME: be more flexible than this, of course
     if not endswithdigit:
         return gene
 
-    # More complex cases, e.g. Col1a1, are more tricky to catch. If we
-    # have not returned yet, look for a pattern like the above
+    # If we found or converted an end digit, we should look for
+    # internal digit-likes, e.g. Col1a1
     sfx = len(str(ndigit)) + 1
     for ntext, ndigit in numbers[::-1]:
         if gene[:-sfx].endswith(ntext):
             gene = gene[:-sfx-len(ntext)] + str(ndigit) + gene[-sfx:]
             break
-    else:
-        return gene
 
-    # NOTE: we might put more logic here
-
+    print(gene)
     return gene
 
 

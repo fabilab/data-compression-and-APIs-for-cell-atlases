@@ -111,7 +111,7 @@ def heatmap_differential():
 
 
 # Generic views
-@app.route("/celltype/<genestring>", methods=['GET'])
+@app.route("/heatmap_by_celltype/<genestring>", methods=['GET'])
 def heatmap_by_celltype_genes(genestring):
     searchstring = genestring.replace(" ", "")
     return render_template(

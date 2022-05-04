@@ -86,11 +86,14 @@ def rename_celltypes(celltypes_raw):
 def validate_correct_celltypestr(celltypestr):
     '''Validate cell type names and correct misspellings if possible'''
     # TODO: check punctuation more accurately
-    celltypes = celltypestr.replace('.', ',').replace(';', ',').split(',')
+    celltypes = celltypestr.strip(' ').replace('.', ',').replace(';', ',').split(',')
 
     # Capitalization is not great, lowercase check
     celltypes = [x.lower() for x in celltypes]
-    celltypesd = {x.lower(): x for x in celltypes_all}
+    celltypesd = {}
+    for ct1, ct2 in celltype_dict.items():
+        celltypesd[ct1.lower()] = ct2
+        celltypesd[ct2.lower()] = ct2
 
     # Validate
     celltypesv = []

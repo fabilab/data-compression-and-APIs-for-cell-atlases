@@ -8,7 +8,7 @@ function HeatMap(result, html_element_id) {
             var y_axis = Object.keys(result);
             var ngenes =  y_axis.length;
             var graph_width = 1300;
-            var graph_height = 370 + 26 * ngenes;
+            var graph_height = 270 + 26 * ngenes;
             // y-axis:41 cell types
             var data_content = [];
             for (var i = 0; i < Object.keys(result).length; i++) {
@@ -33,14 +33,14 @@ function HeatMap(result, html_element_id) {
                 height: graph_height,
                 title: 'Heatmap of gene expression level in selected cell types',
                 xaxis: {
-                    title: 'Cell types',
+                    //title: 'Cell types',
                     automargin: true,
-                    tickangle: 60,
+                    tickangle: 70,
                     scaleanchor: 'y',
                     scaleratio: 1,
                 },
                 yaxis: {
-                    title: 'Genes',
+                    //title: 'Genes',
                     automargin: true,
                     autorange: "reversed",
                 },

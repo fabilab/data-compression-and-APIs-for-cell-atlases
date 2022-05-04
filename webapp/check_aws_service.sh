@@ -1,4 +1,4 @@
-# Create service
+# Create service (only once)
 aws lightsail create-container-service --service-name compressed-atlas-service --power small --scale 1
 
 # Check service
@@ -36,6 +36,9 @@ aws lightsail get-container-services --service-name compressed-atlas-service
 
 # Check status online (alternative, more visual)
 https://lightsail.aws.amazon.com/ls/webapp/us-west-2/container-services/compressed-atlas-service/deployments
+
+# Check out the result (public endpoint)
+https://compressed-atlas-service.vphsnedioc8ke.us-west-2.cs.amazonlightsail.com/
 
 # Delete service
 #aws lightsail delete-container-service --service-name compressed-atlas

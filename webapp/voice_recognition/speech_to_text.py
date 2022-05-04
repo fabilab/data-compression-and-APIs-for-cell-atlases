@@ -19,20 +19,12 @@ def check_ensure_gcloud_credentials():
 
 def convert_audio_blob_to_text(audio_blob):
     from io import BytesIO
-    import soundfile as sf
-    import librosa
-    from playsound import playsound
+    #from playsound import playsound
 
     audio_bytes = audio_blob.read()
     audio = speech_v1.RecognitionAudio(
             content=audio_bytes,
     )
-
-    # FIXME: debug: play audio blob
-    #audio_tmp_file = '/tmp/audio.wav'
-    #with open(audio_tmp_file, 'wb') as f:
-    #    f.write(audio_bytes)
-    #playsound(audio_tmp_file)
 
     # convert the input audio into whatever the client requires
     config = speech_v1.RecognitionConfig(

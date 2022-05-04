@@ -243,6 +243,11 @@ def get_friends(genes):
 
 def get_marker_genes(celltypes):
     '''Get markers for cell types'''
+    from validation.celltypes import celltype_dict
+    
+    celltype_dict_inv = {val: key for key, val in celltype_dict.items()}
+    celltype_dict_inv.update({ct: ct for ct in celltype_dict_inv.values()})
+
     # Sometimes we get a string
     if isinstance(celltypes, str):
         celltypes = celltypes.split(',')
@@ -251,9 +256,10 @@ def get_marker_genes(celltypes):
     with h5py.File(fdn_data + "marker_genes.h5", "r") as h5_data:
         group = h5_data['celltype']
         for celltype in celltypes:
-            if celltype not in group:
+            if celltype not in celltype_dict_inv:
                 return ''
-            genes_i = list(np.array(group[celltype].asstr()))
+            raw_ct = celltype_dict_inv[celltype]
+            genes_i = list(np.array(group[raw_ct].asstr()))
             for gene in genes_i:
                 if gene not in markers:
                     markers.append(gene)

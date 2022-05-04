@@ -24,6 +24,8 @@ phrase_dict = {
         'prefixes': [
             'what is the expression of',
             'what\'s the expression of',
+            'what is the gene expression of',
+            'what\'s the gene expression of',
             'expression of',
             'gene expression of',
             'show expression of',
@@ -40,6 +42,8 @@ phrase_dict = {
         'prefixes': [
             'what is the developmental expression of',
             'what\'s the developmental expression of',
+            'what is the developmental progression of',
+            'what\'s the developmental progression of',
             'progression of',
             'developmental expression of',
             'developmental progression of',
@@ -48,6 +52,8 @@ phrase_dict = {
             'show developmental expression of',
             'show the developmental expression of',
             'show the developmental gene expression of',
+            'show the progression of',
+            'show progression of',
             'prog of',
             'p of',
             '!p',
@@ -82,7 +88,7 @@ phrase_dict = {
             'show marker genes of',
             'show marker genes for',
             'show the markers of',
-            'show the markers for','hyperoxia'
+            'show the markers for',
             'show the marker genes of',
             'show the marker genes for',
             '!m',
@@ -149,7 +155,12 @@ def infer_command_from_text(text_raw):
         suffix_type = phrase_dict[category]['suffix_type']
 
         # Cut prefix
-        if suffix_type in ('celltype_dataset_timepoint_string', 'timepoint'):
+        cats_keep_whitespace = (
+            'celltype_dataset_timepoint_string',
+            'timepoint',
+            'celltypestring',
+            )
+        if suffix_type in cats_keep_whitespace:
             suffix = text_raw[len(prefix):]
         else:
             suffix = text[len(prefix):]

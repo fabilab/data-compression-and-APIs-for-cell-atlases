@@ -14,7 +14,7 @@ from models import get_marker_genes, get_degs
 
 command_dict = {
     'expression_by_celltype': {
-        'url_func': lambda sfx: f'/celltype/{sfx}',
+        'url_func': lambda sfx: url_for('heatmap_by_celltype_genes', genestring=sfx),
     },
     'expression_unified_heatmap': {
         'url_func': lambda sfx: f'/heatmap_unified/{sfx}',
@@ -23,7 +23,8 @@ command_dict = {
         'url_func': 'TODO',  # TODO
     },
     'marker_genes': {
-        'url_func': lambda sfx: '/celltype/'+get_marker_genes(sfx),
+        'url_func': lambda sfx: url_for('heatmap_by_celltype_genes',
+            genestring=get_marker_genes(sfx)),
     },
     'differentially_expressed_genes': {
         'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='both'),

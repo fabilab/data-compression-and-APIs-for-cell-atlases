@@ -155,7 +155,6 @@ def list_celltypes_timepoint(timepoint):
             timepoint,
             kind='qualitative',
             )
-
     return render_template(
             'list_celltypes.html',
             timepoint=timepoint,

@@ -120,6 +120,8 @@ phrase_dict = {
     'list_cell_types': {
         'prefixes': [
             'list cell types',
+            'list the cell types',
+            'show cell types',
             'what are the cell types',
             'what cell types are there',
             'what cell types are present',
@@ -147,7 +149,7 @@ def infer_command_from_text(text_raw):
         suffix_type = phrase_dict[category]['suffix_type']
 
         # Cut prefix
-        if suffix_type == 'celltype_dataset_timepoint_string':
+        if suffix_type in ('celltype_dataset_timepoint_string', 'timepoint'):
             suffix = text_raw[len(prefix):]
         else:
             suffix = text[len(prefix):]

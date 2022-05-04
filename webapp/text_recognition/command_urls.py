@@ -6,6 +6,7 @@ content:    Interpret text from Google TTS into a redirect URL.
 '''
 import numpy as np
 import pandas as pd
+from flask import url_for
 
 from models import get_marker_genes, get_degs
 
@@ -34,7 +35,7 @@ command_dict = {
         'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='down'),
     },
     'list_cell_types': {
-        'url_func': lambda sfx: f'/list_celltypes/{sfx}',
+        'url_func': lambda sfx: url_for('list_celltypes_timepoint', timepoint=sfx),
     },
 }
 

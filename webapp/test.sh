@@ -12,6 +12,7 @@ VENV_DIR=.venv
 VERBOSE=0
 MAIN_FLASK_FILE=app.py
 CERT=0
+export FLASK_DEBUG=1
 
 if [ x$CLEAN = x1 ]; then
     rm -rf ${VENV_DIR}

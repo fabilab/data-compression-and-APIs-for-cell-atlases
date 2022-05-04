@@ -338,7 +338,7 @@ def get_data_hyperoxia(data_type, genes=None):
 
 
 def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
-    # TODO
+    '''Get cell type abundances at a certain time point'''
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
 
     idx = ncells.index.str.contains('_'+dataset+'_'+timepoint)

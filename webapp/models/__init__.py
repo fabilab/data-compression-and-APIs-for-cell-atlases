@@ -14,8 +14,6 @@ from validation.celltypes import (
 
 
 fdn_data = "./static/scData/"
-# FIXME
-fn_atlas = fdn_data + "condensed_lung_atlas_in_cpm.h5"
 fn_atlas = fdn_data + "condensed_lung_atlas_ordered.h5"
 
 
@@ -135,7 +133,7 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
     return dic_per_dataset
 
 
-def get_big_heatmap(gene, use_log, use_hierarchical):
+def dataset_unified(gene):
     '''Get JS plotly code for big heatmap
 
     NOTE: this technically breaks the API concept. Let's keep it in mind
@@ -146,9 +144,6 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
 
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
     countg = read_counts_from_file('celltype_dataset_timepoint', genes=[gene]).iloc[0]
-
-    if use_log:
-        countg = np.log10(0.1 + countg)
 
     # Sort the rows
     timepoint_order = ['E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
@@ -163,46 +158,23 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
     ncells.sort_values(['timepoint_order', 'dataset_order'], inplace=True)
     countg.index = countg.index.str.split('_', 1, expand=True)
     countg = countg.unstack(0, fill_value=-1).loc[ncells.index]
-
-    # Sort the columns
-    if use_hierarchical:
-        distance = pdist(countg.T.values)
-        # print(distance)
-        Z = linkage(distance, optimal_ordering=True)
-        new_order = leaves_list(Z)
-        countg = countg.iloc[:, new_order]
-
     ncells = ncells.loc[:, countg.columns]
 
-    # NOTE: this is the part that we could outsource to the frontend
-    # Construct data structures (lists) for plotly
-    plot_data = {'x': [], 'y': [], 'text': [], 'marker': {'color': [], 'size': [], 'opacity': []}}
-    colormax = countg.values.max()
-    color_steps = pcolors.colorbrewer.Reds
-    ncolors = len(color_steps)
-    for i, label in enumerate(ncells.index):
-        for j, celltype in enumerate(countg.columns):
-            nc = ncells.at[label, celltype]
-            ge = countg.at[label, celltype]
-            plot_data['x'].append(celltype)
-            plot_data['y'].append(label)
-            plot_data['text'].append(str(ge))
-            if nc < 5:
-                ms = 8
-                opacity = 0.5
-            elif nc < 40:
-                ms = 13
-                opacity = 0.7
-            else:
-                ms = 20
-                opacity = 0.9
-            plot_data['marker']['size'].append(ms)
-            plot_data['marker']['opacity'].append(opacity)
-            color = min(ncolors - 1, int(ncolors * ge / colormax))
-            plot_data['marker']['color'].append(color)
+    # Set canonical celltype order
+    celltypes_adj, idx = adjust_celltypes(ncells.columns)
+    ncells = ncells.iloc[:, idx]
+    countg = countg.iloc[:, idx]
+    ncells.columns = celltypes_adj
+    countg.columns = celltypes_adj
 
-    plot_data['mode'] = 'markers'
-    plot_data['marker_symbol'] = 'square'
+    # Sort the columns
+    distance = pdist(countg.T.values)
+    Z = linkage(distance, optimal_ordering=True)
+    new_order = leaves_list(Z)
+
+    celltypes = countg.columns.tolist()
+    celltypes_hierarchical = countg.columns[new_order].tolist()
+    row_labels = ncells.index.tolist()
 
     xticks = list(countg.columns)
     yticks = list(ncells.index)
@@ -215,7 +187,12 @@ def get_big_heatmap(gene, use_log, use_hierarchical):
             yticktext.append('')
 
     return {
-        'data': plot_data,
+        'gene': gene,
+        'gene_expression': countg.T.to_dict(),
+        'ncells': ncells.T.to_dict(),
+        'celltypes': celltypes,
+        'celltypes_hierarchical': celltypes_hierarchical,
+        'row_labels': row_labels,
         'xticks': xticks,
         'yticks': yticks,
         'yticktext': yticktext,
@@ -340,6 +317,7 @@ def get_data_hyperoxia(data_type, genes=None):
 
             item['data'] = dfi
             result.append(item)
+
     return result
 
 

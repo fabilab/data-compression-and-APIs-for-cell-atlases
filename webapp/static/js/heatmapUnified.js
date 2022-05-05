@@ -1,22 +1,67 @@
-function range(start, end) {
-    var ans = [];
-    for (let i = start; i < end; i++) {
-        ans.push(i);
+var plotData = {};
+
+function plotHeatmapUnified(result, scaleData, celltypeOrder) {
+    let gene_name = result['gene'];
+    let x_axis;
+    if (celltypeOrder === "original") {
+        x_axis = result['celltypes'];
+    } else {
+        x_axis = result['celltypes_hierarchical'];
     }
-    return ans;
-}
+    let y_axis = result['row_labels'];
+    let nx = x_axis.length;
+    let ny = y_axis.length;
 
-function plotHeatmapUnified(gene_name, result) {
-    var data = result['data'];
-    data['type'] = 'scatter';
-    data['marker']['symbol'] = 'square';
+    let x = [],
+        y = [],
+        tooltip = [],
+        markersize = [],
+        markeropacity = [],
+        markercolor = [];
+    let ms, opacity;
+    for (let i = 0; i < y_axis.length; i++) {
+        const label = y_axis[i];
+        for (let j = 0; j < x_axis.length; j++) {
+            const celltype = x_axis[j];
+            let nc = result['ncells'][label][celltype]
+            let ge = result['gene_expression'][label][celltype]
+            if (scaleData == "log10") {
+                ge = Math.log10(ge + 0.5);
+            }
+            if (nc < 5) {
+                ms = 8;
+                opacity = 0.5;
+            } else if (nc < 40) {
+                ms = 13;
+                opacity = 0.7;
+            } else {
+                ms = 20;
+                opacity = 0.9;
+            }
+            x.push(celltype)
+            y.push(label)
+            markercolor.push(ge);
+            markeropacity.push(opacity);
+            markersize.push(ms);
+            tooltip.push("Expression: "+ge, "Label: "+label);
+        }
+    }
 
-    var xticks = result['xticks'];
-    var yticks = result['yticks'];
-    var nx = xticks.length;
-    var ny = yticks.length;
+    let data = {
+        x: x,
+        y: y,
+        text: tooltip,
+        mode: 'markers',
+        marker: {
+            size: markersize,
+            opacity: opacity,
+            symbol: 'square',
+            colorscale: 'Reds',
+            color: markercolor,
+        },
+    };
 
-    var layout = {
+    let layout = {
         automargin: true,
         autosize: true,
         width: 1300,
@@ -27,7 +72,7 @@ function plotHeatmapUnified(gene_name, result) {
             xanchor: 'center',
         },
         xaxis: {
-            tickangle: 60,
+            tickangle: 70,
             automargin: true,
             linewidth: 0,
             type: 'category',
@@ -51,34 +96,16 @@ function plotHeatmapUnified(gene_name, result) {
 
 function AssembleAjaxRequest() {
 
-    // action here when clicking the search button
     var gene_name = $('#searchGeneName').val();
-    if (gene_name === '') {
-      gene_name = "Car4";
-    }
-    cpm_is_active = $("#cpmTab").hasClass('is-active');
-    orginal_is_active = $("#originalOrderTab").hasClass('is-active')
-    var use_log, use_hierarchical;
-    
-    if (cpm_is_active) {
-      use_log = '0';
-    } else {
-      use_log = '1';
-    } 
-    
-    if (orginal_is_active) {
-      use_hierarchical = "0";
-    } else {
-      use_hierarchical = "1";
-    }
 
     $.ajax({
         type:'GET',
         url:'/data_heatmap_unified',
-        data: "gene=" + gene_name + "&use_log=" + use_log + "&use_hierarchical=" + use_hierarchical,
+        data: "gene=" + gene_name,
         dataType:'json',
         success: function(result) {
-            plotHeatmapUnified(gene_name, result)
+            plotData = result;
+            updatePlot();
         },
         error: function (e) {
           alert('Request data Failed')
@@ -86,11 +113,56 @@ function AssembleAjaxRequest() {
     });
 }
 
-$("#searchOnClick").click(function() {
-  // action here when clicking the search button
-  AssembleAjaxRequest();
-})
+function updatePlot() {
+    let scaleData, celltypeOrder;
+    
+    if ($("#cpmTab").hasClass('is-active')) {
+      scaleData = "original";
+    } else {
+      scaleData = "log10";
+    } 
+    
+    if ($("#originalOrderTab").hasClass('is-active')) {
+        celltypeOrder = "original";
+    } else {
+        celltypeOrder = "hierarchical";
+    }
 
-$(document).ready(function () {
-    AssembleAjaxRequest();
+    plotHeatmapUnified(plotData, scaleData, celltypeOrder);
+}
+
+$("#searchOnClick").click(AssembleAjaxRequest);
+$(document).ready(AssembleAjaxRequest);
+
+// Normalise the data with log10 and generate a new plot (when user click the button)
+$("#log10OnClick" ).click(function() {
+    // if User has input their gene of interest, generate the heatmap with that value
+    // otherwise use the default data
+    $("#logTab").addClass('is-active');
+    $("#cpmTab").removeClass('is-active');
+    updatePlot();
+    
 });
+
+$("#CPMOnClick" ).click(function() {
+    $("#logTab").removeClass('is-active');
+    $("#cpmTab").addClass('is-active');
+    updatePlot();
+});
+
+// Second set of buttons
+$("#hClusterOnClick" ).click(function() {
+    // if User has input their gene of interest, generate the heatmap with that value
+    // otherwise use the default data
+    $("#hierachicalTab").addClass('is-active');
+    $("#originalOrderTab").removeClass('is-active');
+    updatePlot();
+});
+
+
+$("#originalOnClick" ).click(function() {
+    $("#originalOrderTab").addClass('is-active');
+    $("#hierachicalTab").removeClass('is-active');
+    updatePlot();
+});
+

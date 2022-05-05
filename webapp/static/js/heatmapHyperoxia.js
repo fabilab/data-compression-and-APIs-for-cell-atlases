@@ -1,23 +1,29 @@
 // Plot heatmap by celltype as a callback for the AJAX request
-function HeatmapHyperoxia(result, html_element_id, title) {
-        if (!result) {
-            alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
-        } else {
-            temp0 = result;
+// Use global variables to store persistent data
+var heatmapData = [];
 
-            const dataScale = result['data_scale'];
-            var x_axis = result['celltypes'];
-            var y_axis = result['genes'];
-            var ngenes =  y_axis.length;
+function HeatmapHyperoxia(result, html_element_id, title, order) {
+        if (!result) {
+            alert("Error: Nothing to plot or gene names invalid")
+        } else {
+            var x_axis;
+            if (order == "original") {
+                x_axis = result['celltypes'];
+            } else {
+                x_axis = result['celltypes_hierarchical'];
+            }
+            var ngenes =  result['genes'].length;
             var graph_width = 1300;
             var graph_height = 370 + 26 * ngenes;
 
             let data_content = [];
             let i = 0;
             for (let gene in result['data']) {
-                data_content.push([])
-                for (let ct in result['data'][gene]) {
-                    data_content[i].push(result['data'][gene][ct]);
+                data_content.push([]);
+                for (let j = 0; j < x_axis.length; j++) {
+                    const ct = x_axis[j];
+                    let gene_exp = result['data'][gene][ct];
+                    data_content[i].push(gene_exp);
                 }
                 i+= 1;
             }
@@ -25,13 +31,13 @@ function HeatmapHyperoxia(result, html_element_id, title) {
                 {
                     z: data_content,
                     x: x_axis,
-                    y: y_axis,
+                    y: result['genes'],
                     type: 'heatmap',
                     hoverongaps: false,
                     colorscale: 'Reds',
                 }
                 ];
-            if (dataScale === "log2FC") {
+            if (result['data_scale'] === "log2FC") {
                 data[0]['colorscale'] = 'RdBu';
                 data[0]['zmid'] = 0;
             }
@@ -94,29 +100,35 @@ function AssembleAjaxRequest() {
     // sent gene names to the API
     $.ajax({
         type:'GET',
-        url:'/data_hyperoxia',
+        url:'/data/hyperoxia',
         data: "gene_names="+gene_names+"&plot_type="+plot_type+"&data_type="+data_type,
         dataType:'json',
         success: function(result) {
             // Clear mobile DOM elements
             $("#h5_data_plot").html("");
 
+            heatmapData = [];
+
             // result is a JSON list
-            // FIXME
-            for(let i = 0; i < 1; i++) {
+            for(let i = 0; i < result.length; i++) {
                 let item = result[i];
                 const dataset = item['dataset'];
                 const timepoint = item['timepoint'];
+                const title = dataset+", "+timepoint;
 
                 // Add DOM element
                 const newId = "h5_data_plot_"+dataset+"_"+timepoint;
                 $("#h5_data_plot").append("<div id="+newId+"></div>");
 
+                // Add the data to persistency
+                heatmapData.push({'item': item, 'div': newId, 'title': title});
+
                 // Plot inside DOM element
                 HeatmapHyperoxia(
                       item, 
                       newId,
-                      dataset+", "+timepoint,
+                      title,
+                      plot_type,
                     );
             }
         },
@@ -128,6 +140,19 @@ function AssembleAjaxRequest() {
 
 };
 
+
+function updateOrder(order) {
+    // NOTE: heatmapData is the global persistent object
+    for(let i = 0; i < heatmapData.length; i++) {
+        HeatmapHyperoxia(
+              heatmapData[i]['item'], 
+              heatmapData[i]['div'],
+              heatmapData[i]['title'],
+              order,
+            );
+    }
+}
+
 // Both on click and load, plot the heatmap
 $("#searchOnClick").click(function() {
   // action here when clicking the search button
@@ -137,3 +162,42 @@ $("#searchOnClick").click(function() {
 $(document).ready(function() {
   AssembleAjaxRequest();
 });
+
+
+// normalization
+$("#log2FCOnClick" ).click(function() {
+    $("#log2FCTab").addClass('is-active');
+    $("#cpmTab").removeClass('is-active');
+    $("#logTab").removeClass('is-active');
+    AssembleAjaxRequest()
+});
+
+$("#log10OnClick" ).click(function() {
+    $("#log2FCTab").removeClass('is-active');
+    $("#cpmTab").removeClass('is-active');
+    $("#logTab").addClass('is-active');
+    AssembleAjaxRequest()
+});
+
+$("#CPMOnClick" ).click(function() {
+    $("#log2FCTab").removeClass('is-active');
+    $("#cpmTab").addClass('is-active');
+    $("#logTab").removeClass('is-active');
+    AssembleAjaxRequest()
+});
+
+
+// order of cell types
+$("#hClusterOnClick" ).click(function() {
+    $("#hierachicalTab").addClass('is-active');
+    $("#originalOrderTab").removeClass('is-active');
+    updateOrder("hierarchical");
+});
+
+
+$("#originalOnClick" ).click(function() {
+    $("#originalOrderTab").addClass('is-active');
+    $("#hierachicalTab").removeClass('is-active');
+    updateOrder("original");
+});
+

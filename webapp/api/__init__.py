@@ -16,43 +16,46 @@ import plotly
 from models import (
         read_counts_from_file,
         dataset_by_timepoint,
-        get_big_heatmap,
+        dataset_unified,
         get_friends,
         get_marker_genes,
         get_data_hyperoxia,
         get_celltype_abundances,
     )
-from validation import (
-        validate_correct_genestr,
-        validate_correct_celltypestr,
-    )
+from validation.genes import validate_correct_genestr
+from validation.celltypes import validate_correct_celltypestr
 
 
 class geneExp(Resource):
     '''API for the compressed atlas data, to be visualized as a heatmap'''
     def get(self):
         genestring = request.args.get("gene_names")
-        plot_type = request.args.get("plot_type")
-        data_type = request.args.get("data_type")
-
         gene_names = genestring.replace(' ', '').split(',')
         try:
             df = read_counts_from_file("celltype", genes=gene_names).T
         except KeyError:
             return None
 
-        if data_type == "log10":
-            df = np.log10(0.1 + df)
+        dfl = np.log10(df + 0.5)
 
-        if plot_type == "hierachical":
-            print(df.values.shape)  # (41x5)
-            distance = pdist(df.values)
-            # print(distance)
-            Z = linkage(distance, optimal_ordering=True)
-            new_order = leaves_list(Z)
-            df = df.iloc[new_order]
+        celltypes_hierarchical = leaves_list(linkage(
+            pdist(dfl.values),
+            optimal_ordering=True),
+        )
+        genes_hierarchical = leaves_list(linkage(
+            pdist(dfl.values.T),
+            optimal_ordering=True),
+        )
 
-        return json.loads(df.to_json())
+        result = {
+            'data': df.to_dict(),
+            'genes': df.columns.tolist(),
+            'celltypes': df.index.tolist(),
+            'celltypes_hierarchical': df.index[celltypes_hierarchical].tolist(),
+            'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
+        }
+
+        return jsonify(result)
 
 
 class geneExpTime(Resource):
@@ -73,9 +76,7 @@ class geneExpTime(Resource):
 class geneExpTimeUnified(Resource):
     def get(self):
         gene = request.args.get("gene")
-        use_log = request.args.get("use_log") == '1'
-        use_hierarchical = request.args.get("use_hierarchical") == '1'
-        data = get_big_heatmap(gene, use_log, use_hierarchical)
+        data = dataset_unified(gene)
         return data
 
 
@@ -97,18 +98,25 @@ class geneExpHyperoxia(Resource):
         for item in result:
             df = item['data']
             item['genes'] = df.columns.tolist()
-            if plot_type == "original":
-                item['celltypes'] = df.index.tolist()
-            else:
-                distance = pdist(df.values)
-                # print(distance)
-                Z = linkage(distance, optimal_ordering=True)
-                new_order = leaves_list(Z)
-                df = df.iloc[new_order]
-                item['celltypes'] = df.index.tolist()
-                item['data'] = df
 
-                print(item['celltypes'])
+            # FIXME
+            #if plot_type == "original":
+            #    item['celltypes'] = df.index.tolist()
+            #else:
+            #    distance = pdist(df.values)
+            #    # print(distance)
+            #    Z = linkage(distance, optimal_ordering=True)
+            #    new_order = leaves_list(Z)
+            #    df = df.iloc[new_order]
+            #    item['celltypes'] = df.index.tolist()
+            #    item['data'] = df
+            item['celltypes'] = df.index.tolist()
+
+            distance = pdist(df.values)
+            # print(distance)
+            Z = linkage(distance, optimal_ordering=True)
+            new_order = leaves_list(Z)
+            item['celltypes_hierarchical'] = df.index[new_order].tolist()
 
         for item in result:
             item['data'] = item['data'].to_dict()

@@ -11,8 +11,7 @@ from flask import (
 from flask_restful import Api
 from flask_cors import CORS
 
-from validation.genes import validate_correct_genestr
-from ca_API import (
+from api import (
     geneExp,
     geneExpTime,
     plotsForSeachGenes,
@@ -23,17 +22,18 @@ from ca_API import (
     markerGenes,
     celltypeAbundance,
 )
-# NOTE: modify this direct model import (e.g. blueprint, API)?
 from models import get_celltype_abundances
+from validation.genes import validate_correct_genestr
 from voice_recognition import mod as voice_control_blueprint
 from text_recognition import mod as text_control_blueprint
 
 
+##############################
 app = Flask(__name__, static_url_path="/static", template_folder="templates")
-api = Api(app)
-
+app_api = Api(app)
 # Note: this might be unsafe
 CORS(app)
+##############################
 
 
 ##############################
@@ -58,6 +58,7 @@ def voice_control():
     return render_template(
             "voice_control.html",
             )
+
 
 # Default redirects
 @app.route("/heatmap_by_celltype", methods=["GET"])
@@ -115,7 +116,7 @@ def heatmap_differential():
 def heatmap_by_celltype_genes(genestring):
     searchstring = genestring.replace(" ", "")
     return render_template(
-            "heatmap_celltype.html",
+            "heatmap_by_celltype.html",
             searchstring=searchstring,
             )
 
@@ -148,7 +149,7 @@ def heatmap_differential_genes(genestring):
             )
 
 
-@app.route("/celltype_abundance/<timepoint>", methods=["GET"])
+@app.route("/list_celltypes/<timepoint>", methods=["GET"])
 def list_celltypes_timepoint(timepoint):
     '''List cell types and their abundances'''
     celltype_dict = get_celltype_abundances(
@@ -159,7 +160,22 @@ def list_celltypes_timepoint(timepoint):
             'list_celltypes.html',
             timepoint=timepoint,
             celltypes=celltype_dict,
-            kind='qualitative',
+            searchstring=timepoint,
+            )
+
+
+@app.route("/celltype_abundance/<timepoint>", methods=["GET"])
+def plot_celltype_abundance(timepoint):
+    '''Plot cell type abundances'''
+    celltype_dict = get_celltype_abundances(
+            timepoint,
+            kind='quantitative',
+            )
+    return render_template(
+            'celltype_abundance.html',
+            timepoint=timepoint,
+            celltypes=celltype_dict,
+            searchstring=timepoint,
             )
 
 
@@ -187,16 +203,16 @@ app.register_blueprint(voice_control_blueprint)
 
 
 # API endpoints
-api.add_resource(geneExp, "/data/by_celltype")
+app_api.add_resource(geneExp, "/data/by_celltype")
+app_api.add_resource(geneExpTime, "/data_timepoint")
+app_api.add_resource(geneFriends, "/gene_friends")
+app_api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
+app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
+app_api.add_resource(checkGenenames, "/check_genenames")
+app_api.add_resource(markerGenes, "/data/marker_genes")
+app_api.add_resource(celltypeAbundance, "/data/celltype_abundance")
 # FIXME: this should not be a separate API endpoint
-api.add_resource(plotsForSeachGenes, "/data/by_celltype_2_genes")
-api.add_resource(geneExpTime, "/data_timepoint")
-api.add_resource(geneFriends, "/gene_friends")
-api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
-api.add_resource(geneExpHyperoxia, "/data_hyperoxia")
-api.add_resource(checkGenenames, "/check_genenames")
-api.add_resource(markerGenes, "/marker_genes")
-api.add_resource(celltypeAbundance, "/data/celltype_abundance")
+app_api.add_resource(plotsForSeachGenes, "/data/by_celltype_2_genes")
 
 
 # Main loop

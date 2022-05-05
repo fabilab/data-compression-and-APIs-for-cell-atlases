@@ -108,7 +108,7 @@ function clarifyResponse(response) {
         // Validate new cell type string
         $.ajax({
             type:'GET',
-            url:'/marker_genes',
+            url:'/data/marker_genes',
             data: "celltype_names="+ctstr,
             success: function(result) {
                 if (result['outcome'] == 'fail') {

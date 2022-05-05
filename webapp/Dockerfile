@@ -16,7 +16,7 @@ RUN pip install -r requirements.txt
 # Copy the content of the local src directory to the working directory
 # Python/Flask backend
 COPY app.py .
-COPY ca_API.py .
+ADD api api
 ADD models models
 ADD text_recognition text_recognition
 ADD validation validation

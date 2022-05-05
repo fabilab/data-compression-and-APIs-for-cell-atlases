@@ -17,26 +17,40 @@ command_dict = {
         'url_func': lambda sfx: url_for('heatmap_by_celltype_genes', genestring=sfx),
     },
     'expression_unified_heatmap': {
-        'url_func': lambda sfx: f'/heatmap_unified/{sfx}',
+        'url_func': lambda sfx: url_for('heatmap_unified_genes', genestring=sfx),
     },
     'gene_friends': {
         'url_func': 'TODO',  # TODO
     },
     'marker_genes': {
-        'url_func': lambda sfx: url_for('heatmap_by_celltype_genes',
+        'url_func': lambda sfx: url_for(
+            'heatmap_by_celltype_genes',
             genestring=get_marker_genes(sfx)),
     },
     'differentially_expressed_genes': {
-        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='both'),
+        'url_func': lambda sfx: url_for(
+            'heatmap_differential_genes',
+            genestring=get_degs(sfx, kind='both')),
     },
     'upregulated_genes': {
-        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='up'),
+        'url_func': lambda sfx: url_for(
+            'heatmap_differential_genes',
+            genestring=get_degs(sfx, kind='up')),
     },
     'downregulated_genes': {
-        'url_func': lambda sfx: '/heatmap_differential/'+get_degs(sfx, kind='down'),
+        'url_func': lambda sfx: url_for(
+            'heatmap_differential_genes',
+            genestring=get_degs(sfx, kind='down')),
     },
     'list_cell_types': {
-        'url_func': lambda sfx: url_for('list_celltypes_timepoint', timepoint=sfx),
+        'url_func': lambda sfx: url_for(
+            'list_celltypes_timepoint',
+            timepoint=sfx),
+    },
+    'celltype_abundance': {
+        'url_func': lambda sfx: url_for(
+            'plot_celltype_abundance',
+            timepoint=sfx),
     },
 }
 

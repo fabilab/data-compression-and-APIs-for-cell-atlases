@@ -11,12 +11,12 @@ from models import (
     gene_order,
     celltypes as celltypes_all,
     )
-from validation import (
-    validate_correct_genestr,
+from validation.genes import validate_correct_genestr
+from validation.celltypes import (
     validate_correct_celltypestr,
     validate_correct_celltypedatasettimepoint,
-    validate_correct_timepoint,
     )
+from validation.timepoints import validate_correct_timepoint
 
 
 phrase_dict = {
@@ -133,6 +133,14 @@ phrase_dict = {
             'what cell types are present',
             'cell types',
             '!ct',
+        ],
+        'suffix_type': 'timepoint',
+    },
+    'celltype_abundance': {
+        'prefixes': [
+            'show cell type abundance at',
+            'cell type abundance at',
+            'abundance of cell types at',
         ],
         'suffix_type': 'timepoint',
     },

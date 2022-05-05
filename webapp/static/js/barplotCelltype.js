@@ -1,5 +1,6 @@
 // Plot heatmap by celltype as a callback for the AJAX request
-function HeatMap(result, html_element_id) {
+function barplotCelltype(result, html_element_id) {
+    //TODO
         if (!result) {
             alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
         } else {

@@ -16,7 +16,6 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 y_axis = result['genes_hierarchical'];
             }
 
-            var y_axis = result['genes'];
             var ngenes =  y_axis.length;
             var graph_width = 1300;
             var graph_height = 270 + 26 * ngenes;

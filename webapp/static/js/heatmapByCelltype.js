@@ -79,13 +79,32 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 data[0]['z'] = [data_content];
                 data[0]['x'] = [x_axis];
                 data[0]['y'] = [y_axis];
-
                 Plotly.update(
                     document.getElementById(html_element_id),
                     data[0],
                     {yaxis: {autorange: "reversed"}},
                     [0],
                 ); 
+
+                // FIXME: how to animate color changes in a heatmap?
+                //data[0]['z'] = data_content;
+                //data[0]['x'] = x_axis;
+                //data[0]['y'] = y_axis;
+                //Plotly.animate(
+                //    document.getElementById(html_element_id),
+                //    {
+                //        data: data,
+                //    },
+                //    {
+                //        transition: {
+                //            duration: 1500,
+                //            easing: 'cubic-in-out',
+                //        },
+                //        frame: {
+                //            duration: 1500,
+	        //        },
+                //    },
+                //); 
             }
         };
     } 

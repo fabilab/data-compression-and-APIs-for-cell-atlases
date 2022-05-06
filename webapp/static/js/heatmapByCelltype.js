@@ -3,110 +3,111 @@
 var heatmapData = {};
 
 function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
-        if (!result) {
-            alert("Error: no data to plot");
-        } else {
+    if (!result) {
+        alert("Error: no data to plot");
+        return;
+    }
 
-            let x_axis;
-            if (celltypeOrder == "original") {
-                x_axis = result['celltypes'];
-                y_axis = result['genes'];
-            } else {
-                x_axis = result['celltypes_hierarchical'];
-                y_axis = result['genes_hierarchical'];
+    let x_axis;
+    if (celltypeOrder == "original") {
+        x_axis = result['celltypes'];
+        y_axis = result['genes'];
+    } else {
+        x_axis = result['celltypes_hierarchical'];
+        y_axis = result['genes_hierarchical'];
+    }
+
+    var ngenes =  y_axis.length;
+    var graph_width = 1300;
+    var graph_height = 270 + 26 * ngenes;
+
+    let data_content = [];
+    for (let i = 0; i < y_axis.length; i++) {
+        const gene = y_axis[i];
+        data_content.push([]);
+        for (let j = 0; j < x_axis.length; j++) {
+            const ct = x_axis[j];
+            let gene_exp = result['data'][gene][ct]; 
+            if (dataScale == "log10") {
+                gene_exp = Math.log10(gene_exp + 0.5);
             }
+            data_content[i].push(gene_exp);
+        }
+    }
+    var data = [
+        {
+            type: 'heatmap',
+            hoverongaps: false,
+            colorscale: 'Reds',
+        }
+        ];
 
-            var ngenes =  y_axis.length;
-            var graph_width = 1300;
-            var graph_height = 270 + 26 * ngenes;
+    // Make new plot if none is present
+    if ($('#'+html_element_id).html() === "") {
 
-            let data_content = [];
-            for (let i = 0; i < y_axis.length; i++) {
-                const gene = y_axis[i];
-                data_content.push([]);
-                for (let j = 0; j < x_axis.length; j++) {
-                    const ct = x_axis[j];
-                    let gene_exp = result['data'][gene][ct]; 
-                    if (dataScale == "log10") {
-                        gene_exp = Math.log10(gene_exp + 0.5);
-                    }
-                    data_content[i].push(gene_exp);
-                }
-            }
-            var data = [
-                {
-                    type: 'heatmap',
-                    hoverongaps: false,
-                    colorscale: 'Reds',
-                }
-                ];
+        data['z'] = data_content;
+        data['x'] = x_axis;
+        data['y'] = y_axis;
 
-            // Make new plot if none is present
-            if ($('#'+html_element_id).html() === "") {
-
-                data[0]['z'] = data_content;
-                data[0]['x'] = x_axis;
-                data[0]['y'] = y_axis;
-
-                var layout = {
-                    autosize: true,
-                    width: graph_width,
-                    height: graph_height,
-                    title: 'Heatmap of gene expression level in selected cell types',
-                    xaxis: {
-                        //title: 'Cell types',
-                        automargin: true,
-                        tickangle: 70,
-                        scaleanchor: 'y',
-                        scaleratio: 1,
-                    },
-                    yaxis: {
-                        //title: 'Genes',
-                        automargin: true,
-                        autorange: "reversed",
-                    },
-                };
-                    
-                Plotly.newPlot(
-                    document.getElementById(html_element_id),
-                    data,
-                    layout,
-                ); 
-
-            // Update existing plot if present
-            } else {
-                data[0]['z'] = [data_content];
-                data[0]['x'] = [x_axis];
-                data[0]['y'] = [y_axis];
-                Plotly.update(
-                    document.getElementById(html_element_id),
-                    data[0],
-                    {yaxis: {autorange: "reversed"}},
-                    [0],
-                ); 
-
-                // FIXME: how to animate color changes in a heatmap?
-                //data[0]['z'] = data_content;
-                //data[0]['x'] = x_axis;
-                //data[0]['y'] = y_axis;
-                //Plotly.animate(
-                //    document.getElementById(html_element_id),
-                //    {
-                //        data: data,
-                //    },
-                //    {
-                //        transition: {
-                //            duration: 1500,
-                //            easing: 'cubic-in-out',
-                //        },
-                //        frame: {
-                //            duration: 1500,
-	        //        },
-                //    },
-                //); 
-            }
+        var layout = {
+            autosize: true,
+            width: graph_width,
+            height: graph_height,
+            title: 'Heatmap of gene expression level in selected cell types',
+            xaxis: {
+                //title: 'Cell types',
+                automargin: true,
+                tickangle: 70,
+                scaleanchor: 'y',
+                scaleratio: 1,
+            },
+            yaxis: {
+                //title: 'Genes',
+                automargin: true,
+                autorange: "reversed",
+            },
         };
-    } 
+            
+        Plotly.newPlot(
+            document.getElementById(html_element_id),
+            [data],
+            layout,
+        ); 
+
+    // Update existing plot if present
+    } else {
+        data['z'] = [data_content];
+        data['x'] = [x_axis];
+        data['y'] = [y_axis];
+        Plotly.update(
+            document.getElementById(html_element_id),
+            data,
+            {yaxis: {autorange: "reversed"}},
+            [0],
+        ); 
+
+        // FIXME: how to animate color changes in a heatmap?
+        // One could make the frames by hand, but hmm
+        //data[0]['z'] = data_content;
+        //data[0]['x'] = x_axis;
+        //data[0]['y'] = y_axis;
+        //Plotly.animate(
+        //    document.getElementById(html_element_id),
+        //    {
+        //        data: data,
+        //    },
+        //    {
+        //        transition: {
+        //            duration: 1500,
+        //            easing: 'cubic-in-out',
+        //        },
+        //        frame: {
+        //            duration: 1500,
+        //        },
+        //    },
+        //); 
+    }
+} 
 
 
 // SuggestGenes: create a div with a "suggest" button

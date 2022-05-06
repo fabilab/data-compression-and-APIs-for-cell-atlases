@@ -48,56 +48,78 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
     }
 
     let data = {
-        x: x,
-        y: y,
-        text: tooltip,
         mode: 'markers',
         marker: {
-            size: markersize,
-            opacity: opacity,
             symbol: 'square',
             colorscale: 'Reds',
-            color: markercolor,
         },
     };
 
-    let layout = {
-        automargin: true,
-        autosize: true,
-        width: 1300,
-        height: 1000,
-        title: {
-            text: gene_name + ' expression over time',
-            x: 0.5,
-            xanchor: 'center',
-        },
-        xaxis: {
-            tickangle: 70,
+    // Make new plot if none is present
+    if ($('#heatmapUnified').html() === "") {
+        data['x'] = x;
+        data['y'] = y;
+        data['text'] = tooltip;
+        data['marker']['color'] = markercolor;
+        data['marker']['size'] = markersize;
+        data['marker']['opacity'] = opacity;
+
+        let layout = {
             automargin: true,
-            linewidth: 0,
-            type: 'category',
-        },
-        yaxis: {
-            //automargin: true,
-            autorange: 'reversed',
-            type: 'category',
-            tickvals: result['yticks'],
-            ticktext: result['yticktext'],
-        },
-    };
+            autosize: true,
+            width: 1300,
+            height: 1000,
+            title: {
+                text: gene_name + ' expression over time',
+                x: 0.5,
+                xanchor: 'center',
+            },
+            xaxis: {
+                tickangle: 70,
+                automargin: true,
+                linewidth: 0,
+                type: 'category',
+            },
+            yaxis: {
+                //automargin: true,
+                autorange: 'reversed',
+                type: 'category',
+                tickvals: result['yticks'],
+                ticktext: result['yticktext'],
+            },
+        };
 
-    Plotly.newPlot(
-        document.getElementById('heatmap_unified'),
-        [data],
-        layout,
-    ); 
+        Plotly.newPlot(
+            document.getElementById('heatmapUnified'),
+            [data],
+            layout,
+        ); 
+
+    // Update existing plot if present
+    } else {
+        data['x'] = [x];
+        data['y'] = [y];
+        data['text'] = [tooltip];
+        data['marker']['color'] = markercolor;
+        data['marker']['size'] = markersize;
+        data['marker']['opacity'] = opacity;
+        Plotly.update(
+            document.getElementById('heatmapUnified'),
+            data,
+            {yaxis: {
+                autorange: "reversed",
+                type: 'category',
+                tickvals: result['yticks'],
+                ticktext: result['yticktext'],
+            }},
+            [0],
+        );
+    }
 }
 
 
 function AssembleAjaxRequest() {
-
     var gene_name = $('#searchGeneName').val();
-
     $.ajax({
         type:'GET',
         url:'/data_heatmap_unified',

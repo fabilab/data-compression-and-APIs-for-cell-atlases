@@ -21,6 +21,24 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
     var graph_width = 1300;
     var graph_height = 270 + 26 * ngenes;
 
+    let yticktext = [];
+    for (let i = 0; i < y_axis.length; i++) {
+        const gene = y_axis[i];
+        const geneId = result['gene_ids'][gene];
+        if (geneId === "") {
+            yticktext.push(gene);
+        } else {
+            let geneUrl = gene;
+            if (geneId.startsWith('MGI')) {
+                geneUrl = 'http://www.informatics.jax.org/marker/'+geneId;
+            } else {
+                geneUrl = 'https://www.genecards.org/cgi-bin/carddisp.pl?gene='+geneId;
+            }
+            const tickText = '<a href="'+geneUrl+'">'+gene+'</a>'
+            yticktext.push(tickText);
+        }
+    }
+
     let data_content = [];
     for (let i = 0; i < y_axis.length; i++) {
         const gene = y_axis[i];
@@ -34,13 +52,11 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             data_content[i].push(gene_exp);
         }
     }
-    var data = [
-        {
+    var data = {
             type: 'heatmap',
             hoverongaps: false,
             colorscale: 'Reds',
-        }
-        ];
+        };
 
     // Make new plot if none is present
     if ($('#'+html_element_id).html() === "") {
@@ -60,11 +76,15 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 tickangle: 70,
                 scaleanchor: 'y',
                 scaleratio: 1,
+                type: 'category',
             },
             yaxis: {
                 //title: 'Genes',
                 automargin: true,
                 autorange: "reversed",
+                type: 'category',
+                tickvals: y_axis,
+                ticktext: yticktext,
             },
         };
             
@@ -181,6 +201,7 @@ function AssembleAjaxRequest() {
         //FIXME: ScatterPlot should happen here
     },
     error: function (e) {
+        console.log(e);
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
     }
     });

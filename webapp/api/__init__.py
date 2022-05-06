@@ -21,6 +21,8 @@ from models import (
         get_marker_genes,
         get_data_hyperoxia,
         get_celltype_abundances,
+        get_data_differential,
+        get_gene_MGI_ids,
     )
 from validation.genes import validate_correct_genestr
 from validation.celltypes import validate_correct_celltypestr
@@ -36,16 +38,21 @@ class geneExp(Resource):
         except KeyError:
             return None
 
+        gene_ids_MGI = get_gene_MGI_ids(df.columns)
+
         dfl = np.log10(df + 0.5)
 
         celltypes_hierarchical = leaves_list(linkage(
             pdist(dfl.values),
             optimal_ordering=True),
         )
-        genes_hierarchical = leaves_list(linkage(
-            pdist(dfl.values.T),
-            optimal_ordering=True),
-        )
+        if len(gene_names) == 1:
+            genes_hierarchical = [0]
+        else:
+            genes_hierarchical = leaves_list(linkage(
+                pdist(dfl.values.T),
+                optimal_ordering=True),
+            )
 
         result = {
             'data': df.to_dict(),
@@ -53,6 +60,7 @@ class geneExp(Resource):
             'celltypes': df.index.tolist(),
             'celltypes_hierarchical': df.index[celltypes_hierarchical].tolist(),
             'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
+            'gene_ids': gene_ids_MGI,
         }
 
         return jsonify(result)
@@ -81,12 +89,13 @@ class geneExpTimeUnified(Resource):
 
 
 class geneExpHyperoxia(Resource):
-    '''API for the compressed atlas data, to be visualized as a heatmap'''
+    '''API for hyperoxia data'''
     def get(self):
         genestring = request.args.get("gene_names")
-        plot_type = request.args.get("plot_type")
         data_type = request.args.get("data_type")
 
+        # NOTE: probably do not want a full NLP-style parsing for the API,
+        # but this might also be a little insufficient.
         gene_names = genestring.replace(' ', '').split(',')
         try:
             result = get_data_hyperoxia(
@@ -98,30 +107,37 @@ class geneExpHyperoxia(Resource):
         for item in result:
             df = item['data']
             item['genes'] = df.columns.tolist()
-
-            # FIXME
-            #if plot_type == "original":
-            #    item['celltypes'] = df.index.tolist()
-            #else:
-            #    distance = pdist(df.values)
-            #    # print(distance)
-            #    Z = linkage(distance, optimal_ordering=True)
-            #    new_order = leaves_list(Z)
-            #    df = df.iloc[new_order]
-            #    item['celltypes'] = df.index.tolist()
-            #    item['data'] = df
             item['celltypes'] = df.index.tolist()
 
-            distance = pdist(df.values)
-            # print(distance)
-            Z = linkage(distance, optimal_ordering=True)
-            new_order = leaves_list(Z)
+            new_order = leaves_list(linkage(
+                pdist(df.values),
+                optimal_ordering=True,
+                ))
             item['celltypes_hierarchical'] = df.index[new_order].tolist()
 
         for item in result:
             item['data'] = item['data'].to_dict()
 
         return jsonify(result)
+
+
+class geneExpDifferential(Resource):
+    '''API for generic differential expression'''
+    def get(self):
+        genestring = request.args.get("gene_names")
+        conditionstring = request.args.get("conditions")
+
+        # NOTE: probably do not want a full NLP-style parsing for the API,
+        # but this might also be a little insufficient.
+        gene_names = genestring.replace(' ', '').split(',')
+        conditions = conditionstring.replace(' ', '').split(',')
+        try:
+            result = get_data_differential(
+                    conditions=conditions,
+                    genes=gene_names)
+        except (KeyError, ValueError):
+            return None
+
 
 
 class plotsForSeachGenes(Resource):

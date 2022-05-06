@@ -321,6 +321,64 @@ def get_data_hyperoxia(data_type, genes=None):
     return result
 
 
+def get_data_differential(conditions, genes=None):
+    '''Get log2 fold change between expression in two conditions'''
+    if len(conditions) != 2:
+        raise ValueError(
+                "Differential expression requires exactly two conditions",
+                )
+
+    dfs = []
+    for condition in conditions:
+        if "hyperoxia" in condition:
+            dfi = read_counts_from_file(
+                'celltype_dataset_timepoint_hyperoxia',
+                genes=genes,
+                )
+            
+        else:
+            dfi = read_counts_from_file(
+                'celltype_dataset_timepoint',
+                genes=genes,
+                )
+        dfs.append(dfi)
+
+    # Restrict to hyperoxia celltypes, datasets, and timepoints
+    # NOTE: no dataset took hyperoxia from a timepoint that has no normal.
+    # However, come cell types are hyperoxia specific
+    for key in df_ho:
+        if key not in df_normal.columns:
+            # Default to zero expression
+            df_normal[key] = 0
+    df_normal = df_normal.loc[df_ho.index, df_ho.columns]
+    df_ho = np.log2(df_ho + 0.5) - np.log2(df_normal + 0.5)
+
+    # Split by dataset and timepoint, and unstack
+    df_ho = df_ho.T
+    datasets = ['ACZ', 'Hurskainen2021']
+    timepointd = {'ACZ': ['P7'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
+    result = []
+    for ds in datasets:
+        for tp in timepointd[ds]:
+            item = {
+                'dataset': ds,
+                'timepoint': tp,
+                'data_scale': data_type,
+            }
+            dfi = df_ho.loc[df_ho.index.str.endswith(f'{ds}_{tp}')]
+            dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
+
+            # Adjust cell type names and order
+            celltypes_adj, idx = adjust_celltypes(dfi.index)
+            dfi = dfi.iloc[idx]
+
+            item['data'] = dfi
+            result.append(item)
+
+    return result
+
+
+
 def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
     '''Get cell type abundances at a certain time point'''
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
@@ -360,3 +418,18 @@ def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
 
     return result
 
+
+def get_gene_MGI_ids(genes):
+    '''Get the MGI ids of a list of genes'''
+    fn = fdn_data+'mouse_gene_names.tsv'
+    df = pd.read_csv(fn, sep='\t', index_col=0)
+    mgi_dict = df['MGI_id'].to_dict()
+    human_dict = df['HumanGeneName'].to_dict()
+    id_dict = {}
+    for gene in genes:
+        new_name = human_dict.get(gene, '')
+        if new_name == '':
+            new_name = mgi_dict.get(gene, '')
+        id_dict[gene] = new_name
+
+    return id_dict

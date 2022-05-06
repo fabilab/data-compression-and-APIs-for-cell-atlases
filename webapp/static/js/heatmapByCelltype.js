@@ -36,38 +36,57 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             }
             var data = [
                 {
-                    z: data_content,
-                    x: x_axis,
-                    y: y_axis,
                     type: 'heatmap',
                     hoverongaps: false,
                     colorscale: 'Reds',
                 }
                 ];
-            var layout = {
-                autosize: true,
-                width: graph_width,
-                height: graph_height,
-                title: 'Heatmap of gene expression level in selected cell types',
-                xaxis: {
-                    //title: 'Cell types',
-                    automargin: true,
-                    tickangle: 70,
-                    scaleanchor: 'y',
-                    scaleratio: 1,
-                },
-                yaxis: {
-                    //title: 'Genes',
-                    automargin: true,
-                    autorange: "reversed",
-                },
-            };
-                
-            Plotly.newPlot(
-                document.getElementById(html_element_id),
-                data,
-                layout,
-            ); 
+
+            // Make new plot if none is present
+            if ($('#'+html_element_id).html() === "") {
+
+                data[0]['z'] = data_content;
+                data[0]['x'] = x_axis;
+                data[0]['y'] = y_axis;
+
+                var layout = {
+                    autosize: true,
+                    width: graph_width,
+                    height: graph_height,
+                    title: 'Heatmap of gene expression level in selected cell types',
+                    xaxis: {
+                        //title: 'Cell types',
+                        automargin: true,
+                        tickangle: 70,
+                        scaleanchor: 'y',
+                        scaleratio: 1,
+                    },
+                    yaxis: {
+                        //title: 'Genes',
+                        automargin: true,
+                        autorange: "reversed",
+                    },
+                };
+                    
+                Plotly.newPlot(
+                    document.getElementById(html_element_id),
+                    data,
+                    layout,
+                ); 
+
+            // Update existing plot if present
+            } else {
+                data[0]['z'] = [data_content];
+                data[0]['x'] = [x_axis];
+                data[0]['y'] = [y_axis];
+
+                Plotly.update(
+                    document.getElementById(html_element_id),
+                    data[0],
+                    {yaxis: {autorange: "reversed"}},
+                    [0],
+                ); 
+            }
         };
     } 
 

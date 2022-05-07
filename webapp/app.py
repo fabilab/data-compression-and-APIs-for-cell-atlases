@@ -18,12 +18,14 @@ from api import (
     geneFriends,
     geneExpTimeUnified,
     geneExpHyperoxia,
+    geneExpDifferential,
     checkGenenames,
     markerGenes,
     celltypeAbundance,
 )
 from models import get_celltype_abundances
 from validation.genes import validate_correct_genestr
+from validation.timepoints import validate_correct_timepoint
 from voice_recognition import mod as voice_control_blueprint
 from text_recognition import mod as text_control_blueprint
 
@@ -152,6 +154,8 @@ def heatmap_differential_genes(genestring):
 @app.route("/list_celltypes/<timepoint>", methods=["GET"])
 def list_celltypes_timepoint(timepoint):
     '''List cell types and their abundances'''
+    timepoint = validate_correct_timepoint(timepoint)
+
     celltype_dict = get_celltype_abundances(
             timepoint,
             kind='qualitative',
@@ -208,6 +212,7 @@ app_api.add_resource(geneExpTime, "/data_timepoint")
 app_api.add_resource(geneFriends, "/gene_friends")
 app_api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
+app_api.add_resource(geneExpDifferential, "/data/deg")
 app_api.add_resource(checkGenenames, "/check_genenames")
 app_api.add_resource(markerGenes, "/data/marker_genes")
 app_api.add_resource(celltypeAbundance, "/data/celltype_abundance")

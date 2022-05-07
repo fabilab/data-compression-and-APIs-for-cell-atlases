@@ -14,12 +14,25 @@ def validate_correct_timepoint(text):
     if text.startswith('at '):
         text = text[3:]
 
+    # The e in E18.5 seems hard to guess
+    hard_to_guess_embryonic = False
+    try:
+        float(text)
+        hard_to_guess_embryonic = True
+    except ValueError:
+        pass
+    if hard_to_guess_embryonic:
+        text = 'E'+text
+
     # Older ages are like 3m, 18m, etc.
     if text[0].isdigit():
         if text[:-1].isdigit() and text[-1] in ('m', 'y'):
             return text
         else:
             return None
+
+    # If not an older age, capitalize
+    text = text[0].upper()+text[1:]
 
     # Not starting with a digit, so it shoul be e.g. E18.5/P1
     if not text[-1].isdigit():

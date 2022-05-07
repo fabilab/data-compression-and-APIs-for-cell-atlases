@@ -110,27 +110,6 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             },
             [0],
         ); 
-
-        // FIXME: how to animate color changes in a heatmap?
-        // One could make the frames by hand, but hmm
-        //data[0]['z'] = data_content;
-        //data[0]['x'] = x_axis;
-        //data[0]['y'] = y_axis;
-        //Plotly.animate(
-        //    document.getElementById(html_element_id),
-        //    {
-        //        data: data,
-        //    },
-        //    {
-        //        transition: {
-        //            duration: 1500,
-        //            easing: 'cubic-in-out',
-        //        },
-        //        frame: {
-        //            duration: 1500,
-        //        },
-        //    },
-        //); 
     }
 } 
 

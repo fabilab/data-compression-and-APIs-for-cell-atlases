@@ -44,6 +44,8 @@ phrase_dict = {
             'what\'s the developmental expression of',
             'what is the developmental progression of',
             'what\'s the developmental progression of',
+            'what is the gene progression of',
+            'what\'s the gene progression of',
             'progression of',
             'developmental expression of',
             'developmental progression of',
@@ -127,6 +129,8 @@ phrase_dict = {
         'prefixes': [
             'list cell types',
             'list the cell types',
+            'list cell type ',
+            'list the cell type '
             'show cell types',
             'what are the cell types',
             'what cell types are there',

@@ -46,8 +46,8 @@ class geneExp(Resource):
             pdist(dfl.values),
             optimal_ordering=True),
         )
-        if len(gene_names) == 1:
-            genes_hierarchical = [0]
+        if len(gene_names) <= 2:
+            genes_hierarchical = list(range(len(gene_names)))
         else:
             genes_hierarchical = leaves_list(linkage(
                 pdist(dfl.values.T),
@@ -62,6 +62,8 @@ class geneExp(Resource):
             'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
             'gene_ids': gene_ids_MGI,
         }
+
+        print(result)
 
         return jsonify(result)
 
@@ -84,7 +86,11 @@ class geneExpTime(Resource):
 class geneExpTimeUnified(Resource):
     def get(self):
         gene = request.args.get("gene")
+
+        gene_id_MGI = get_gene_MGI_ids([gene])[gene]
+
         data = dataset_unified(gene)
+        data['gene_id'] = gene_id_MGI
         return data
 
 

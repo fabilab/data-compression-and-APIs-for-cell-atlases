@@ -1,7 +1,8 @@
 var plotData = {};
 
 function plotHeatmapUnified(result, scaleData, celltypeOrder) {
-    let gene_name = result['gene'];
+    let geneName = result['gene'];
+    let geneId = result['gene_id'];
     let x_axis;
     if (celltypeOrder === "original") {
         x_axis = result['celltypes'];
@@ -11,6 +12,18 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
     let y_axis = result['row_labels'];
     let nx = x_axis.length;
     let ny = y_axis.length;
+
+    let title;
+    if (geneId === "") {
+        title = geneName + ' expression over time';
+    } else {
+        if (geneId.startsWith('MGI')) {
+            geneUrl = 'http://www.informatics.jax.org/marker/'+geneId;
+        } else {
+            geneUrl = 'https://www.genecards.org/cgi-bin/carddisp.pl?gene='+geneId;
+        }
+        title = '<a href="'+geneUrl+'">'+geneName+'</a> expression over time';
+    }
 
     let x = [],
         y = [],
@@ -70,7 +83,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             width: 1300,
             height: 1000,
             title: {
-                text: gene_name + ' expression over time',
+                text: title,
                 x: 0.5,
                 xanchor: 'center',
             },
@@ -106,7 +119,11 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
         Plotly.update(
             document.getElementById('heatmapUnified'),
             data,
-            {yaxis: {
+            {
+                title: {
+                    text: title,
+                },
+                yaxis: {
                 autorange: "reversed",
                 type: 'category',
                 tickvals: result['yticks'],
@@ -119,11 +136,11 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
 
 
 function AssembleAjaxRequest() {
-    var gene_name = $('#searchGeneName').val();
+    var geneName = $('#searchGeneName').val();
     $.ajax({
         type:'GET',
         url:'/data_heatmap_unified',
-        data: "gene=" + gene_name,
+        data: "gene=" + geneName,
         dataType:'json',
         success: function(result) {
             plotData = result;

@@ -102,7 +102,12 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         Plotly.update(
             document.getElementById(html_element_id),
             data,
-            {yaxis: {autorange: "reversed"}},
+            {
+                height: graph_height,
+                yaxis: {
+                    autorange: "reversed",
+                },
+            },
             [0],
         ); 
 
@@ -129,95 +134,6 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
     }
 } 
 
-
-// SuggestGenes: create a div with a "suggest" button
-function onClickSuggestions() {
-    var gene_names = $('#searchGeneName').val();
-    $.ajax({
-        type:'GET',
-        url:'/gene_friends',
-        data: "gene_names=" + gene_names,
-        success: function(result) {
-            $('#searchGeneName').val(result);
-            AssembleAjaxRequest();
-        },
-        error: function (e) {
-          alert('Error: Could not find gene friends for '+gene_names+'.')
-        }
-    });
-}
-
-function SuggestGenes() {
-
-    // Fill div
-    const html_element_id = "gene_suggestions";
-    $("#"+html_element_id).empty();
-    $("#"+html_element_id).text('Suggest similar genes');
-
-    // Add link
-    $("#"+html_element_id).click(onClickSuggestions);
-}
-
-// gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
-// Col1a1,Fsd1l
-function AssembleAjaxRequest() {
-  if(! $('#scatter_plot').is('empty')) {
-    $('#scatter_plot').empty();
-  }
-
-  // Get the list of genes to plot from the search box
-  var gene_names = $('#searchGeneName').val();
-
-  const gene_array = gene_names.split(",")
-  if (gene_array.length == 2) {
-    $.ajax({
-      type:'GET',
-      url:'/2_genes',
-      data: "gene_names=" + gene_names,
-      success: ScatterPlot,
-      error: function (e) {
-        alert('Request data Failed')
-      }
-    });
-  }
-    // sent gene names to the API
-  $.ajax({
-    type:'GET',
-    url:'/data/by_celltype',
-    data: "gene_names=" + gene_names,
-    success: function(result) {
-        // Store global variable
-        heatmapData = {
-            'result': result,
-            'div': 'h5_data_plot',
-        };
-
-        // Create heatmap
-        updatePlot();
-
-        // Create gene suggestions DOM element
-        SuggestGenes();
-
-        //FIXME: ScatterPlot should happen here
-    },
-    error: function (e) {
-        console.log(e);
-      alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
-    }
-    });
-};
-
-// Both on click and load, plot the heatmap
-$("#searchOnClick").click(function() {
-  // action here when clicking the search button
-  AssembleAjaxRequest();
-});
-
-$(document).ready(function() {
-  AssembleAjaxRequest();
-});
-
-
 // NOTE: this is why react was invented...
 function updatePlot() {
     let dataScale = "original";
@@ -238,7 +154,56 @@ function updatePlot() {
     );
 }
 
+function AssembleAjaxRequest() {
+    // Get the list of genes to plot from the search box
+    var gene_names = $('#searchGeneName').val();
+  
+      // sent gene names to the API
+    $.ajax({
+        type:'GET',
+        url:'/data/by_celltype',
+        data: "gene_names=" + gene_names,
+        success: function(result) {
+            // Store global variable
+            heatmapData = {
+                'result': result,
+                'div': 'h5_data_plot',
+            };
 
+            // Update search box: corrected gene names, excluding missing genes
+            $('#searchGeneName').val(result['genes']);
+  
+            // Create heatmap
+            updatePlot();
+        },
+        error: function (e) {
+            console.log(e);
+            alert('Error: Could not find some gene names.')
+        },
+    });
+};
+
+// SuggestGenes: create a div with a "suggest" button
+function onClickSuggestions() {
+    var gene_names = $('#searchGeneName').val();
+    $.ajax({
+        type:'GET',
+        url:'/gene_friends',
+        data: "gene_names=" + gene_names,
+        success: function(result) {
+            $('#searchGeneName').val(result);
+            AssembleAjaxRequest();
+        },
+        error: function (e) {
+          alert('Error: Could not find gene friends for '+gene_names+'.')
+        }
+    });
+}
+
+
+////////////////////
+// EVENTS
+////////////////////
 // Normalise the data with log10 and generate a new plot (when user click the button)
 $("#log10OnClick" ).click(function() {
     // if User has input their gene of interest, generate the heatmap with that value
@@ -246,7 +211,6 @@ $("#log10OnClick" ).click(function() {
     $("#logTab").addClass('is-active');
     $("#cpmTab").removeClass('is-active');
     updatePlot();
-    
 });
 
 $("#CPMOnClick" ).click(function() {
@@ -271,3 +235,7 @@ $("#originalOnClick" ).click(function() {
     updatePlot();
 });
 
+// Both on click and load, plot the heatmap
+$("#searchOnClick").click(AssembleAjaxRequest);
+$(document).ready(AssembleAjaxRequest);
+$("#geneSuggestions").click(onClickSuggestions);

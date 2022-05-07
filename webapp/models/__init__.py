@@ -424,7 +424,7 @@ def get_gene_MGI_ids(genes):
     fn = fdn_data+'mouse_gene_names.tsv'
     df = pd.read_csv(fn, sep='\t', index_col=0)
     mgi_dict = df['MGI_id'].to_dict()
-    human_dict = df['HumanGeneName'].to_dict()
+    human_dict = df['HumanGeneName'].fillna('').to_dict()
     id_dict = {}
     for gene in genes:
         new_name = human_dict.get(gene, '')

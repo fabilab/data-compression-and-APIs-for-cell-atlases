@@ -141,9 +141,20 @@ def heatmap_unified_genes(genestring):
             )
 
 
+@app.route("/heatmap_hyperoxia/<genestring>", methods=["GET"])
+def heatmap_hyperoxia(genestring):
+    """A sort of heatmap with hyperoxia"""
+    searchstring = genestring.replace(" ", "")
+    return render_template(
+            "heatmap_hyperoxia.html",
+            searchstring=searchstring,
+            )
+
+
+# FIXME: this one should start to diverge
 @app.route("/heatmap_differential/<genestring>", methods=["GET"])
 def heatmap_differential_genes(genestring):
-    """A sort of heatmap with differential expression"""
+    """A sort of heatmap for differential gene expression"""
     searchstring = genestring.replace(" ", "")
     return render_template(
             "heatmap_differential.html",

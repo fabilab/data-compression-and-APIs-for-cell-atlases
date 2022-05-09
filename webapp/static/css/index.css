@@ -36,6 +36,19 @@
  padding-top: 20px;
 }
 
+#FAQTextHeader {
+ padding-bottom: 10px;
+}
+
+#FAQTextFooter {
+ padding: 20px;
+}
+
+#FAQTextFooter2 {
+ text-decoration: underline;
+}
+
+
 .askBar {
  padding: 10px;
 }
@@ -48,6 +61,7 @@
  font-weight: bolder;
  padding: 10px;
 }
+
 
 .P:hover,.E:hover,.m:hover {
     color:rgb(22,132,212);

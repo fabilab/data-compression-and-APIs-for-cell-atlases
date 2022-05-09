@@ -65,6 +65,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
         marker: {
             symbol: 'square',
             colorscale: 'Reds',
+            colorbar: {},
         },
     };
 

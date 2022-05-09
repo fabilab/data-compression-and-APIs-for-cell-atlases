@@ -99,8 +99,8 @@ phrase_dict = {
     },
     'differentially_expressed_genes': {
         'prefixes': [
-            'differentially expressed genes in',
-            'degs in',
+            'differentially expressed genes',
+            'degs',
             '!d',
         ],
         'suffix_type': 'celltype_dataset_timepoint_string',

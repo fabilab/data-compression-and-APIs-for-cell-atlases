@@ -3,73 +3,74 @@
 var heatmapData = [];
 
 function HeatmapHyperoxia(result, html_element_id, title, order) {
-        if (!result) {
-            alert("Error: Nothing to plot or gene names invalid")
-        } else {
-            var x_axis;
-            if (order == "original") {
-                x_axis = result['celltypes'];
-            } else {
-                x_axis = result['celltypes_hierarchical'];
-            }
-            var ngenes =  result['genes'].length;
-            var graph_width = 1300;
-            var graph_height = 370 + 26 * ngenes;
+    if (!result) {
+        alert("Error: Nothing to plot or gene names invalid")
+        return;
+    }
 
-            let data_content = [];
-            let i = 0;
-            for (let gene in result['data']) {
-                data_content.push([]);
-                for (let j = 0; j < x_axis.length; j++) {
-                    const ct = x_axis[j];
-                    let gene_exp = result['data'][gene][ct];
-                    data_content[i].push(gene_exp);
-                }
-                i+= 1;
-            }
-            var data = [
-                {
-                    z: data_content,
-                    x: x_axis,
-                    y: result['genes'],
-                    type: 'heatmap',
-                    hoverongaps: false,
-                    colorscale: 'Reds',
-                }
-                ];
-            if (result['data_scale'] === "log2FC") {
-                data[0]['colorscale'] = 'RdBu';
-                data[0]['zmid'] = 0;
-            }
+    let x_axis, y_axis;
+    if (order == "original") {
+        x_axis = result['celltypes'];
+    } else {
+        x_axis = result['celltypes_hierarchical'];
+    }
+    y_axis = result['genes'];
+    var ngenes =  y_axis.length;
+    var graph_width = 1300;
+    var graph_height = 370 + 26 * ngenes;
 
-            var layout = {
-                autosize: true,
-                width: graph_width,
-                height: graph_height,
-                title: title,
-                xaxis: {
-                    //title: 'Cell types',
-                    automargin: true,
-                    tickangle: 60,
-                    scaleanchor: 'y',
-                    scaleratio: 1,
-                    type: 'category',
-                },
-                yaxis: {
-                    //title: 'Genes',
-                    automargin: true,
-                    autorange: "reversed",
-                    type: 'category',
-                },
-            };
-                
-            Plotly.newPlot(
-                document.getElementById(html_element_id),
-                data,
-                layout,
-            ); 
-        };
-    } 
+    let data_content = [];
+    for (let i = 0; i < ngenes; i++) {
+        const gene = y_axis[i];
+        data_content.push([]);
+        for (let j = 0; j < x_axis.length; j++) {
+            const ct = x_axis[j];
+            let gene_exp = result['data'][gene][ct];
+            data_content[i].push(gene_exp);
+        }
+    }
+    var data = [
+        {
+            z: data_content,
+            x: x_axis,
+            y: result['genes'],
+            type: 'heatmap',
+            hoverongaps: false,
+            colorscale: 'Reds',
+        }
+        ];
+    if (result['data_scale'] === "log2FC") {
+        data[0]['colorscale'] = 'RdBu';
+        data[0]['zmid'] = 0;
+    }
+
+    var layout = {
+        autosize: true,
+        width: graph_width,
+        height: graph_height,
+        title: title,
+        xaxis: {
+            //title: 'Cell types',
+            automargin: true,
+            tickangle: 60,
+            scaleanchor: 'y',
+            scaleratio: 1,
+            type: 'category',
+        },
+        yaxis: {
+            //title: 'Genes',
+            automargin: true,
+            autorange: "reversed",
+            type: 'category',
+        },
+    };
+        
+    Plotly.newPlot(
+        document.getElementById(html_element_id),
+        data,
+        layout,
+    ); 
+} 
 
 
 // gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1

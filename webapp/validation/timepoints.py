@@ -4,6 +4,7 @@ author:     Fabio Zanini
 date:       03/05/22
 content:    Validate time points.
 '''
+timepoints = ['E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
 
 
 def validate_correct_timepoint(text):
@@ -14,7 +15,7 @@ def validate_correct_timepoint(text):
     if text.startswith('at '):
         text = text[3:]
 
-    # The e in E18.5 seems hard to guess
+    # The "e" in E18.5 seems hard to guess
     hard_to_guess_embryonic = False
     try:
         float(text)
@@ -26,6 +27,11 @@ def validate_correct_timepoint(text):
 
     # Older ages are like 3m, 18m, etc.
     if text[0].isdigit():
+        if text.endswith('months'):
+            text = text[:-len('onths')]
+        elif text.endswith('years'):
+            text = text[:-len('ears')]
+
         if text[:-1].isdigit() and text[-1] in ('m', 'y'):
             return text
         else:

@@ -41,8 +41,8 @@ celltype_tuples = [
     'DC III',
     'Mac I',
     'Mac II',
-    'Mac III',
-    'Mac IV',
+    ('Mac III', 'Alveolar mac'),
+    ('Mac IV', 'Interstitial mac'),
     ('Mac V', 'Monocyte'),
     ('basophil', 'Basophil'),
     ('mast cell', 'Mast cell'),
@@ -56,6 +56,7 @@ for ct in celltype_tuples:
         celltype_dict[ct] = ct
     else:
         celltype_dict[ct[0]] = ct[1]
+celltype_dict_inv = {val: key for key, val in celltype_dict.items()}
 
 
 def adjust_celltypes(celltypes_raw):
@@ -78,9 +79,12 @@ def adjust_celltypes(celltypes_raw):
     return np.array(ct_adj), np.array(idx)
 
 
-def rename_celltypes(celltypes_raw):
+def rename_celltypes(celltypes_raw, inverse=False):
     '''Rename celltypes according to the standard table above, no order change'''
-    return [celltype_dict[x] for x in celltypes_raw]
+    if not inverse:
+        return [celltype_dict[x] for x in celltypes_raw]
+    else:
+        return [celltype_dict_inv[x] for x in celltypes_raw]
 
 
 def validate_correct_celltypestr(celltypestr):

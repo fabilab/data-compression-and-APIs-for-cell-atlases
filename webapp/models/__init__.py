@@ -10,7 +10,9 @@ from scipy.spatial.distance import pdist
 from validation.celltypes import (
         adjust_celltypes,
         rename_celltypes,
+        validate_correct_celltypestr,
         )
+from validation.differential_expression import get_deg_conditions
 
 
 fdn_data = "./static/scData/"
@@ -50,13 +52,20 @@ def read_counts_from_file(df_type, genes=None):
         if genes is not None:
             index = []
             for gene in genes:
+                # Try perfect match
+                if gene in gene_order.index:
+                    if gene not in index:
+                        index.append(gene)
+                    continue
+
+                # Try imperfect match
                 candidates = gene_order.index[gene_order.index.str.match(gene)]
                 if len(candidates) == 0:
                     raise KeyError('Gene match not found: '+gene)
                 for cand in candidates:
                     if cand not in index:
                         index.append(cand)
-                
+
             idx = gene_order.loc[index].values
             # Slices of h5 must be ordered...
             tmp = pd.Series(idx, index=np.arange(len(idx))).to_frame(name='idx')
@@ -123,7 +132,6 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
             gene_exp_df = np.log10(0.1 + gene_exp_df)
         if plottype == "hierachical":
             distance = pdist(gene_exp_df.values)
-            # print(distance)
             Z = linkage(distance, optimal_ordering=True)
             new_order = leaves_list(Z)
             gene_exp_df = gene_exp_df.iloc[new_order]
@@ -244,127 +252,47 @@ def get_marker_genes(celltypes):
     return ",".join(markers)
 
 
-# FIXME: should this be in another module?
-def get_deg_conditions(suffix):
-    '''Interpret the deg conditions from a suffix'''
-    if ((' vs ' not in suffix) and
-        (' versus ' not in suffix) and
-        ('hyperoxia' not in suffix)):
-        raise ValueError('Conditions not recognized')
-
-    # Default to hyperoxia vs normoxia for a specific time point
-    # and cell type
-    if (' vs ' not in suffix) and (' versus ' not in suffix):
-        divider = suffix.find(' in ')
-        split, condition = suffix[:divider], suffix[divider+4:]
-        split = split.strip(' ')
-        condition = condition.strip(' ')
-        # deal with the grammar of "in ACZ" and "at P7"
-        if ' in ' in condition:
-            divider = condition.find(' in ')
-            condition = condition[:divider] + condition[divider+3:]
-        if ' at ' in condition:
-            divider = condition.find(' at ')
-            condition = condition[:divider] + condition[divider+3:]
-        # FIXME: separate dataset, timepoint, and cell type
-        return [
-            ('hyperoxia', condition),
-            ('normoxia', condition),
-        ]
-
-    # Figure out dataset, timepoint, and cell type
-    deli = ' vs '
-    if deli not in suffix:
-        deli = ' versus '
-    idx_deli = suffix.find(deli)
-    condraws = [suffix[:idx_deli], suffix[idx_deli+len(deli):]]
-    conditions = []
-    for condraw in condraws:
-        deli = ' at '
-        if deli not in condraw:
-            raise ValueError('Condition time point not recognized')
-        idx_deli = condraw.find(deli)
-        tp = condraw[idx_deli+len(deli):]
-        #if ' ' in 
-        tp = tp[:tp.find(' ')]
-
-
-def get_degs(suffix, kind='both'):
+def get_degs(suffix, kind='both', n_genes=20):
     '''Get differentially expressed, up- or downregulated genes
 
     the special phease " in " separated the split (e.g. hyperoxia) from
     the celltype/timepoint/dataset specification (e.g. basophil ACZ P7)
     '''
-    conditions = get_deg_conditions(suffix)
-    if conditions[0][0] == 'hyperoxia':
-        condition = conditions[0][1]
+    deg_request = get_deg_conditions(suffix)
+    conditions = deg_request['conditions']
 
-    # Replace the last two spaces with _ like in the h5 file
-    condition = condition[::-1].replace(' ', '_', 2)[::-1]
-
-    with h5py.File(fdn_data + "degs.h5", "r") as h5_data:
-        genes = np.array(h5_data[split][condition][kind].asstr())
-
-    return ",".join(genes)
-
-
-def get_data_differential(conditions, genes=None):
-    '''Get log2 fold change between expression in two conditions'''
-    if len(conditions) != 2:
-        raise ValueError(
-                "Differential expression requires exactly two conditions",
-                )
-
+    # Compute DEGs on the fly
     dfs = []
     for condition in conditions:
-        if "hyperoxia" in condition:
+        if condition.get('disease', 'normal') == "hyperoxia":
             dfi = read_counts_from_file(
-                'celltype_dataset_timepoint_hyperoxia',
-                genes=genes,
-                )
-            print(dfi.index)
-
+             'celltype_dataset_timepoint_hyperoxia',
+             ) 
         else:
             dfi = read_counts_from_file(
                 'celltype_dataset_timepoint',
-                genes=genes,
                 )
+        idx_row = '_'.join([
+            condition['celltype'],
+            condition['dataset'],
+            condition['timepoint'],
+            ])
+        if idx_row not in dfi.columns:
+            raise ValueError(f'Condition not found: {idx_row}')
+        dfi = dfi.loc[:, idx_row]
         dfs.append(dfi)
 
-    ## Restrict to hyperoxia celltypes, datasets, and timepoints
-    ## NOTE: no dataset took hyperoxia from a timepoint that has no normal.
-    ## However, come cell types are hyperoxia specific
-    #for key in df_ho:
-    #    if key not in df_normal.columns:
-    #        # Default to zero expression
-    #        df_normal[key] = 0
-    #df_normal = df_normal.loc[df_ho.index, df_ho.columns]
-    #df_ho = np.log2(df_ho + 0.5) - np.log2(df_normal + 0.5)
+    # Get log2 fold change
+    log2fc = np.log2(dfs[0] + 0.5) - np.log2(dfs[1] + 0.5)
+    deg_up = log2fc.nlargest(n_genes).index.tolist()
+    deg_down = log2fc.nsmallest(n_genes).index.tolist()
+    genes = deg_up + deg_down[::-1]
+    return ",".join(genes)
 
-    ## Split by dataset and timepoint, and unstack
-    #df_ho = df_ho.T
-    #datasets = ['ACZ', 'Hurskainen2021']
-    #timepointd = {'ACZ': ['P7'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
-    #result = []
-    #for ds in datasets:
-    #    for tp in timepointd[ds]:
-    #        item = {
-    #            'dataset': ds,
-    #            'timepoint': tp,
-    #            'data_scale': data_type,
-    #        }
-    #        dfi = df_ho.loc[df_ho.index.str.endswith(f'{ds}_{tp}')]
-    #        dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
 
-    #        # Adjust cell type names and order
-    #        celltypes_adj, idx = adjust_celltypes(dfi.index)
-    #        dfi = dfi.iloc[idx]
-
-    #        item['data'] = dfi
-    #        result.append(item)
-
-    #return result
-
+# FIXME: speed this up... if we compute on the fly then we should return on the fly
+def get_data_differential():
+    return None
     
 
 def get_data_hyperoxia(data_type, genes=None):
@@ -420,8 +348,6 @@ def get_data_hyperoxia(data_type, genes=None):
 def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
     '''Get cell type abundances at a certain time point'''
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
-
-    print(timepoint)
 
     idx = ncells.index.str.contains('_'+dataset+'_'+timepoint)
     ncells_tp = ncells[idx]

@@ -28,14 +28,14 @@ def send_css(path):
 @app.route('/',methods=['GET'])
 # def helloworld():
 def page1():
-    return render_template('index.html',highlight='home_button',search_box='Car4,Vwf,Col1a1,Ptprc,Ms4a1')
+    return render_template('byCelltype.html',highlight='home_button',search_box='Car4,Vwf,Col1a1,Ptprc,Ms4a1')
 
 @app.route('/heatmap_by_timepoints',methods=['GET'])
 def page2():
     # with open('page2.html') as f:
     #     response = f.read()
     # return response
-    return render_template('page2.html',highlight='page2_button',search_box='Car4')
+    return render_template('byDataset.html',highlight='page2_button',search_box='Car4')
 
 
 @app.route('/heatmap_by_timepoints_datasets',methods=['GET'])
@@ -43,7 +43,7 @@ def page3():
     # with open('page3.html') as f:
     #     response = f.read()
     # return response
-    return render_template('page3.html',highlight='page3_button',search_box='Car4')
+    return render_template('Unified.html',highlight='page3_button',search_box='Car4')
 
 # new end point for timepoint dataset:
 class geneExpTime(Resource):

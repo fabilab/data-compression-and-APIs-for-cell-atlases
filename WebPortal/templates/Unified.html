@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+  <!-- Plots below -->
+  <div class="container" id="dataDisplay">
+    {% include 'tooltipTimepoint.html' %}
+    <div id="bigHeatMap">
+
+    </div>
+  </div>
+  <script src="/js/bigHeatmap.js"></script>
+  <script src="/js/heatMap.js"></script>
+  <script src="/js/eventsTimepoint.js"></script>
+  <script src="/js/showTimepointInfo.js"></script>
+{% endblock %}

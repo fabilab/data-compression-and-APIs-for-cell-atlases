@@ -1,5 +1,5 @@
 from base64 import decode
-from flask import Flask, send_from_directory,request
+from flask import Flask, send_from_directory,request,render_template
 from flask_restful import Resource, Api
 from flask_cors import CORS
 import pandas as pd
@@ -8,10 +8,10 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from helper import data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
+from ca_data_access import data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
 
 
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__, static_url_path='/static',template_folder='templates')
 api = Api(app)
 # Note: this might be unsafe
 CORS(app)
@@ -26,22 +26,24 @@ def send_css(path):
     return send_from_directory('static/css', path)
 
 @app.route('/',methods=['GET'])
-def helloworld():
-    with open('index.html') as f:
-        response = f.read()
-    return response
+# def helloworld():
+def page1():
+    return render_template('index.html',highlight='home_button',search_box='Car4,Vwf,Col1a1,Ptprc,Ms4a1')
 
 @app.route('/heatmap_by_timepoints',methods=['GET'])
 def page2():
-    with open('page2.html') as f:
-        response = f.read()
-    return response
+    # with open('page2.html') as f:
+    #     response = f.read()
+    # return response
+    return render_template('page2.html',highlight='page2_button',search_box='Car4')
+
 
 @app.route('/heatmap_by_timepoints_datasets',methods=['GET'])
 def page3():
-    with open('page3.html') as f:
-        response = f.read()
-    return response
+    # with open('page3.html') as f:
+    #     response = f.read()
+    # return response
+    return render_template('page3.html',highlight='page3_button',search_box='Car4')
 
 # new end point for timepoint dataset:
 class geneExpTime(Resource):

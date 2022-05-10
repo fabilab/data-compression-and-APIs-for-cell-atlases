@@ -1,4 +1,3 @@
-
 function AssembleAjaxRequestTimepoint() {
 
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
@@ -18,9 +17,6 @@ function AssembleAjaxRequestTimepoint() {
   
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
-  if (gene_name === '') {
-    gene_name = "Col1a1";
-  }
 
   const gene_array = gene_name.split(",")
     // sent gene names to the API

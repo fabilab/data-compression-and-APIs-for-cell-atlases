@@ -11,23 +11,13 @@ from scipy.spatial.distance import pdist
 # gives the name of dataset we want as an input
 # celltype / celltype_dataset / celltype_dataset_timepoint
 def read_file(df_type):
-    h5_data = h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r")
-    
-    df = pd.DataFrame(data=np.array(h5_data[df_type]\
-    ['gene_expression_average']['block0_values']),\
-    index=np.array(h5_data[df_type]['gene_expression_average']['axis1'])\
-    ,columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'])).T
-
-    new_index = []
-    for i in df.index:
-        new_index.append(i.decode('utf-8'))
-    # convert column name from binary to string
-    new_column_name = []
-    for i in df.columns:
-        new_column_name.append(i.decode('utf-8'))
-    df.index=new_index
-    df.columns=new_column_name
-    df = df.astype(np.float32)
+    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+        
+        df = pd.DataFrame(
+            data=np.array(h5_data[df_type]['gene_expression_average']['block0_values']).astype(np.float32),
+            index=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr()),
+            columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'].asstr()),
+            ).T
     
     return df
 

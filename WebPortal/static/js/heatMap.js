@@ -2,9 +2,9 @@ function HeatMap(result, html_element_id) {
         if (!result) {
             alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
         } else {
-            // x-axis: 5 genes of interest
+            // x-axis: cell types
             let x_axis = Object.keys(result[Object.keys(result)[0]]);
-            // y-axis:41 cell types
+            // y-axis: genes
             let y_axis = Object.keys(result);
             let data_content = [];
             for (var i = 0; i < Object.keys(result).length; i++) {
@@ -34,7 +34,7 @@ function HeatMap(result, html_element_id) {
                     automargin: true
                 },
                 with: 700,
-                height: 500,
+                height: 700,
             };
                 
             Plotly.newPlot(document.getElementById(html_element_id), data,layout); 

@@ -1,5 +1,3 @@
-// gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
-// Col1a1,Fsd1l
 function AssembleAjaxRequest() {
   if(! $('#scatter_plot').is('empty')) {
     $('#scatter_plot').empty();
@@ -21,17 +19,14 @@ function AssembleAjaxRequest() {
   }
   
   // action here when clicking the search button
-  var gene_name = $('#searchGeneName').val();
-  if (gene_name === '') {
-    gene_name = "Car4,Vwf,Col1a1,Ptprc,Ms4a1";
-  }
+  var genes_string = $('#searchGeneName').val();
 
-  const gene_array = gene_name.split(",")
+  const gene_array = genes_string.split(",")
   if (gene_array.length == 2) {
     $.ajax({
       type:'GET',
       url:'http://127.0.0.1:5000/2_genes',
-      data: "gene_names=" + gene_name,
+      data: "gene_names=" + genes_string,
       success: ScatterPlot,
       error: function (e) {
         alert('Request data Failed')
@@ -42,8 +37,9 @@ function AssembleAjaxRequest() {
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data',
-    data: "gene_names=" + gene_name + "&plot_type=" + plot_type + "&data_type=" + data_type,
+    data: "gene_names=" + genes_string + "&plot_type=" + plot_type + "&data_type=" + data_type,
     success: function(result) {  
+      console.log(result);
       HeatMap(result, "h5_data_plot");
     },
     error: function (e) {
@@ -52,3 +48,4 @@ function AssembleAjaxRequest() {
     });
   }
 $("#searchOnClick" ).click(AssembleAjaxRequest)
+$(document).ready(AssembleAjaxRequest)

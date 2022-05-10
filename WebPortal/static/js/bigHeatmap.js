@@ -1,7 +1,4 @@
 var gene_name = $('#searchGeneName').val();
-if (gene_name === '') {
-  gene_name = "Car4";
-}
 
 $(document).ready(function() {
     $.ajax({

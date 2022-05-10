@@ -19,20 +19,32 @@
       </a>
     </div>
     <div class="navbar-start">
+    {% if highlight == 'home_button' %}
       <a href="http://127.0.0.1:5000/" class="button is-ghost has-text-info ">
-        Home
+    {% else %}
+      <a href="http://127.0.0.1:5000/" class="button is-ghost has-text-grey-darker ">
+    {% endif %}
+        By Celltype
       </a>
+    {% if highlight == 'page2_button' %}
+      <a href="http://127.0.0.1:5000/heatmap_by_timepoints" class="button is-ghost has-text-info">
+    {% else %}
       <a href="http://127.0.0.1:5000/heatmap_by_timepoints" class="button is-ghost has-text-grey-darker">
-          Heatmaps by Timepoint
+    {% endif %}
+        By Dataset
       </a>
+    {% if highlight == 'page3_button' %}
+      <a href="http://127.0.0.1:5000/heatmap_by_timepoints_datasets" class="button is-ghost has-text-info">
+    {% else %}    
       <a href="http://127.0.0.1:5000/heatmap_by_timepoints_datasets" class="button is-ghost has-text-grey-darker">
-        Heatmaps by Timepoint and Dataset
+    {% endif %}     
+        Unified(Timepoint&Dataset)
       </a>
-  </div>
+    </div>
     <div class="navbar-end">
       <div class="field has-addons">
         <div class="control">
-          <input class="input is-info" id="searchGeneName" type="text" placeholder="gene1,gene2,gene3">
+          <input class="input is-info" id="searchGeneName" type="text" value={{search_box}} placeholder="gene1,gene2,gene3">
         </div>
         <div class="control">
           <a class="button is-info" id="searchOnClick">
@@ -68,27 +80,14 @@
               <a id="originalOnClick">Original</a>
             </li>
             <li id="hierachicalTab">
-              <a id="hClusterOnClick">Hierarchical Clustered</a>
+              <a id="hClusterOnClick">Hierachical Clustered</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
   </div>
-  <!-- Plots below -->
-  <div class="container" id="dataDisplay">
-    <div id="h5_data_plot">
-
-    </div>   
-    <div id="scatter_plot">
-
-    </div>
-  </div>
-  <script src="/js/scatterPlot.js"></script>
-  <script src="/js/heatMap.js"></script>
-  <script src="/js/assembleHcellType.js"></script>
-  <script src="/js/defaultHeatMap.js"></script>
-  <script src="/js/resetPage.js"></script>
-  <script src="/js/events.js"></script>
-  </body>
+  {% block content %}
+  {% endblock %}
+</body>
 </html>

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+  <!-- Plots below -->
+  <div class="container" id="dataDisplay">
+    <div id="timepoint_info">
+      <span class="has-text-weight-bold">Timepoints:&nbsp&nbsp</span>
+      <span class="E has-tooltip-bottom" data-tooltip="Embrioic Day">
+        <i class="far fa-question-circle"></i>
+        <span>E&nbsp&nbsp&nbsp</span>
+      </span>
+      <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
+        <i class=" far fa-question-circle"></i>
+        <span>P&nbsp&nbsp&nbsp</span>
+      </span>
+      <span class="m has-tooltip-bottom" data-tooltip="Months">
+        <i class="far fa-question-circle"></i>
+        <span>m</span>
+      </span>
+    </div>
+    <div id="dataset_1">
+    </div>
+    <div id="dataset_2">
+
+    </div>
+    <div id="dataset_3">
+
+    </div>
+
+  </div>
+  <script src="/js/resetPage.js"></script>
+  <script src="/js/heatmapByTimepoint.js"></script>
+  <script src="/js/timepointPlot.js"></script>
+  <script src="/js/assembleHtimepoints.js"></script>
+  <script src="/js/eventsTimepoint.js"></script>
+  <script src="/js/showTimepointInfo.js"></script>
+{% endblock %}

@@ -1,25 +1,22 @@
 // Plot heatmap by celltype as a callback for the AJAX request
 // Use global variables to store persistent data
-var heatmapData = {};
-
-function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
+function HeatmapDifferential(result, html_element_id, dataScale, order) {
     if (!result) {
-        alert("Error: no data to plot");
+        alert("Error: Nothing to plot or gene names invalid")
         return;
     }
 
-    let x_axis;
-    if (celltypeOrder == "original") {
+    let x_axis, y_axis;
+    if (order == "original") {
         x_axis = result['celltypes'];
         y_axis = result['genes'];
     } else {
         x_axis = result['celltypes_hierarchical'];
         y_axis = result['genes_hierarchical'];
     }
-
     var ngenes =  y_axis.length;
     var graph_width = 1300;
-    var graph_height = 270 + 26 * ngenes;
+    var graph_height = 370 + 26 * ngenes;
 
     // Add hyperlinks to gene names
     let yticktext = [];
@@ -47,22 +44,51 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         data_content.push([]);
         for (let j = 0; j < x_axis.length; j++) {
             const ct = x_axis[j];
-            let gene_exp = result['data'][gene][ct]; 
+            let geneExp = result['data'][gene][ct];
             if (dataScale == "log10") {
-                gene_exp = Math.log10(gene_exp + 0.5);
+                geneExp = Math.log10(geneExp + 0.5);
+            } else if (dataScale == "log2FC") {
+                // If the comparison is against a certain cell type, we subtract
+                // that subtype from all others
+                let geneExpBaseline;
+                if (heatmapData['comparison'] == 'celltypes') {
+                    let ct2 = result['celltype_baseline'];
+                    geneExpBaseline = result['data_baseline'][gene][ct2];
+                } else {
+                    geneExpBaseline = result['data_baseline'][gene][ct];
+                }
+                geneExp = Math.log2(geneExp + 0.5) - Math.log2(geneExpBaseline + 0.5);
             }
-            data_content[i].push(gene_exp);
+            data_content[i].push(geneExp);
         }
     }
+
+    let title;
+    if (dataScale == "log2FC") {
+        title = 'Differential expression ';
+        if (heatmapData['comparison'] == 'hyperoxia/normal') {
+            title += 'hyperoxia vs normal at '+heatmapData['timepoint'];
+        } else if (heatmapData['comparison'] == 'timepoints') {
+            title += heatmapData['timepoint']+' vs '+heatmapData['timepoint_baseline'];
+        } else if (heatmapData['comparison'] == 'celltypes') {
+            title += ' at '+heatmapData['timepoint']+' in '+heatmapData['celltype']+' vs '+heatmapData['celltype_baseline'];
+        }
+    }
+
     var data = {
             type: 'heatmap',
             hoverongaps: false,
-            colorscale: 'Reds',
-        };
+    }
+    if (dataScale === "log2FC") {
+        data['colorscale'] = 'RdBu';
+        data['zmid'] = 0;
+    } else {
+        data['colorscale'] = 'Reds';
+        data['zmid'] = '';
+    }
 
     // Make new plot if none is present
     if ($('#'+html_element_id).html() === "") {
-
         data['z'] = data_content;
         data['x'] = x_axis;
         data['y'] = y_axis;
@@ -71,7 +97,7 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             autosize: true,
             width: graph_width,
             height: graph_height,
-            title: 'Heatmap of gene expression level in selected cell types',
+            title: title,
             xaxis: {
                 //title: 'Cell types',
                 automargin: true,
@@ -106,6 +132,7 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             data,
             {
                 height: graph_height,
+                title: title,
                 yaxis: {
                     autorange: "reversed",
                 },
@@ -115,10 +142,13 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
     }
 } 
 
+
 // NOTE: this is why react was invented...
 function updatePlot() {
     let dataScale = "original";
-    if (!$("#cpmTab").hasClass('is-active')) {
+    if ($("#log2FCTab").hasClass('is-active')) {
+        dataScale = "log2FC";
+    } else if ($("#logTab").hasClass('is-active')) {
         dataScale = "log10";
     }
     let celltypeOrder = "original";
@@ -127,83 +157,96 @@ function updatePlot() {
     }
 
     // NOTE: heatmapData is the global persistent object
-    HeatmapByCelltype(
-        heatmapData['result'], 
-        heatmapData['div'],
+    HeatmapDifferential(
+        heatmapData, 
+        "h5_data_plot",
         dataScale,
         celltypeOrder,
     );
 }
 
+
+// gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
+// Col1a1,Fsd1l
 function AssembleAjaxRequest() {
+
     // Get the list of genes to plot from the search box
-    var gene_names = $('#searchGeneName').val();
-  
-      // sent gene names to the API
+    let geneNames = $('#searchGeneName').val();
+    // NOTE: you cannot cache the genes because the hierarchical clustering
+    // will differ anyway
+
+    let request_data = {
+        'comparison': heatmapData['comparison'],
+        'ct1': heatmapData['celltype'],
+        'ct2': heatmapData['celltype_baseline'],
+        'ds1': heatmapData['dataset'],
+        'ds2': heatmapData['dataset_baseline'],
+        'tp1': heatmapData['timepoint'],
+        'tp2': heatmapData['timepoint_baseline'],
+        'dis1': heatmapData['disease'],
+        'dis2': heatmapData['disease_baseline'],
+        'genestr': geneNames,
+    }
+
+
+    // sent conditions and gene names to the API
     $.ajax({
         type:'GET',
-        url:'/data/by_celltype',
-        data: "gene_names=" + gene_names,
+        url:'/data/differential',
+        data: $.param(request_data),
+        dataType:'json',
         success: function(result) {
-            // Store global variable
-            heatmapData = {
-                'result': result,
-                'div': 'h5_data_plot',
-            };
+            // Clear mobile DOM elements
+            $("#h5_data_plot").html("");
 
-            // Update search box: corrected gene names, excluding missing genes
-            $('#searchGeneName').val(result['genes']);
-  
-            // Create heatmap
+            heatmapData = result;
             updatePlot();
+
         },
         error: function (e) {
             console.log(e);
-            alert('Error: Could not find some gene names.')
-        },
-    });
-};
-
-// SuggestGenes: create a div with a "suggest" button
-function onClickSuggestions() {
-    var gene_names = $('#searchGeneName').val();
-    $.ajax({
-        type:'GET',
-        url:'/gene_friends',
-        data: "gene_names=" + gene_names,
-        success: function(result) {
-            $('#searchGeneName').val(result);
-            AssembleAjaxRequest();
-        },
-        error: function (e) {
-          alert('Error: Could not find gene friends for '+gene_names+'.')
+            alert('Request data Failed');
         }
     });
-}
+
+};
 
 
-////////////////////
-// EVENTS
-////////////////////
-// Normalise the data with log10 and generate a new plot (when user click the button)
-$("#log10OnClick" ).click(function() {
-    // if User has input their gene of interest, generate the heatmap with that value
-    // otherwise use the default data
-    $("#logTab").addClass('is-active');
+// On search click, keep the same conditions but change the genes
+$("#searchOnClick").click(function() {
+  // action here when clicking the search button
+  AssembleAjaxRequest();
+});
+
+// On load, the heatmap data are already embedded in the template
+$(document).ready(updatePlot);
+
+
+// normalization
+$("#log2FCOnClick" ).click(function() {
+    $("#log2FCTab").addClass('is-active');
     $("#cpmTab").removeClass('is-active');
-    updatePlot();
+    $("#logTab").removeClass('is-active');
+    updatePlot()
+});
+
+$("#log10OnClick" ).click(function() {
+    $("#log2FCTab").removeClass('is-active');
+    $("#cpmTab").removeClass('is-active');
+    $("#logTab").addClass('is-active');
+    updatePlot()
 });
 
 $("#CPMOnClick" ).click(function() {
-    $("#logTab").removeClass('is-active');
+    $("#log2FCTab").removeClass('is-active');
     $("#cpmTab").addClass('is-active');
-    updatePlot();
+    $("#logTab").removeClass('is-active');
+    updatePlot()
 });
 
-// Second set of buttons
+
+// order of cell types
 $("#hClusterOnClick" ).click(function() {
-    // if User has input their gene of interest, generate the heatmap with that value
-    // otherwise use the default data
     $("#hierachicalTab").addClass('is-active');
     $("#originalOrderTab").removeClass('is-active');
     updatePlot();
@@ -216,7 +259,3 @@ $("#originalOnClick" ).click(function() {
     updatePlot();
 });
 
-// Both on click and load, plot the heatmap
-$("#searchOnClick").click(AssembleAjaxRequest);
-$(document).ready(AssembleAjaxRequest);
-$("#geneSuggestions").click(onClickSuggestions);

@@ -78,11 +78,11 @@ def read_counts_from_file(df_type, genes=None):
             index = gene_order.index
         counts = np.array(counts).astype(np.float32)
 
-    # FIXME: fix this in the h5 file...
-    #Fix this gene that has "inf" counts: CT010467.1
-    if genes is None:
-        counts[:, 5370] = 0
-        counts = 1e6 * (counts.T / counts.sum(axis=1)).T
+    ## FIXME: fix this in the h5 file...
+    ##Fix this gene that has "inf" counts: CT010467.1
+    #if genes is None:
+    #    counts[:, 5370] = 0
+    #    counts = 1e6 * (counts.T / counts.sum(axis=1)).T
 
     df = pd.DataFrame(
             data=counts[idx_cols].T,
@@ -252,94 +252,135 @@ def get_marker_genes(celltypes):
     return ",".join(markers)
 
 
-def get_degs(suffix, kind='both', n_genes=20):
+def get_de_url(suffix, kind='both'):
+    '''Get differential expression url for up-, downregulated genes, or both'''
+    from urllib.parse import urlencode
+
+    deg_dict = get_deg_conditions(suffix)
+    deg_request = {
+        'comparison': deg_dict['kind'],
+        'ct1': deg_dict['conditions'][0]['celltype'],
+        'ct2': deg_dict['conditions'][1]['celltype'],
+        'ds1': deg_dict['conditions'][0]['dataset'],
+        'ds2': deg_dict['conditions'][1]['dataset'],
+        'tp1': deg_dict['conditions'][0]['timepoint'],
+        'tp2': deg_dict['conditions'][1]['timepoint'],
+        'dis1': deg_dict['conditions'][0].get('disease', 'normal'),
+        'dis2': deg_dict['conditions'][1].get('disease', 'normal'),
+        'kind': kind,
+    }
+    deg_request['n_genes'] = deg_request.get('n_genes', 20)
+    url = urlencode(deg_request)
+    return url
+
+
+def get_data_differential(conditions, kind='both', n_genes=20, genes=None):
     '''Get differentially expressed, up- or downregulated genes
 
     the special phease " in " separated the split (e.g. hyperoxia) from
     the celltype/timepoint/dataset specification (e.g. basophil ACZ P7)
     '''
-    deg_request = get_deg_conditions(suffix)
-    conditions = deg_request['conditions']
-
-    # Compute DEGs on the fly
-    dfs = []
+    # If requested, compute DEGs on the fly
+    if genes is None:
+        dfs = []
+    # In any case, collect data to show in the heatmap
+    dfs_alltypes = []
     for condition in conditions:
         if condition.get('disease', 'normal') == "hyperoxia":
             dfi = read_counts_from_file(
              'celltype_dataset_timepoint_hyperoxia',
+             genes=genes,
              ) 
         else:
             dfi = read_counts_from_file(
                 'celltype_dataset_timepoint',
+                genes=genes,
                 )
-        idx_row = '_'.join([
-            condition['celltype'],
-            condition['dataset'],
-            condition['timepoint'],
-            ])
-        if idx_row not in dfi.columns:
-            raise ValueError(f'Condition not found: {idx_row}')
-        dfi = dfi.loc[:, idx_row]
-        dfs.append(dfi)
+        
+        # Get data for only this condition if computation of DEGs is requested
+        if genes is None:
+            idx_col = '_'.join([
+                condition['celltype'],
+                condition['dataset'],
+                condition['timepoint'],
+                ])
+            if idx_col not in dfi.columns:
+                raise ValueError(f'Condition not found: {idx_col}')
+            dfi_cond = dfi.loc[:, idx_col]
+            dfs.append(dfi_cond)
 
-    # Get log2 fold change
-    log2fc = np.log2(dfs[0] + 0.5) - np.log2(dfs[1] + 0.5)
-    deg_up = log2fc.nlargest(n_genes).index.tolist()
-    deg_down = log2fc.nsmallest(n_genes).index.tolist()
-    genes = deg_up + deg_down[::-1]
-    return ",".join(genes)
+        # In any case, get data for this condition, but all cell types
+        idx_col = dfi.columns.str.contains(
+                '_'+condition['dataset']+'_'+condition['timepoint'])
+        dfi_alltypes = dfi.loc[:, idx_col]
+        # Rename the columns as the cell types
+        dfi_alltypes.columns = [x.split('_')[0] for x in dfi_alltypes.columns]
+        dfs_alltypes.append(dfi_alltypes)
+
+    if genes is None:
+        # Get log2 fold change
+        log2fc = np.log2(dfs[0] + 0.5) - np.log2(dfs[1] + 0.5)
+
+        # Get DEGs
+        deg_up = log2fc.nlargest(n_genes).index.tolist()
+        deg_down = log2fc.nsmallest(n_genes).index.tolist()
+        genes = deg_up + deg_down[::-1]
+
+    # Use or recycle data to make heatmap
+    # FIXME: make an expected total ordering including disease
+    celltypes = dfs_alltypes[0].columns.tolist()
+    for ct in dfs_alltypes[1].columns:
+        if ct not in celltypes:
+            celltypes.append(ct)
+    dfs_alltypes = [dfi.loc[genes] for dfi in dfs_alltypes]
+    for i, dfi in enumerate(dfs_alltypes):
+        for ct in celltypes:
+            if ct not in dfi.columns:
+                dfi[ct] = 0
+        dfs_alltypes[i] = dfi
+
+    return dfs_alltypes
 
 
-# FIXME: speed this up... if we compute on the fly then we should return on the fly
-def get_data_differential():
-    return None
-    
-
-def get_data_hyperoxia(data_type, genes=None):
+def get_data_hyperoxia(genes=None):
     '''Get heatmap data for hyperoxia'''
     df_ho = read_counts_from_file(
         'celltype_dataset_timepoint_hyperoxia',
         genes=genes,
         )
 
-    if data_type == "log2FC":
-        df_normal = read_counts_from_file(
-                'celltype_dataset_timepoint',
-                genes=genes,
-            )
-        # Restrict to hyperoxia celltypes, datasets, and timepoints
-        # NOTE: no dataset took hyperoxia from a timepoint that has no normal.
-        # However, come cell types are hyperoxia specific
-        for key in df_ho:
-            if key not in df_normal.columns:
-                # Default to zero expression
-                df_normal[key] = 0
-        df_normal = df_normal.loc[df_ho.index, df_ho.columns]
-        df_ho = np.log2(df_ho + 0.5) - np.log2(df_normal + 0.5)
-
-    elif data_type == "log10":
-        df_ho = np.log10(df_ho + 0.5)
+    df_normal = read_counts_from_file(
+            'celltype_dataset_timepoint',
+            genes=genes,
+        )
+    # Restrict to hyperoxia celltypes, datasets, and timepoints
+    # NOTE: no dataset took hyperoxia from a timepoint that has no normal.
+    # However, come cell types are hyperoxia specific
+    for key in df_ho:
+        if key not in df_normal.columns:
+            # Default to zero expression
+            df_normal[key] = 0
+    df_normal = df_normal.loc[df_ho.index, df_ho.columns]
 
     # Split by dataset and timepoint, and unstack
-    df_ho = df_ho.T
+    df_dict = {'data': df_ho.T, 'data_baseline': df_normal.T}
+    result = []
+
     datasets = ['ACZ', 'Hurskainen2021']
     timepointd = {'ACZ': ['P7'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
-    result = []
     for ds in datasets:
         for tp in timepointd[ds]:
             item = {
                 'dataset': ds,
                 'timepoint': tp,
-                'data_scale': data_type,
             }
-            dfi = df_ho.loc[df_ho.index.str.endswith(f'{ds}_{tp}')]
-            dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
-
-            # Adjust cell type names and order
-            celltypes_adj, idx = adjust_celltypes(dfi.index)
-            dfi = dfi.iloc[idx]
-
-            item['data'] = dfi
+            for key, df in df_dict.items():
+                dfi = df.loc[df.index.str.endswith(f'{ds}_{tp}')]
+                dfi.index = dfi.index.str.split('_', expand=True).get_level_values(0)
+                # Adjust cell type names and order
+                celltypes_adj, idx = adjust_celltypes(dfi.index)
+                dfi = dfi.iloc[idx]
+                item[key] = dfi
             result.append(item)
 
     return result

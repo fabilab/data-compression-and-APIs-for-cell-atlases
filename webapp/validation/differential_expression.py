@@ -187,8 +187,10 @@ def get_deg_conditions(suffix):
     # Two cell types
     deli2 = ' in '
     idx_deli2 = suffix[:idx_deli].rfind(deli2)
-    celltypestr = suffix[idx_deli2:idx_deli]+','+text_after_vs
-    celltypes = validate_correct_celltypestr(celltypestr).split(',')
+    celltypestr = suffix[idx_deli2+len(deli2):idx_deli]+','+text_after_vs
+    print(celltypestr)
+    celltypestr_vali = validate_correct_celltypestr(celltypestr)
+    celltypes = celltypestr_vali.split(',')
     if len(celltypes) != 2:
             raise ValueError('Sentence structure for DEG not recognized')
     celltypes = rename_celltypes(celltypes, inverse=True)

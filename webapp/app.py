@@ -10,6 +10,7 @@ from flask import (
 )
 from flask_restful import Api
 from flask_cors import CORS
+from flask_wtf import FlaskForm
 
 from api import (
     geneExp,
@@ -23,7 +24,7 @@ from api import (
     markerGenes,
     celltypeAbundance,
 )
-from models import get_celltype_abundances
+from models import get_celltype_abundances, get_data_differential, get_gene_MGI_ids
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
 from voice_recognition import mod as voice_control_blueprint
@@ -35,6 +36,8 @@ app = Flask(__name__, static_url_path="/static", template_folder="templates")
 app_api = Api(app)
 # Note: this might be unsafe
 CORS(app)
+with open('secret_key.txt') as f:
+    app.config['SECRET_KEY'] = f.read()
 ##############################
 
 
@@ -97,11 +100,11 @@ def heatmap_unified():
     )
 
 
-@app.route("/heatmap_differential", methods=["GET"])
-def heatmap_differential():
+@app.route("/heatmap_hyperoxia", methods=["GET"])
+def heatmap_hyperoxia():
     """A sort of heatmap with differential expression"""
     return redirect(url_for(
-        'heatmap_differential_genes',
+        'heatmap_hyperoxia_genes',
         genestring=','.join([
             'Col1a1,Col2a1',
             'Adh1,Col13a1,Col14a1',
@@ -142,23 +145,82 @@ def heatmap_unified_genes(genestring):
 
 
 @app.route("/heatmap_hyperoxia/<genestring>", methods=["GET"])
-def heatmap_hyperoxia(genestring):
+def heatmap_hyperoxia_genes(genestring):
     """A sort of heatmap with hyperoxia"""
     searchstring = genestring.replace(" ", "")
+    # Default dataset/timepoints combos
+    dataset_timepoints = [
+        'ACZ_P7', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14',
+    ]
     return render_template(
             "heatmap_hyperoxia.html",
             searchstring=searchstring,
+            datasetTimepoints=dataset_timepoints,
             )
 
 
-# FIXME: this one should start to diverge
-@app.route("/heatmap_differential/<genestring>", methods=["GET"])
-def heatmap_differential_genes(genestring):
+# NOTE: This is where API and views break down and react would be better
+@app.route("/heatmap_differential", methods=["GET"])
+def heatmap_differential_genes():
     """A sort of heatmap for differential gene expression"""
-    searchstring = genestring.replace(" ", "")
+    from scipy.cluster.hierarchy import linkage, leaves_list
+    from scipy.spatial.distance import pdist
+
+    rqd = dict(request.args)
+    conditions = [
+            {'celltype': rqd['ct1'], 'timepoint': rqd['tp1'],
+             'dataset': rqd['ds1'], 'disease': rqd['dis1']},
+            {'celltype': rqd['ct2'], 'timepoint': rqd['tp2'],
+             'dataset': rqd['ds2'], 'disease': rqd['dis2']},
+    ]
+    dfs = get_data_differential(
+            conditions,
+            kind=rqd['kind'],
+            n_genes=int(rqd['n_genes']),
+    )
+
+    # Get hierarchical clustering of cell types and genes
+    df = dfs[0] - dfs[1]
+    new_order = leaves_list(linkage(
+                pdist(df.values),
+                optimal_ordering=True,
+                ))
+    genes_hierarchical = df.index[new_order].tolist()
+    new_order = leaves_list(linkage(
+                pdist(df.values.T),
+                optimal_ordering=True,
+                ))
+    celltypes_hierarchical = df.columns[new_order].tolist()
+
+    # Gene hyperlinks
+    gene_ids = get_gene_MGI_ids(df.index)
+
+    # Inject dfs into template
+    heatmap_data = {
+        'comparison': rqd['comparison'],
+        'data': dfs[0].T.to_dict(),
+        'data_baseline': dfs[1].T.to_dict(),
+        'celltype': conditions[0]['celltype'],
+        'celltype_baseline': conditions[1]['celltype'],
+        'dataset': conditions[0]['dataset'],
+        'dataset_baseline': conditions[1]['dataset'],
+        'timepoint': conditions[0]['timepoint'],
+        'timepoint_baseline': conditions[1]['timepoint'],
+        'disease': conditions[0]['disease'],
+        'disease_baseline': conditions[1]['disease'],
+        'genes': dfs[0].index.tolist(),
+        'celltypes': dfs[0].columns.tolist(),
+        'genes_hierarchical': genes_hierarchical,
+        'celltypes_hierarchical': celltypes_hierarchical,
+        'gene_ids': gene_ids,
+    }
+
+    # Set search string
+    searchstring = ','.join(dfs[0].index)
     return render_template(
             "heatmap_differential.html",
             searchstring=searchstring,
+            heatmapData=heatmap_data,
             )
 
 
@@ -223,7 +285,7 @@ app_api.add_resource(geneExpTime, "/data_timepoint")
 app_api.add_resource(geneFriends, "/gene_friends")
 app_api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
-app_api.add_resource(geneExpDifferential, "/data/deg")
+app_api.add_resource(geneExpDifferential, "/data/differential")
 app_api.add_resource(checkGenenames, "/check_genenames")
 app_api.add_resource(markerGenes, "/data/marker_genes")
 app_api.add_resource(celltypeAbundance, "/data/celltype_abundance")

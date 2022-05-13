@@ -33,8 +33,9 @@ def text_to_response(text_raw):
 mod = Blueprint('text_control_blueprint', __name__)
 
 
-@mod.route('/submit_text', methods=['GET'])
+@mod.route('/submit_text', methods=['POST'])
 def text_control():
-    text_raw = request.args.get("text")
+    text_raw = request.form["text"]
     response = text_to_response(text_raw)
+
     return response

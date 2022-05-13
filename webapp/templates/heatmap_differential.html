@@ -43,6 +43,9 @@
     <div id="h5_data_plot"></div>   
   </div>
 
-  <script src="/js/heatmapHyperoxia.js"></script>
+  <script>
+    var heatmapData = {{ heatmapData | safe }};
+  </script>
+  <script src="/js/heatmapDifferential.js"></script>
 
 {% endblock %}

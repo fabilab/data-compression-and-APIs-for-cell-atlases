@@ -1,8 +1,8 @@
 function AssembleAjaxRequest() {
     var command = $('#textCommand').val();
-  
+
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: '/submit_text',
         data: "text="+command,
         dataType: 'json',

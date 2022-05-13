@@ -27,7 +27,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
 
     let x = [],
         y = [],
-        tooltip = [],
+        tooltips = [],
         markersize = [],
         markeropacity = [],
         markercolor = [];
@@ -41,6 +41,8 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             if (scaleData == "log10") {
                 ge = Math.log10(ge + 0.5);
             }
+            const labelArray = label.split("_");
+            const tooltip = "Expression: "+ge+", Dataset: "+labelArray[0]+", Time point: "+labelArray[1];
             if (nc < 5) {
                 ms = 8;
                 opacity = 0.5;
@@ -56,7 +58,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             markercolor.push(ge);
             markeropacity.push(opacity);
             markersize.push(ms);
-            tooltip.push("Expression: "+ge, "Label: "+label);
+            tooltips.push(tooltip);
         }
     }
 
@@ -67,13 +69,14 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             colorscale: 'Reds',
             colorbar: {},
         },
+        'hoverinfo': 'text',
     };
 
     // Make new plot if none is present
     if ($('#heatmapUnified').html() === "") {
         data['x'] = x;
         data['y'] = y;
-        data['text'] = tooltip;
+        data['text'] = tooltips;
         data['marker']['color'] = markercolor;
         data['marker']['size'] = markersize;
         data['marker']['opacity'] = opacity;
@@ -113,7 +116,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
     } else {
         data['x'] = [x];
         data['y'] = [y];
-        data['text'] = [tooltip];
+        data['text'] = [tooltips];
         data['marker']['color'] = markercolor;
         data['marker']['size'] = markersize;
         data['marker']['opacity'] = opacity;

@@ -157,7 +157,7 @@ for key, val in phrase_dict.items():
 
 def infer_command_from_text(text_raw):
     '''Figure out category of command'''
-    text = text_raw.lower()
+    text = text_raw.strip().lower()
 
     for prefix, category in phrase_dict_inv.items():
         if not text.startswith(prefix):

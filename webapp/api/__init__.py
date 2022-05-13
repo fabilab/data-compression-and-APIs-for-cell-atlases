@@ -38,7 +38,7 @@ class geneExp(Resource):
         except KeyError:
             return None
 
-        gene_ids_MGI = get_gene_MGI_ids(df.columns)
+        gene_ids = get_gene_MGI_ids(df.columns)
 
         dfl = np.log10(df + 0.5)
 
@@ -60,7 +60,7 @@ class geneExp(Resource):
             'celltypes': df.index.tolist(),
             'celltypes_hierarchical': df.index[celltypes_hierarchical].tolist(),
             'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
-            'gene_ids': gene_ids_MGI,
+            'gene_ids': gene_ids,
         }
 
         print(result)
@@ -98,15 +98,12 @@ class geneExpHyperoxia(Resource):
     '''API for hyperoxia data'''
     def get(self):
         genestring = request.args.get("gene_names")
-        data_type = request.args.get("data_type")
 
         # NOTE: probably do not want a full NLP-style parsing for the API,
         # but this might also be a little insufficient.
-        gene_names = genestring.replace(' ', '').split(',')
+        genes = genestring.replace(' ', '').split(',')
         try:
-            result = get_data_hyperoxia(
-                    data_type=data_type,
-                    genes=gene_names)
+            result = get_data_hyperoxia(genes=genes)
         except KeyError:
             return None
 
@@ -115,14 +112,20 @@ class geneExpHyperoxia(Resource):
             item['genes'] = df.columns.tolist()
             item['celltypes'] = df.index.tolist()
 
+            df_delta = np.log2(df + 0.5) - np.log2(item['data_baseline'] + 0.5)
             new_order = leaves_list(linkage(
-                pdist(df.values),
+                pdist(df_delta.values),
                 optimal_ordering=True,
                 ))
             item['celltypes_hierarchical'] = df.index[new_order].tolist()
+            new_order = leaves_list(linkage(
+                pdist(df_delta.values.T),
+                optimal_ordering=True,
+                ))
+            item['genes_hierarchical'] = df.columns[new_order].tolist()
 
-        for item in result:
             item['data'] = item['data'].to_dict()
+            item['data_baseline'] = item['data_baseline'].to_dict()
 
         return jsonify(result)
 
@@ -130,20 +133,56 @@ class geneExpHyperoxia(Resource):
 class geneExpDifferential(Resource):
     '''API for generic differential expression'''
     def get(self):
-        genestring = request.args.get("gene_names")
-        conditionstring = request.args.get("conditions")
+        rqd = dict(request.args)
+        conditions = [
+                {'celltype': rqd['ct1'], 'timepoint': rqd['tp1'],
+                 'dataset': rqd['ds1'], 'disease': rqd['dis1']},
+                {'celltype': rqd['ct2'], 'timepoint': rqd['tp2'],
+                 'dataset': rqd['ds2'], 'disease': rqd['dis2']},
+        ]
+        genes = rqd['genestr'].split(',')
 
-        # NOTE: probably do not want a full NLP-style parsing for the API,
-        # but this might also be a little insufficient.
-        gene_names = genestring.replace(' ', '').split(',')
-        conditions = conditionstring.replace(' ', '').split(',')
         try:
-            result = get_data_differential(
-                    conditions=conditions,
-                    genes=gene_names)
+            dfs = get_data_differential(conditions, genes=genes)
         except (KeyError, ValueError):
             return None
 
+        # Get hierarchical clustering of cell types and genes
+        df = dfs[0] - dfs[1]
+        new_order = leaves_list(linkage(
+                    pdist(df.values),
+                    optimal_ordering=True,
+                    ))
+        genes_hierarchical = df.index[new_order].tolist()
+        new_order = leaves_list(linkage(
+                    pdist(df.values.T),
+                    optimal_ordering=True,
+                    ))
+        celltypes_hierarchical = df.columns[new_order].tolist()
+
+        # Gene hyperlinks
+        gene_ids = get_gene_MGI_ids(df.index)
+
+        # Inject dfs into template
+        heatmap_data = {
+            'comparison': rqd['comparison'],
+            'data': dfs[0].T.to_dict(),
+            'data_baseline': dfs[1].T.to_dict(),
+            'celltype': conditions[0]['celltype'],
+            'celltype_baseline': conditions[1]['celltype'],
+            'dataset': conditions[0]['dataset'],
+            'dataset_baseline': conditions[1]['dataset'],
+            'timepoint': conditions[0]['timepoint'],
+            'timepoint_baseline': conditions[1]['timepoint'],
+            'disease': conditions[0]['disease'],
+            'disease_baseline': conditions[1]['disease'],
+            'genes': dfs[0].index.tolist(),
+            'celltypes': dfs[0].columns.tolist(),
+            'genes_hierarchical': genes_hierarchical,
+            'celltypes_hierarchical': celltypes_hierarchical,
+            'gene_ids': gene_ids,
+        }
+        return heatmap_data
 
 
 class plotsForSeachGenes(Resource):

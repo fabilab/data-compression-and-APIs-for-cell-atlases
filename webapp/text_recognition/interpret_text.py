@@ -157,40 +157,74 @@ for key, val in phrase_dict.items():
 
 def infer_command_from_text(text_raw):
     '''Figure out category of command'''
-    text = text_raw.strip().lower()
+    # Cut punctuation at the end of the command
+    text = text_raw.rstrip('?!.')
+
+    # Prefixes are checked case-insensitive
+    text_lower = text.strip().lower()
 
     for prefix, category in phrase_dict_inv.items():
-        if not text.startswith(prefix):
+        if not text_lower.startswith(prefix):
             continue
 
         # Figure out type of suffix
         suffix_type = phrase_dict[category]['suffix_type']
 
-        # Cut prefix
+        # Cut prefix... there are two common cases for how to treat the suffix
         cats_keep_whitespace = (
             'celltype_dataset_timepoint_string',
             'timepoint',
             'celltypestring',
             )
         if suffix_type in cats_keep_whitespace:
-            suffix = text_raw[len(prefix):]
-        else:
             suffix = text[len(prefix):]
+        else:
+            suffix = text_lower[len(prefix):]
+
+        # Extract species from suffix
+        suffix, species = excise_species_from_suffix(suffix)
+
+        if suffix_type not in cats_keep_whitespace:
             # Remove whitespace from suffix
             suffix = suffix.replace(' ', '')
-
-        # Cut punctuation at the end of the command
-        suffix = suffix.rstrip('?!.')
 
         return {
             'prefix': prefix,
             'suffix': suffix,
             'category': category,
+            'species': species,
             }
     return None
 
 
+def excise_phrase(text, phrase):
+    '''Excise a phrase from a text'''
+    if phrase not in text:
+        return text
+    if text.endswith(phrase):
+        # Assume space before
+        return text[:-len(phrase)-1]
+    # Assume space after
+    idx = text.find(phrase+' ')
+    return text[:idx]+text[idx+len(phrase)+1:]
+
+
+def excise_species_from_suffix(suffix):
+    '''Excise species from suffix if found'''
+    phrases = {
+        'human': ['in humans', 'in human'],
+        'mouse': ['in mouse', 'in mice'],
+    }
+    for species, phrases_species in phrases.items():
+        for phrase in phrases_species:
+            if phrase in suffix:
+                suffix = excise_phrase(suffix, phrase)
+                return suffix, species
+    return suffix, 'mouse'
+
+
 def interpret_text(text):
+    '''Interpret natural language text as command'''
     inferred_dict = infer_command_from_text(text)
     if inferred_dict is None:
         return None
@@ -207,7 +241,8 @@ def interpret_text(text):
         suffix_corrected = validate_correct_celltypestr(suffix)
         question = 'celltype_string'
     elif suffix_type == 'celltype_dataset_timepoint_string':
-        suffix_corrected = validate_correct_celltypedatasettimepoint(suffix)
+        suffix_corrected = validate_correct_celltypedatasettimepoint(
+                suffix)
         question = 'celltype_dataset_timepoint_string'
     elif suffix_type == 'timepoint':
         suffix_corrected = validate_correct_timepoint(suffix)
@@ -221,4 +256,5 @@ def interpret_text(text):
         'suffix_corrected': suffix_corrected,
         'category': category,
         'question': question,
+        'species': inferred_dict['species'],
     }

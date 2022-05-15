@@ -48,6 +48,18 @@ command_dict = {
 }
 
 
+def add_species_to_url(url, species):
+    # Mouse is still the default
+    if species == 'mouse':
+        return url
+
+    if '?' not in url:
+        url += '?species='+species
+    else:
+        url += '&species='+species
+    return url
+
+
 def get_command_response(text_dict):
     '''Format response to each given command'''
     if text_dict is None:
@@ -67,6 +79,9 @@ def get_command_response(text_dict):
         }
 
     url = command_dict[category]['url_func'](suffix_corrected)
+
+    url = add_species_to_url(url, text_dict['species'])
+
     return {
         'outcome': 'success',
         'url': url,

@@ -426,17 +426,23 @@ def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
     return result
 
 
-def get_gene_MGI_ids(genes):
-    '''Get the MGI ids of a list of genes'''
-    fn = fdn_data+'mouse_gene_names.tsv'
-    df = pd.read_csv(fn, sep='\t', index_col=0)
-    mgi_dict = df['MGI_id'].to_dict()
-    human_dict = df['HumanGeneName'].fillna('').to_dict()
-    id_dict = {}
-    for gene in genes:
-        new_name = human_dict.get(gene, '')
-        if new_name == '':
-            new_name = mgi_dict.get(gene, '')
-        id_dict[gene] = new_name
+def get_gene_ids(genes, species='mouse'):
+    '''Get the ids (MGI/GeneCards) of a list of genes'''
+    if species == 'mouse':
+        fn = fdn_data+'mouse_gene_names.tsv'
+        df = pd.read_csv(fn, sep='\t', index_col=0)
+        mgi_dict = df['MGI_id'].to_dict()
+        human_dict = df['HumanGeneName'].fillna('').to_dict()
+        id_dict = {}
+        for gene in genes:
+            new_name = human_dict.get(gene, '')
+            if new_name == '':
+                new_name = mgi_dict.get(gene, '')
+            id_dict[gene] = new_name
+    elif species == 'human':
+        # GeneCards uses gene names as URL ids
+        id_dict = {g: g for g in genes}
+    else:
+        raise NotImplementedError
 
     return id_dict

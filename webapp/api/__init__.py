@@ -22,7 +22,7 @@ from models import (
         get_data_hyperoxia,
         get_celltype_abundances,
         get_data_differential,
-        get_gene_MGI_ids,
+        get_gene_ids,
     )
 from validation.genes import validate_correct_genestr
 from validation.celltypes import validate_correct_celltypestr
@@ -31,14 +31,19 @@ from validation.celltypes import validate_correct_celltypestr
 class geneExp(Resource):
     '''API for the compressed atlas data, to be visualized as a heatmap'''
     def get(self):
+        species = request.args.get("species")
         genestring = request.args.get("gene_names")
         gene_names = genestring.replace(' ', '').split(',')
         try:
-            df = read_counts_from_file("celltype", genes=gene_names).T
+            df = read_counts_from_file(
+                    "celltype",
+                    genes=gene_names,
+                    species=species,
+                    ).T
         except KeyError:
             return None
 
-        gene_ids = get_gene_MGI_ids(df.columns)
+        gene_ids = get_gene_ids(df.columns, species=species)
 
         dfl = np.log10(df + 0.5)
 
@@ -87,10 +92,10 @@ class geneExpTimeUnified(Resource):
     def get(self):
         gene = request.args.get("gene")
 
-        gene_id_MGI = get_gene_MGI_ids([gene])[gene]
+        gene_id = get_gene_ids([gene])[gene]
 
         data = dataset_unified(gene)
-        data['gene_id'] = gene_id_MGI
+        data['gene_id'] = gene_id
         return data
 
 
@@ -161,7 +166,7 @@ class geneExpDifferential(Resource):
         celltypes_hierarchical = df.columns[new_order].tolist()
 
         # Gene hyperlinks
-        gene_ids = get_gene_MGI_ids(df.index)
+        gene_ids = get_gene_ids(df.index)
 
         # Inject dfs into template
         heatmap_data = {

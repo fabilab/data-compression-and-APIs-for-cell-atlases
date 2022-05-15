@@ -19,14 +19,14 @@ fdn_data = "./static/scData/"
 fn_atlas = fdn_data + "condensed_lung_atlas_ordered.h5"
 
 
-def read_gene_order(data_type='celltype'):
+def read_gene_order(data_type='celltype', species='mouse'):
     with h5py.File(fn_atlas, "r") as h5_data:
         genes = np.array(h5_data[data_type]["gene_expression_average"]["axis0"].asstr())
     gene_order = pd.Series(data=np.arange(len(genes)), index=genes)
     return gene_order
 
 
-def read_cell_types():
+def read_cell_types(species='mouse'):
     with h5py.File(fn_atlas, "r") as h5_data:
         celltypes = np.array(h5_data['celltype']["gene_expression_average"]["axis1"].asstr())
     celltypes, _ = adjust_celltypes(celltypes)
@@ -37,7 +37,7 @@ gene_order = read_gene_order()
 celltypes = read_cell_types()
 
 
-def read_counts_from_file(df_type, genes=None):
+def read_counts_from_file(df_type, genes=None, species='mouse'):
     '''Read the h5 file with the compressed atlas
 
     gives the name of dataset we want as an input
@@ -92,7 +92,7 @@ def read_counts_from_file(df_type, genes=None):
     return df
 
 
-def read_number_cells_from_file(df_type):
+def read_number_cells_from_file(df_type, species='mouse'):
     '''Read the number of cells per time point per dataset from file'''
     with h5py.File(fn_atlas) as f:
         dic = f[df_type]
@@ -104,7 +104,7 @@ def read_number_cells_from_file(df_type):
     return ncells
 
 
-def dataset_by_timepoint(genename, df_type, datatype, plottype):
+def dataset_by_timepoint(genename, df_type, datatype, plottype, species='mouse'):
     '''get the cell type dataset timepoint as a dictionary
 
     user input a gene name.
@@ -141,7 +141,7 @@ def dataset_by_timepoint(genename, df_type, datatype, plottype):
     return dic_per_dataset
 
 
-def dataset_unified(gene):
+def dataset_unified(gene, species='mouse'):
     '''Get JS plotly code for big heatmap
 
     NOTE: this technically breaks the API concept. Let's keep it in mind
@@ -210,6 +210,15 @@ def dataset_unified(gene):
 def get_friends(genes):
     '''Get genes that are "friends" (correlated) with a list of genes'''
     friends = []
+    if len(genes) == 0:
+        return ''
+
+    # Guess species
+    if genes[0].upper() == genes[0]:
+        species = 'human'
+    else:
+        species = 'mouse'
+
     with h5py.File(fdn_data + "gene_friends.h5", "r") as h5_data:
         for gene in genes:
             friends.append(gene)
@@ -226,7 +235,7 @@ def get_friends(genes):
     return ",".join(friends)
 
 
-def get_marker_genes(celltypes):
+def get_marker_genes(celltypes, species='mouse'):
     '''Get markers for cell types'''
     from validation.celltypes import celltype_dict
     
@@ -274,7 +283,7 @@ def get_de_url(suffix, kind='both'):
     return url
 
 
-def get_data_differential(conditions, kind='both', n_genes=20, genes=None):
+def get_data_differential(conditions, kind='both', n_genes=20, genes=None, species='mouse'):
     '''Get differentially expressed, up- or downregulated genes
 
     the special phease " in " separated the split (e.g. hyperoxia) from
@@ -386,7 +395,7 @@ def get_data_hyperoxia(genes=None):
     return result
 
 
-def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative'):
+def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative', species='mouse'):
     '''Get cell type abundances at a certain time point'''
     ncells = read_number_cells_from_file('celltype_dataset_timepoint')
 

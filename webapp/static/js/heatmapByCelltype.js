@@ -138,12 +138,16 @@ function updatePlot() {
 function AssembleAjaxRequest() {
     // Get the list of genes to plot from the search box
     var gene_names = $('#searchGeneName').val();
+    let requestData = {
+        gene_names: gene_names,
+        species: species,
+    }
   
       // sent gene names to the API
     $.ajax({
         type:'GET',
         url:'/data/by_celltype',
-        data: "gene_names=" + gene_names,
+        data: $.param(requestData),
         success: function(result) {
             // Store global variable
             heatmapData = {
@@ -167,10 +171,14 @@ function AssembleAjaxRequest() {
 // SuggestGenes: create a div with a "suggest" button
 function onClickSuggestions() {
     var gene_names = $('#searchGeneName').val();
+    let requestData = {
+        gene_names: gene_names,
+        species: species,
+    }
     $.ajax({
         type:'GET',
         url:'/gene_friends',
-        data: "gene_names=" + gene_names,
+        data: $.param(requestData),
         success: function(result) {
             $('#searchGeneName').val(result);
             AssembleAjaxRequest();

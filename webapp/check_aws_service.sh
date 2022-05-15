@@ -11,6 +11,8 @@ aws lightsail get-container-services --service-name compressed-atlas-service
 sudo systemctl start docker
 # Make new image (user should be in docker group)
 docker build -t compressed-atlas .
+# Test the image
+docker run -p 5000:5000 compressed-atlas
 
 # Push locally built image to service
 aws lightsail push-container-image --service-name compressed-atlas-service --label compressed-atlas --image compressed-atlas

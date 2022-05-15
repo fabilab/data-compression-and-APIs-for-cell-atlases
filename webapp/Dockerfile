@@ -9,6 +9,7 @@ WORKDIR /app
 
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
+COPY secret_key.txt .
 
 # Install any dependencies
 RUN pip install -r requirements.txt

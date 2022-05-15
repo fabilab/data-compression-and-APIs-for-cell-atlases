@@ -89,12 +89,16 @@ function AssembleAjaxRequest() {
 
     // Get the list of genes to plot from the search box
     var gene_names = $('#searchGeneName').val();
+    let requestData = {
+        gene_names: gene_names,
+        species: species,
+    }
 
     // sent gene names to the API
     $.ajax({
         type:'GET',
         url:'/data/hyperoxia',
-        data: "gene_names="+gene_names,
+        data: $.param(requestData),
         dataType:'json',
         success: function(result) {
             heatmapData = result;

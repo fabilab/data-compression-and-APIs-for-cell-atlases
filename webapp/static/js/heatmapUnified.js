@@ -140,11 +140,15 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
 
 
 function AssembleAjaxRequest() {
-    var geneName = $('#searchGeneName').val();
+    var gene = $('#searchGeneName').val();
+    let requestData = {
+        gene: gene,
+        species: species,
+    }
     $.ajax({
         type:'GET',
         url:'/data_heatmap_unified',
-        data: "gene=" + geneName,
+        data: $.param(requestData),
         dataType:'json',
         success: function(result) {
             plotData = result;

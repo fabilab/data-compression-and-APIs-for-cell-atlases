@@ -175,25 +175,25 @@ function AssembleAjaxRequest() {
     // NOTE: you cannot cache the genes because the hierarchical clustering
     // will differ anyway
 
-    let request_data = {
-        'comparison': heatmapData['comparison'],
-        'ct1': heatmapData['celltype'],
-        'ct2': heatmapData['celltype_baseline'],
-        'ds1': heatmapData['dataset'],
-        'ds2': heatmapData['dataset_baseline'],
-        'tp1': heatmapData['timepoint'],
-        'tp2': heatmapData['timepoint_baseline'],
-        'dis1': heatmapData['disease'],
-        'dis2': heatmapData['disease_baseline'],
-        'genestr': geneNames,
+    let requestData = {
+        comparison: heatmapData['comparison'],
+        ct1: heatmapData['celltype'],
+        ct2: heatmapData['celltype_baseline'],
+        ds1: heatmapData['dataset'],
+        ds2: heatmapData['dataset_baseline'],
+        tp1: heatmapData['timepoint'],
+        tp2: heatmapData['timepoint_baseline'],
+        dis1: heatmapData['disease'],
+        dis2: heatmapData['disease_baseline'],
+        genestr': geneNames,
+        species: species,
     }
-
 
     // sent conditions and gene names to the API
     $.ajax({
         type:'GET',
         url:'/data/differential',
-        data: $.param(request_data),
+        data: $.param(requestData),
         dataType:'json',
         success: function(result) {
             // Clear mobile DOM elements

@@ -10,7 +10,6 @@ from flask import (
 )
 from flask_restful import Api
 from flask_cors import CORS
-from flask_wtf import FlaskForm
 
 from api import (
     geneExp,
@@ -65,88 +64,58 @@ def voice_control():
             )
 
 
-# Default redirects
-@app.route("/heatmap_by_celltype", methods=["GET"])
+@app.route("/heatmap_by_celltype", methods=['GET'])
 def heatmap_by_celltype():
-    """Landing page"""
-    return redirect(url_for(
-        'heatmap_by_celltype_genes',
-        genestring=','.join([
+    species = request.args.get('species')
+    if species is None:
+        species = 'mouse'
+    genestring = request.args.get("genestring")
+    if genestring is None:
+        genestring = ','.join([
             'Col1a1,Col2a1',
             'Adh1,Col13a1,Col14a1',
             'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
             'Pecam1,Gja5,Vwf,Car8,Car4',
             'Ptprc,Cd19,Gzma,Cd3d,Cd68',
             'Epcam',
-            ])),
-    )
-
-
-@app.route("/heatmap_by_timepoint", methods=["GET"])
-def heatmap_by_timepoint():
-    """Heatmaps by timepoint (one per dataset)"""
-    return redirect(url_for(
-        'heatmap_by_timepoint_genes',
-        genestring="Car4"),
-    )
-
-
-@app.route("/heatmap_unified", methods=["GET"])
-def heatmap_unified():
-    """One large heatmap across development, one gene"""
-    return redirect(url_for(
-        'heatmap_unified_genes',
-        genestring='Car4'),
-    )
-
-
-@app.route("/heatmap_hyperoxia", methods=["GET"])
-def heatmap_hyperoxia():
-    """A sort of heatmap with differential expression"""
-    return redirect(url_for(
-        'heatmap_hyperoxia_genes',
-        genestring=','.join([
-            'Col1a1,Col2a1',
-            'Adh1,Col13a1,Col14a1',
-            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
-            'Pecam1,Gja5,Vwf,Car8,Car4',
-            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
-            'Epcam',
-            ])),
-    )
-
-
-# Generic views
-@app.route("/heatmap_by_celltype/<genestring>", methods=['GET'])
-def heatmap_by_celltype_genes(genestring):
+            ])
     searchstring = genestring.replace(" ", "")
     return render_template(
             "heatmap_by_celltype.html",
             searchstring=searchstring,
+            species=species,
             )
 
 
-@app.route("/heatmap_by_timepoint/<genestring>", methods=['GET'])
-def heatmap_by_timepoint_genes(genestring):
-    searchstring = genestring.replace(" ", "")
-    return render_template(
-            "heatmap_by_timepoint.html",
-            searchstring=searchstring,
-            )
-
-
-@app.route("/heatmap_unified/<genestring>", methods=['GET'])
-def heatmap_unified_genes(genestring):
+@app.route("/heatmap_development", methods=['GET'])
+def heatmap_development():
+    species = request.args.get('species')
+    if species is None:
+        species = 'mouse'
+    genestring = request.args.get("genestring")
+    if genestring is None:
+        genestring = 'Car4'
     searchstring = genestring.replace(" ", "")
     return render_template(
             "heatmap_unified.html",
             searchstring=searchstring,
+            species=species,
             )
 
 
-@app.route("/heatmap_hyperoxia/<genestring>", methods=["GET"])
-def heatmap_hyperoxia_genes(genestring):
+@app.route("/heatmap_hyperoxia", methods=["GET"])
+def heatmap_hyperoxia():
     """A sort of heatmap with hyperoxia"""
+    genestring = request.args.get("genestring")
+    if genestring is None:
+        genestring = ','.join([
+            'Col1a1,Col2a1',
+            'Adh1,Col13a1,Col14a1',
+            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
+            'Pecam1,Gja5,Vwf,Car8,Car4',
+            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
+            'Epcam',
+            ])
     searchstring = genestring.replace(" ", "")
     # Default dataset/timepoints combos
     dataset_timepoints = [

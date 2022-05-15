@@ -212,14 +212,18 @@ def excise_phrase(text, phrase):
 def excise_species_from_suffix(suffix):
     '''Excise species from suffix if found'''
     phrases = {
+        # NOTE: order matters
         'human': ['in humans', 'in human'],
         'mouse': ['in mouse', 'in mice'],
+        'lemur': ['in lemur'],
     }
     for species, phrases_species in phrases.items():
         for phrase in phrases_species:
             if phrase in suffix:
                 suffix = excise_phrase(suffix, phrase)
                 return suffix, species
+
+    # Default species is still mouse
     return suffix, 'mouse'
 
 

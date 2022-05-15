@@ -3,6 +3,7 @@ zaninilab_key.json
 secret_key.txt
 
 # want to ignore all the h5ad file
+*.h5ad.part
 *.h5ad
 *.eni
 *.enl

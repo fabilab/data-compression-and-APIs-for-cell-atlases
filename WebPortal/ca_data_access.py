@@ -46,7 +46,12 @@ def data_preprocessing(input_gene_names,df_type):
 
 # output should be in this order: E18.5, P1 P3 P7 P14 P21, 3m 18m 24m
 def timepoint_reorder(tp1, tp2):
+    if '_' in tp1:
+        tp1 = tp1.split('_')[1]
     
+    if '_' in tp2:
+        tp2 = tp2.split('_')[1]
+
     if tp1 == tp2:
         return 0
     
@@ -134,9 +139,9 @@ def dataset_by_timepoint(genename,df_type,datatype,plottype):
 # def dataset_by_timepoint_dataset(genename,datatype,plottype):
 ''' generate a dictionary for the unified heatmap data'''
 def dataset_unified(genename,datatype,plottype):
+    # ,datatype,plottype
     df = read_file('celltype_dataset_timepoint')
     filtered_df = df.filter(items=[genename],axis=0)
-    
     all_celltypes = []
     dt_combinations = []  # store all the existing dataset and timepoint combinations
 
@@ -168,19 +173,22 @@ def dataset_unified(genename,datatype,plottype):
             if name not in filtered_df.columns:
                 exp_value = -1
             else:
-                exp_value = filtered_df[name].values[0]
+                exp_value = float(filtered_df[name].values[0])
             expression[dt][ct] = exp_value
         
-    # if datatype == "log10":
-    #     expression = np.log10(0.1+expression)
+    if datatype == "log10":
+        expression = np.log10(0.1+expression)
     
-    # if plottype == 'hieracical':
-    #     # print(df.values.shape)  #(41x5)
-    #     distance = pdist(expression.values)
-    #     # print(distance)
-    #     Z = linkage(distance,optimal_ordering=True)
-    #     new_order = leaves_list(Z)
-    #     expression = expression.iloc[new_order]
-    print(expression)
-    return expression
+    if plottype == 'hieracical':
+        # print(df.values.shape)  #(41x5)
+        distance = pdist(expression.values)
+        # print(distance)
+        Z = linkage(distance,optimal_ordering=True)
+        new_order = leaves_list(Z)
+        expression = expression.iloc[new_order]
+    
+    dt_sorted = sorted([key for key in expression], key=functools.cmp_to_key(timepoint_reorder))
+
+    
+    return {'expression': expression, 'dataset_timepoint': dt_sorted, 'gene': genename}
     

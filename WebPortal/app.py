@@ -111,15 +111,14 @@ class geneExpUnified(Resource):
         genename = request.args.get('gene')
         datatype = request.args.get('datatype')
         plottype = request.args.get('plottype')
-        print("hello")
-        return dataset_unified(genename)
+        return dataset_unified(genename,datatype,plottype)
 
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')
 api.add_resource(geneNames, '/all_gene_names')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
-api.add_resource(geneExpUnified, '/unified')
+api.add_resource(geneExpUnified, '/data_unified')
 
 if __name__ == '__main__':
     app.run(debug=True)

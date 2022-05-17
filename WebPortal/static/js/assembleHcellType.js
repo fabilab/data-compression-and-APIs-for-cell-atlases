@@ -39,8 +39,7 @@ function AssembleAjaxRequest() {
     url:'http://127.0.0.1:5000/data',
     data: "gene_names=" + genes_string + "&plot_type=" + plot_type + "&data_type=" + data_type,
     success: function(result) {  
-      console.log(result);
-      HeatMap(result, "h5_data_plot");
+      HeatmapCelltype(result, "h5_data_plot");
     },
     error: function (e) {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')

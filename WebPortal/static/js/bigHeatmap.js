@@ -7,10 +7,10 @@ $(document).ready(function() {
         data: "gene=" + gene_name,
         dataType:'json',
         success: function(result) {
-            HeatMap(result, "bigHeatMap");
+            HeatmapCelltype(result, "bigHeatMap");
         },
         error: function (e) {
-        alert('Request data Failed')
+            alert('Request data Failed')
         }
     });
     $("#originalTab").addClass('is-active');

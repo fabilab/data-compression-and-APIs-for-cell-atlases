@@ -32,5 +32,12 @@
 #### 10/04/2022
 
 - Create new dataset for the 3rd heatmap (combined heatmap with all cell types over different timepoints)
-- Complete most part of the Interim report by 14/04/2022
-- 
+- Complete most part of the Interim report by 14/04/2022✅
+
+
+
+#### 16/05/2022
+
+- Heatmap by celltype (1st page): A equation is used to auto adjust the cell's size for the heatmap. For the scatter plot, since it looks a bit messy, I applied a log10 function to all values.✅
+- Heatmap by dataset: after using the jinja template, the timepoint tooltip doesn't work anymore, need to be fix. size of the heatmaps are also needed to be adjusted.
+- 3rd heatmap need to be done before Thursday. 

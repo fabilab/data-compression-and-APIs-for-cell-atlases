@@ -8,7 +8,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
+from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
 
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -44,6 +44,11 @@ def page3():
     #     response = f.read()
     # return response
     return render_template('Unified.html',highlight='page3_button',search_box='Car4')
+
+class geneNames(Resource):
+    def get(self):
+        df = read_file('celltype')
+        return list(df.index)
 
 # new end point for timepoint dataset:
 class geneExpTime(Resource):
@@ -114,6 +119,7 @@ class geneExpDatasetTime(Resource):
 
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')
+api.add_resource(geneNames, '/all_gene_names')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
 api.add_resource(geneExpDatasetTime, '/data_timepoint_dataset')

@@ -131,10 +131,15 @@ def dataset_by_timepoint(genename,df_type,datatype,plottype):
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
 
-def dataset_by_timepoint_dataset(genename,datatype,plottype):
+# def dataset_by_timepoint_dataset(genename,datatype,plottype):
+''' generate a dictionary for the unified heatmap data'''
+def dataset_unified(genename,datatype,plottype):
     df = read_file('celltype_dataset_timepoint')
     filtered_df = df.filter(items=[genename],axis=0)
+    
 
+
+    '''
     # get a list of all the celltypes
     all_celltypes = []
     all_timepoints = []
@@ -198,3 +203,4 @@ def dataset_by_timepoint_dataset(genename,datatype,plottype):
         df = df.iloc[new_order]
     
     return json.loads(df.to_json())
+    '''

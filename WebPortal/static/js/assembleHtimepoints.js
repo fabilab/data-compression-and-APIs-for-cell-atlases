@@ -14,12 +14,12 @@ function AssembleAjaxRequestTimepoint() {
   if (!orginal_is_active) {
     plot_type = "hieracical";
   }
-  
+  console.log('about to ajax');
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
 
   const gene_array = gene_name.split(",")
-    // sent gene names to the API
+  // sent gene names to the API
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data_timepoint',
@@ -29,7 +29,7 @@ function AssembleAjaxRequestTimepoint() {
         for (key in Object.keys(result)) {
             dataset = Object.keys(result)[key]
             let div_id = 'dataset_' + num
-            HeatMapTimepoint(result[dataset], div_id,dataset);
+            HeatmapDataset(result[dataset], div_id,dataset);
             num++
         }
     },
@@ -39,3 +39,4 @@ function AssembleAjaxRequestTimepoint() {
     });
   }
 $("#searchOnClick" ).click(AssembleAjaxRequestTimepoint)
+$(document).ready(AssembleAjaxRequestTimepoint)

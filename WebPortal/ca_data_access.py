@@ -137,70 +137,50 @@ def dataset_unified(genename,datatype,plottype):
     df = read_file('celltype_dataset_timepoint')
     filtered_df = df.filter(items=[genename],axis=0)
     
-
-
-    '''
-    # get a list of all the celltypes
     all_celltypes = []
-    all_timepoints = []
-    all_datasets = []
+    dt_combinations = []  # store all the existing dataset and timepoint combinations
+
     for column_name in filtered_df.columns:
-        # print(column_name)
-        all_celltypes.append(column_name.split("_")[0])
-        all_datasets.append(column_name.split("_")[1])
-        all_timepoints.append(column_name.split("_")[2])
+        celltype = column_name.split("_")[0]
+        dataset_timepoint = column_name.split(celltype+"_")[1]
+        if celltype not in all_celltypes:
+            all_celltypes.append(celltype)
+        if dataset_timepoint not in dt_combinations:
+            dt_combinations.append(dataset_timepoint) 
 
-    # unique
-    all_celltypes = list(set(all_celltypes))
-    all_datasets = list(set(all_datasets))
-    all_timepoints = list(set(all_timepoints))
-    all_timepoints = sorted(all_timepoints, key=functools.cmp_to_key(timepoint_reorder),reverse=True)
-    # to construct this for each cell, e.g
-    # T cell = [
-    #     TMS->[value1,value2 .....value(length of all timepoints)],
-    #     ACZ->[value1,value2 .....value(length of all timepoints)],
-    #     Hurskainen2021->[value1,value2 .....value(length of all timepoints)] 
-    # ]
-    bigData = []
-    for celltype in all_celltypes:
-        list_all_dataset = []
-        for dataset in all_datasets:
-            list_all_times = []
-            for timepoint in all_timepoints:
-                names = (celltype,dataset,timepoint)
-                # check if the combination of celltypes_dataset_timepoint exists
-                name = "_".join(names)
-                if name not in filtered_df.columns:
-                    list_all_times.append(np.nan)
-                    continue
-                else:
-                # check if the value is None
-                    has_value = filtered_df[name].values[0]
-                    if has_value is None:
-                        list_all_times.append(0)
-                    else:
-                        list_all_times.append(has_value)
-            list_all_dataset.append(list_all_times)
-        bigData += list_all_dataset
-    
-    all_celltypes_repeated_3 = list(np.repeat(all_celltypes, 3)) # need to repeate for all 3 dataset
-    big_df = pd.DataFrame(data=bigData,columns=all_timepoints)
-    big_df['celltype'] = all_celltypes_repeated_3
-    big_df['dataset'] = all_datasets * len(all_celltypes)
-
-    big_df.index = [x + '_' + y for x, y in zip(big_df['celltype'], big_df['dataset'])]
-    df = big_df[all_timepoints].copy().T
-
-    if datatype == "log10":
-        df = np.log10(0.1+df)
-    
-    if plottype == 'hieracical':
-        # print(df.values.shape)  #(41x5)
-        distance = pdist(df.values)
-        # print(distance)
-        Z = linkage(distance,optimal_ordering=True)
-        new_order = leaves_list(Z)
-        df = df.iloc[new_order]
-    
-    return json.loads(df.to_json())
+    # create a dictionary of dictionary that contains dataset+timepoint as first key, then celltypes as the second keys
     '''
+    {
+    "ACZ_E18.5": {
+        "Adventitial FB": -1.0,
+        "Early adventitial FB": 0.020416259765625,
+    }
+    "TMS_P21:" {
+        "Adventitial FB": 0.23456,
+        "Early adventitial FB": -1,
+    }
+        '''
+    expression = {}
+    for dt in dt_combinations:
+        expression[dt] = {}
+        for ct in all_celltypes:
+            name = "_".join([ct,dt])
+            if name not in filtered_df.columns:
+                exp_value = -1
+            else:
+                exp_value = filtered_df[name].values[0]
+            expression[dt][ct] = exp_value
+        
+    # if datatype == "log10":
+    #     expression = np.log10(0.1+expression)
+    
+    # if plottype == 'hieracical':
+    #     # print(df.values.shape)  #(41x5)
+    #     distance = pdist(expression.values)
+    #     # print(distance)
+    #     Z = linkage(distance,optimal_ordering=True)
+    #     new_order = leaves_list(Z)
+    #     expression = expression.iloc[new_order]
+    print(expression)
+    return expression
+    

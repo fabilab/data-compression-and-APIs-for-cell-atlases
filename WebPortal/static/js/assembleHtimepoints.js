@@ -14,7 +14,6 @@ function AssembleAjaxRequestTimepoint() {
   if (!orginal_is_active) {
     plot_type = "hieracical";
   }
-  console.log('about to ajax');
   // action here when clicking the search button
   var gene_name = $('#searchGeneName').val();
 

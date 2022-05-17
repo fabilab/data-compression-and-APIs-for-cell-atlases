@@ -8,7 +8,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_by_timepoint_dataset
+from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified
 
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -38,11 +38,8 @@ def page2():
     return render_template('byDataset.html',highlight='page2_button',search_box='Car4')
 
 
-@app.route('/heatmap_by_timepoints_datasets',methods=['GET'])
+@app.route('/unified',methods=['GET'])
 def page3():
-    # with open('page3.html') as f:
-    #     response = f.read()
-    # return response
     return render_template('Unified.html',highlight='page3_button',search_box='Car4')
 
 class geneNames(Resource):
@@ -75,7 +72,6 @@ class geneExp(Resource):
             df = np.log10(0.1+df)
         
         if plot_type == 'hieracical':
-            print(df.values.shape)  #(41x5)
             distance = pdist(df.values)
             # print(distance)
             Z = linkage(distance,optimal_ordering=True)
@@ -110,19 +106,20 @@ class plotsForSeachGenes(Resource):
 
         return result
 
-class geneExpDatasetTime(Resource):
+class geneExpUnified(Resource):
     def get(self):
         genename = request.args.get('gene')
         datatype = request.args.get('datatype')
         plottype = request.args.get('plottype')
-        return dataset_by_timepoint_dataset(genename, datatype, plottype)
+        print("hello")
+        return dataset_unified(genename)
 
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')
 api.add_resource(geneNames, '/all_gene_names')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
-api.add_resource(geneExpDatasetTime, '/data_timepoint_dataset')
+api.add_resource(geneExpUnified, '/unified')
 
 if __name__ == '__main__':
     app.run(debug=True)

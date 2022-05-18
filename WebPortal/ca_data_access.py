@@ -165,30 +165,33 @@ def dataset_unified(genename,datatype,plottype):
         "Early adventitial FB": -1,
     }
         '''
-    expression = {}
+    #  expression = {}
+    gene_exp_df = pd.DataFrame(np.eye(len(all_celltypes),len(dt_combinations)), columns=dt_combinations, index=all_celltypes)
     for dt in dt_combinations:
-        expression[dt] = {}
         for ct in all_celltypes:
             name = "_".join([ct,dt])
             if name not in filtered_df.columns:
                 exp_value = -1
             else:
                 exp_value = float(filtered_df[name].values[0])
-            expression[dt][ct] = exp_value
-        
-    if datatype == "log10":
-        expression = np.log10(0.1+expression)
+            
+            if datatype == "log10":
+                if(exp_value >= 0):
+                    exp_value = np.log10(0.1+exp_value)
+            # expression[dt][ct] = exp_value
+            gene_exp_df[dt][ct] = exp_value
     
+    cell_type_label = all_celltypes
     if plottype == 'hieracical':
         # print(df.values.shape)  #(41x5)
-        distance = pdist(expression.values)
+        distance = pdist(gene_exp_df.values)
         # print(distance)
         Z = linkage(distance,optimal_ordering=True)
         new_order = leaves_list(Z)
-        expression = expression.iloc[new_order]
+        gene_exp_df = gene_exp_df.iloc[new_order]
+        cell_type_label = [ct for ct in gene_exp_df.index]
     
-    dt_sorted = sorted([key for key in expression], key=functools.cmp_to_key(timepoint_reorder))
+    dt_sorted = sorted([key for key in gene_exp_df.columns], key=functools.cmp_to_key(timepoint_reorder))
 
-    
-    return {'expression': expression, 'dataset_timepoint': dt_sorted, 'gene': genename}
+    return {'expression': json.loads(gene_exp_df.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': cell_type_label, 'gene': genename}
     

@@ -1,8 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
   <div class="columns is-mobile is-centered tab-area">
+    <div id="suggestions">
+      <span id="suggestionsHeader">Suggestions:</span>
+      <span class="suggestButton suggestGroup" id="geneSuggestions">Similar genes</span>
+      <span>|</span>
+      <span class="suggestGroup" id="speciesSuggestions">
+        Other species: 
+        {% for spec in ["mouse", "lemur", "human"] %}
+          {% if species != spec %}
+          <span class="speciesSuggestion suggestButton" id="suggest{{ spec }}">{{ spec|capitalize }}</span>
+          {% endif %}
+        {% endfor %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
+  <div class="columns is-mobile is-centered tab-area" style="margin-top: 0px;">
     <div class="field column is-one-quarter">
       <label class="label">Data values</label>
       <div class="control">
@@ -36,7 +52,6 @@
   </div>
   <!-- Plots below -->
   <div class="container" id="dataDisplay">
-    <div id="geneSuggestions">Suggest similar genes</div>
     <div id="h5_data_plot"></div>   
     <div id="scatter_plot"></div>
   </div>

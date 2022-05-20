@@ -168,8 +168,42 @@ function AssembleAjaxRequest() {
     });
 };
 
+// Check another species, same genes
+function onClickSpeciesSuggestions() {
+    var gene_names = $('#searchGeneName').val();
+    const newSpecies = this.id.slice("suggest".length);
+    let requestData = {
+        newSpecies: newSpecies,
+        gene_names: gene_names,
+        species: species,
+    }
+    $.ajax({
+        type:'GET',
+        url:'/data/by_celltype',
+        data: $.param(requestData),
+        success: function(result) {
+            // Store global variable
+            heatmapData = {
+                'result': result,
+                'div': 'h5_data_plot',
+            };
+            $("#suggest"+newSpecies).text(species.slice(0, 1).toUpperCase()+species.slice(1)).prop('id', "suggest"+species);
+            species = result['species'];
+
+            // Update search box: corrected gene names, excluding missing genes
+            $('#searchGeneName').val(result['genes']);
+  
+            // Create heatmap
+            updatePlot();
+        },
+        error: function (e) {
+          alert('Error: Could not find orthologs for '+gene_names+'.')
+        }
+    });
+}
+
 // SuggestGenes: create a div with a "suggest" button
-function onClickSuggestions() {
+function onClickGeneSuggestions() {
     var gene_names = $('#searchGeneName').val();
     let requestData = {
         gene_names: gene_names,
@@ -180,7 +214,10 @@ function onClickSuggestions() {
         url:'/gene_friends',
         data: $.param(requestData),
         success: function(result) {
+            // Update search box: corrected gene names, excluding missing genes
             $('#searchGeneName').val(result);
+
+            // Request data
             AssembleAjaxRequest();
         },
         error: function (e) {
@@ -188,7 +225,6 @@ function onClickSuggestions() {
         }
     });
 }
-
 
 ////////////////////
 // EVENTS
@@ -227,4 +263,5 @@ $("#originalOnClick" ).click(function() {
 // Both on click and load, plot the heatmap
 $("#searchOnClick").click(AssembleAjaxRequest);
 $(document).ready(AssembleAjaxRequest);
-$("#geneSuggestions").click(onClickSuggestions);
+$("#geneSuggestions").click(onClickGeneSuggestions);
+$(".speciesSuggestion").click(onClickSpeciesSuggestions);

@@ -160,6 +160,23 @@ function AssembleAjaxRequest() {
     });
 }
 
+
+// Check another species, same genes
+function onClickGeneSuggestions() {
+    var gene = $('#searchGeneName').val();
+    var newGene = $(this).text();
+
+    // swap button and search box
+    // NOTE: this is not recursive, but easier to go back
+    // API-wise, recursive approach would be more consistent
+    $(this).text(gene);
+    $('#searchGeneName').val(newGene);
+
+    // Get new data and plot
+    AssembleAjaxRequest();
+}
+
+
 function updatePlot() {
     let scaleData, celltypeOrder;
     
@@ -180,6 +197,7 @@ function updatePlot() {
 
 $("#searchOnClick").click(AssembleAjaxRequest);
 $(document).ready(AssembleAjaxRequest);
+$(".geneSuggestion").click(onClickGeneSuggestions);
 
 // Normalise the data with log10 and generate a new plot (when user click the button)
 $("#log10OnClick" ).click(function() {

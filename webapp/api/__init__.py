@@ -23,6 +23,7 @@ from models import (
         get_celltype_abundances,
         get_data_differential,
         get_gene_ids,
+        get_orthologs,
     )
 from validation.genes import validate_correct_genestr
 from validation.celltypes import validate_correct_celltypestr
@@ -34,15 +35,30 @@ class geneExp(Resource):
         species = request.args.get("species")
         genestring = request.args.get("gene_names")
         gene_names = genestring.replace(' ', '').split(',')
+
+        # If we are switching species, get orthologs
+        new_species = request.args.get("newSpecies")
+        if new_species is not None:
+            gene_names = get_orthologs(
+                gene_names, species, new_species,
+            )
+            species = new_species
+            missing_genes = 'skip'
+        else:
+            missing_genes = 'throw'
+
         try:
             df = read_counts_from_file(
                     "celltype",
                     genes=gene_names,
                     species=species,
+                    missing=missing_genes,
                     ).T
         except KeyError:
             return None
 
+        # Just in case we skipped some
+        gene_names = df.index.tolist()
         gene_ids = get_gene_ids(df.columns, species=species)
 
         dfl = np.log10(df + 0.5)
@@ -66,9 +82,8 @@ class geneExp(Resource):
             'celltypes_hierarchical': df.index[celltypes_hierarchical].tolist(),
             'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
             'gene_ids': gene_ids,
+            'species': species,
         }
-
-        print(result)
 
         return jsonify(result)
 
@@ -123,10 +138,13 @@ class geneExpHyperoxia(Resource):
                 optimal_ordering=True,
                 ))
             item['celltypes_hierarchical'] = df.index[new_order].tolist()
-            new_order = leaves_list(linkage(
-                pdist(df_delta.values.T),
-                optimal_ordering=True,
-                ))
+            if len(genes) > 1:
+                new_order = leaves_list(linkage(
+                    pdist(df_delta.values.T),
+                    optimal_ordering=True,
+                    ))
+            else:
+                new_order = [0]
             item['genes_hierarchical'] = df.columns[new_order].tolist()
 
             item['data'] = item['data'].to_dict()
@@ -154,10 +172,13 @@ class geneExpDifferential(Resource):
 
         # Get hierarchical clustering of cell types and genes
         df = dfs[0] - dfs[1]
-        new_order = leaves_list(linkage(
-                    pdist(df.values),
-                    optimal_ordering=True,
-                    ))
+        if len(genes) > 1:
+            new_order = leaves_list(linkage(
+                        pdist(df.values),
+                        optimal_ordering=True,
+                        ))
+        else:
+            new_order = [0]
         genes_hierarchical = df.index[new_order].tolist()
         new_order = leaves_list(linkage(
                     pdist(df.values.T),

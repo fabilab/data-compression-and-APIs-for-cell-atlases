@@ -33,10 +33,18 @@ if __name__ == '__main__':
     dfi.drop_duplicates(['DB Class Key', 'Common Organism Name'], inplace=True)
     dfi.set_index(['DB Class Key', 'Common Organism Name'], inplace=True)
     dfi = dfi['Symbol'].unstack(1, fill_value='')[['mouse', 'human']]
-    dfi = dfi.set_index('mouse')['human'].to_dict()
+    dfid = dfi.set_index('mouse')['human'].to_dict()
     
-    df['HumanGeneName'] = [dfi.get(x, '') for x in df.index]
-
+    # mouse -> human also includes MGI, so it starts from df
+    df['HumanGeneName'] = [dfid.get(x, '') for x in df.index]
     df.to_csv('../webapp/static/scData/mouse_gene_names.tsv', sep='\t', index=True)
 
-
+    # human -> mouse has no MGI, so it takes dfi straight out  
+    df_hm = dfi.drop_duplicates(subset='human').set_index('human')[['mouse']]
+    df_hm.index.name = 'HumanGeneName'
+    df_hm.columns = ['MouseGeneName']
+    df_hm.to_csv(
+            '../webapp/static/scData/human_mouse_gene_orthologs.tsv',
+            sep='\t',
+            index=True,
+    )

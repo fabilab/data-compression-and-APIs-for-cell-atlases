@@ -16,10 +16,15 @@ from validation.differential_expression import get_deg_conditions
 
 
 fdn_data = "./static/scData/"
-fn_atlas = fdn_data + "condensed_lung_atlas_ordered.h5"
+fn_atlasd = {
+    'mouse': fdn_data + "condensed_lung_atlas_ordered.h5",
+    'lemur': fdn_data + "mouselemur_condensed_lung_atlas_in_cpm.h5",
+    'human': fdn_data + "human_condensed_lung_atlas_in_cpm.h5",
+}
 
 
 def read_gene_order(data_type='celltype', species='mouse'):
+    fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas, "r") as h5_data:
         genes = np.array(h5_data[data_type]["gene_expression_average"]["axis0"].asstr())
     gene_order = pd.Series(data=np.arange(len(genes)), index=genes)
@@ -27,6 +32,7 @@ def read_gene_order(data_type='celltype', species='mouse'):
 
 
 def read_cell_types(species='mouse'):
+    fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas, "r") as h5_data:
         celltypes = np.array(h5_data['celltype']["gene_expression_average"]["axis1"].asstr())
     celltypes, _ = adjust_celltypes(celltypes)
@@ -37,17 +43,23 @@ gene_order = read_gene_order()
 celltypes = read_cell_types()
 
 
-def read_counts_from_file(df_type, genes=None, species='mouse'):
+def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw'):
     '''Read the h5 file with the compressed atlas
 
     gives the name of dataset we want as an input
     celltype / celltype_dataset / celltype_dataset_timepoint
     '''
-    gene_order = read_gene_order(data_type=df_type)
+    gene_order = read_gene_order(data_type=df_type, species=species)
 
+    fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas, "r") as h5_data:
         columns = np.array(h5_data[df_type]["gene_expression_average"]["axis1"].asstr())
-        columns, idx_cols = adjust_celltypes(columns)
+        # For mouse, the cell types used for compression are not the final
+        # ones we want to show
+        if species == "mouse":
+            columns, idx_cols = adjust_celltypes(columns)
+        else:
+            idx_cols = np.arange(len(columns))
         counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
         if genes is not None:
             index = []
@@ -61,7 +73,10 @@ def read_counts_from_file(df_type, genes=None, species='mouse'):
                 # Try imperfect match
                 candidates = gene_order.index[gene_order.index.str.match(gene)]
                 if len(candidates) == 0:
-                    raise KeyError('Gene match not found: '+gene)
+                    if missing == 'throw':
+                        raise KeyError('Gene match not found: '+gene)
+                    else:
+                        continue
                 for cand in candidates:
                     if cand not in index:
                         index.append(cand)
@@ -78,12 +93,6 @@ def read_counts_from_file(df_type, genes=None, species='mouse'):
             index = gene_order.index
         counts = np.array(counts).astype(np.float32)
 
-    ## FIXME: fix this in the h5 file...
-    ##Fix this gene that has "inf" counts: CT010467.1
-    #if genes is None:
-    #    counts[:, 5370] = 0
-    #    counts = 1e6 * (counts.T / counts.sum(axis=1)).T
-
     df = pd.DataFrame(
             data=counts[idx_cols].T,
             index=index,
@@ -94,6 +103,7 @@ def read_counts_from_file(df_type, genes=None, species='mouse'):
 
 def read_number_cells_from_file(df_type, species='mouse'):
     '''Read the number of cells per time point per dataset from file'''
+    fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas) as f:
         dic = f[df_type]
 
@@ -207,17 +217,11 @@ def dataset_unified(gene, species='mouse'):
         }
 
 
-def get_friends(genes):
+def get_friends(genes, species="mouse"):
     '''Get genes that are "friends" (correlated) with a list of genes'''
     friends = []
     if len(genes) == 0:
         return ''
-
-    # Guess species
-    if genes[0].upper() == genes[0]:
-        species = 'human'
-    else:
-        species = 'mouse'
 
     with h5py.File(fdn_data + "gene_friends.h5", "r") as h5_data:
         for gene in genes:
@@ -451,7 +455,39 @@ def get_gene_ids(genes, species='mouse'):
     elif species == 'human':
         # GeneCards uses gene names as URL ids
         id_dict = {g: g for g in genes}
+    elif species == 'lemur':
+        # Seems like lemur and human share gene names
+        return get_gene_ids(genes, species='human')
     else:
         raise NotImplementedError
 
     return id_dict
+
+
+def get_orthologs(genes, species, new_species):
+    '''Find orthologs from a species to another'''
+    # Mouse lemur seems to use same gene names as human... is it a primate thing?
+    if species == new_species:
+        return list(genes)
+    elif species == 'lemur':
+        return get_orthologs(genes, 'human', new_species)
+    elif new_species == 'lemur':
+        return get_orthologs(genes, species, 'human')
+    elif (species == 'mouse') and (new_species == 'human'):
+        fn = fdn_data+'mouse_gene_names.tsv'
+        conv = pd.read_csv(fn, sep='\t', index_col=0, usecols=[0, 3])
+        conv = conv.squeeze("columns")
+        genes = [g for g in genes if g in conv.index]
+        new_genes = conv.loc[genes].fillna('').values
+        new_genes = [g for g in new_genes if g != '']
+    elif (species == 'human') and (new_species == 'mouse'):
+        fn = fdn_data+'human_mouse_gene_orthologs.tsv'
+        conv = pd.read_csv(fn, sep='\t', index_col=0)
+        conv = conv.squeeze("columns")
+        genes = [g for g in genes if g in conv.index]
+        new_genes = conv.loc[genes].fillna('').values
+        new_genes = [g for g in new_genes if g != '']
+    else:
+        raise NotImplementedError
+
+    return new_genes

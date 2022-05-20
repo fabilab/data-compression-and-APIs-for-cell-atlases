@@ -12,15 +12,31 @@
     cursor: pointer;
 }
 
-#geneSuggestions {
+#suggestions {
     text-align: center;
-    text-decoration: underline;
-    border-radius: 6px;
 }
 
-#geneSuggestions:hover {
+#suggestionsHeader {
+ font-weight: bolder;
+}
+
+.suggestButton {
+    text-decoration: underline;
+    border-radius: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.suggestButton:hover {
     color: #FFFFFF;
     background-color: #485fc7;
+}
+
+.suggestGroup {
+    padding-top: 5px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 #AudioRecordButton {

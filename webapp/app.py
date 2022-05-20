@@ -23,7 +23,12 @@ from api import (
     markerGenes,
     celltypeAbundance,
 )
-from models import get_celltype_abundances, get_data_differential, get_gene_MGI_ids
+from models import (
+        get_celltype_abundances,
+        get_data_differential,
+        get_gene_ids,
+        get_friends,
+)
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
 from voice_recognition import mod as voice_control_blueprint
@@ -96,10 +101,16 @@ def heatmap_development():
     if genestring is None:
         genestring = 'Car4'
     searchstring = genestring.replace(" ", "")
+
+    similar_genes = get_friends([searchstring]).split(',')
+    if similar_genes[0] == searchstring:
+        similar_genes = similar_genes[1:]
+
     return render_template(
             "heatmap_unified.html",
             searchstring=searchstring,
             species=species,
+            similarGenes=similar_genes,
             )
 
 
@@ -162,7 +173,7 @@ def heatmap_differential_genes():
     celltypes_hierarchical = df.columns[new_order].tolist()
 
     # Gene hyperlinks
-    gene_ids = get_gene_MGI_ids(df.index)
+    gene_ids = get_gene_ids(df.index)
 
     # Inject dfs into template
     heatmap_data = {

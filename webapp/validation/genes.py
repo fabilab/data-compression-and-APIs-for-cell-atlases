@@ -62,11 +62,15 @@ def convert_numbers_in_gene_name(gene):
     return gene
 
 
-def validate_correct_gene(gene):
+def validate_correct_gene(gene, species='mouse'):
     '''Validate and correct misspellings for a single gene name'''
 
     # Murine genes are capitalized
-    gene = gene.capitalize()
+    # Human/monkey genes are upper
+    if species == 'mouse':
+        gene = gene.capitalize()
+    else:
+        gene = gene.upper()
 
     if gene in genes_idx:
         return gene
@@ -95,16 +99,16 @@ def validate_correct_gene(gene):
         return None
 
 
-def validate_correct_genestr(genestr):
+def validate_correct_genestr(genestr, species='mouse'):
     '''Validate gene names and correct misspellings if possible'''
 
     # TODO: check punctuation more accurately
-    genes = genestr.replace('.', ',').replace(';', ',').split(',')
+    genes = genestr.strip(' ').replace('.', ',').replace(';', ',').split(',')
 
     # Validate
     genesv = []
     for gene in genes:
-        genev = validate_correct_gene(gene)
+        genev = validate_correct_gene(gene, species=species)
         if genev is None:
             return None
         genesv.append(genev)

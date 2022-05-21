@@ -1,3 +1,9 @@
+# vim: fdm=indent
+'''
+author:     Fabio Zanini
+date:       22/05/22
+content:    Main flask app for compressed atlases
+'''
 from base64 import decode
 import json
 from flask import (
@@ -10,6 +16,7 @@ from flask import (
 )
 from flask_restful import Api
 from flask_cors import CORS
+import numpy as np
 
 from api import (
     geneExp,
@@ -28,6 +35,7 @@ from models import (
         get_data_differential,
         get_gene_ids,
         get_friends,
+        get_data_species_comparison,
 )
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
@@ -160,7 +168,8 @@ def heatmap_differential_genes():
     )
 
     # Get hierarchical clustering of cell types and genes
-    df = dfs[0] - dfs[1]
+    # FIXME: this works poorly, trying out HC on the log
+    df = np.log10(dfs[0] + 0.5)
     new_order = leaves_list(linkage(
                 pdist(df.values),
                 optimal_ordering=True,
@@ -234,6 +243,69 @@ def plot_celltype_abundance(timepoint):
             celltypes=celltype_dict,
             searchstring=timepoint,
             )
+
+
+@app.route("/heatmap_species_comparison", methods=["GET"])
+def heatmap_species_comparison():
+    '''Plot heatmap of cross-species comparison'''
+    from scipy.cluster.hierarchy import linkage, leaves_list
+    from scipy.spatial.distance import pdist
+
+    species = request.args.get('species')
+    species_baseline = request.args.get('species_baseline')
+    genes = request.args.get('genes').split(',')
+
+    # Get the counts
+    dfs = get_data_species_comparison(species, species_baseline, genes)
+
+    # Get hierarchical clustering of cell types and genes
+    df = np.log10(dfs[0] + 0.5)
+    new_order = leaves_list(linkage(
+                pdist(df.values),
+                optimal_ordering=True,
+                ))
+    genes_hierarchical = df.index[new_order].tolist()
+    genes_hierarchical_baseline = dfs[1].index[new_order].tolist()
+    new_order = leaves_list(linkage(
+                pdist(df.values.T),
+                optimal_ordering=True,
+                ))
+    celltypes_hierarchical = df.columns[new_order].tolist()
+    # FIXME: this needs a 1-1 mapping between cell types or some logic to skip/fill
+    celltypes_hierarchical_baseline = dfs[1].columns[new_order].tolist()
+
+    # Gene hyperlinks
+    gene_ids = get_gene_ids(df.index)
+
+    # Inject dfs into template
+    # NOTE: the whole converting DataFrame to dict of dict makes this quite
+    # a bit more heavy than it should be... just use a list of lists and
+    # accompanying lists of indices
+    heatmap_data = {
+        'data': dfs[0].T.to_dict(),
+        'data_baseline': dfs[1].T.to_dict(),
+        'genes': dfs[0].index.tolist(),
+        'genes_baseline': dfs[1].index.tolist(),
+        'celltypes': dfs[0].columns.tolist(),
+        'celltypes_baseline': dfs[1].columns.tolist(),
+        'genes_hierarchical': genes_hierarchical,
+        'celltypes_hierarchical': celltypes_hierarchical,
+        'genes_hierarchical_baseline': genes_hierarchical_baseline,
+        'celltypes_hierarchical_baseline': celltypes_hierarchical_baseline,
+        'gene_ids': gene_ids,
+        'species': species,
+        'species_baseline': species_baseline,
+    }
+
+    # Set search string
+    searchstring = ','.join(dfs[0].index)
+
+    return render_template(
+        'heatmap_species_comparison.html',
+        species=species,
+        heatmapData=heatmap_data,
+        searchstring=searchstring,
+    )
 
 
 # Static assets (JS/CSS)

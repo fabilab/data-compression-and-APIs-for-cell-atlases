@@ -465,7 +465,7 @@ def get_gene_ids(genes, species='mouse'):
 
 
 def get_orthologs(genes, species, new_species):
-    '''Find orthologs from a species to another'''
+    '''Connect orthologs from a species to another'''
     # Mouse lemur seems to use same gene names as human... is it a primate thing?
     if species == new_species:
         return list(genes)
@@ -478,16 +478,58 @@ def get_orthologs(genes, species, new_species):
         conv = pd.read_csv(fn, sep='\t', index_col=0, usecols=[0, 3])
         conv = conv.squeeze("columns")
         genes = [g for g in genes if g in conv.index]
-        new_genes = conv.loc[genes].fillna('').values
-        new_genes = [g for g in new_genes if g != '']
+        dic = conv.loc[genes].fillna('')
     elif (species == 'human') and (new_species == 'mouse'):
         fn = fdn_data+'human_mouse_gene_orthologs.tsv'
         conv = pd.read_csv(fn, sep='\t', index_col=0)
         conv = conv.squeeze("columns")
         genes = [g for g in genes if g in conv.index]
-        new_genes = conv.loc[genes].fillna('').values
-        new_genes = [g for g in new_genes if g != '']
+        dic = conv.loc[genes].fillna('')
     else:
         raise NotImplementedError
 
-    return new_genes
+    dic = dic[dic != '']
+    return {
+        species: list(dic.index),
+        new_species: list(dic.values),
+    }
+
+
+def guess_genes_species(genes):
+    '''Guess the species from the genes'''
+    species = ('mouse',)
+    for gene in genes:
+        if len(gene) > 1:
+            break
+    else:
+        return species
+
+    if gene == gene.upper():
+        species = ('human', 'lemur')
+    return species
+
+
+def get_data_species_comparison(species, species_baseline, genes):
+    '''Get dataframe of average expression in two species.
+
+    Genes with no ortholog will be ignored.
+    '''
+    gene_species = guess_genes_species(genes)
+    # Several species could have the same
+    if (species in gene_species) and (species_baseline in gene_species):
+        genes_baseline = genes
+    elif species in gene_species:
+        dic = get_orthologs(genes, species, species_baseline)
+        genes = dic[species]
+        genes_baseline = dic[species_baseline]
+    else:
+        dic = get_orthologs(genes, species_baseline, species)
+        genes = dic[species]
+        genes_baseline = dic[species_baseline]
+
+    # Get both dataframes
+    dfs = [
+        read_counts_from_file('celltype', genes, species),
+        read_counts_from_file('celltype', genes_baseline, species_baseline),
+        ]
+    return dfs

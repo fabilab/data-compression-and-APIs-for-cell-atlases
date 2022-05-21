@@ -7,6 +7,7 @@ content:    Interpret text from Google TTS into a redirect URL.
 import numpy as np
 import pandas as pd
 from flask import url_for
+from urllib.parse import urlencode
 
 from models import get_marker_genes, get_de_url
 
@@ -23,8 +24,8 @@ command_dict = {
         'url_func': 'TODO',  # TODO
     },
     'marker_genes': {
-        'url_func': lambda sfx: url_for('heatmap_by_celltype')+\
-                '?genestring='+get_marker_genes(sfx), 
+        'url_func': lambda sfx: url_for('heatmap_by_celltype') + '?' + \
+                'genestring='+get_marker_genes(sfx),
     },
     'differentially_expressed_genes': {
         'url_func': lambda sfx: url_for('heatmap_differential_genes')+"?"+get_de_url(sfx, kind='both')
@@ -44,6 +45,10 @@ command_dict = {
         'url_func': lambda sfx: url_for(
             'plot_celltype_abundance',
             timepoint=sfx),
+    },
+    'compare_species': {
+        'url_func': lambda dic: url_for(
+            'heatmap_species_comparison') + '?' + urlencode(dic)
     },
 }
 
@@ -79,8 +84,8 @@ def get_command_response(text_dict):
         }
 
     url = command_dict[category]['url_func'](suffix_corrected)
-
-    url = add_species_to_url(url, text_dict['species'])
+    if 'species=' not in url:
+        url = add_species_to_url(url, text_dict['species'])
 
     return {
         'outcome': 'success',

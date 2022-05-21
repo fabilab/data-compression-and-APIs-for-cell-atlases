@@ -17,6 +17,10 @@ from validation.celltypes import (
     validate_correct_celltypedatasettimepoint,
     )
 from validation.timepoints import validate_correct_timepoint
+from validation.species import (
+    validate_correct_species,
+    validate_correct_species_genestr,
+)
 
 
 phrase_dict = {
@@ -148,6 +152,15 @@ phrase_dict = {
         ],
         'suffix_type': 'timepoint',
     },
+    'compare_species': {
+        'prefixes': [
+            'compare expression of',
+            'compare gene expression of',
+            'compare the expression of',
+            'compare the gene expression of',
+        ],
+        'suffix_type': 'species_genestring',
+    },
 }
 phrase_dict_inv = {}
 for key, val in phrase_dict.items():
@@ -175,6 +188,7 @@ def infer_command_from_text(text_raw):
             'celltype_dataset_timepoint_string',
             'timepoint',
             'celltypestring',
+            'species_genestring',
             )
         if suffix_type in cats_keep_whitespace:
             suffix = text[len(prefix):]
@@ -211,13 +225,13 @@ def excise_phrase(text, phrase):
 
 def excise_species_from_suffix(suffix):
     '''Excise species from suffix if found'''
-    phrases = {
+    phrases = [
         # NOTE: order matters
-        'human': ['in humans', 'in human'],
-        'mouse': ['in mouse', 'in mice'],
-        'lemur': ['in lemur'],
-    }
-    for species, phrases_species in phrases.items():
+        ('human', ['in humans', 'in human']),
+        ('lemur', ['in mouse lemur', 'in lemur', 'in monkey']),
+        ('mouse', ['in mouse', 'in mice']),
+    ]
+    for species, phrases_species in phrases:
         for phrase in phrases_species:
             if phrase in suffix:
                 suffix = excise_phrase(suffix, phrase)
@@ -236,6 +250,12 @@ def interpret_text(text):
     prefix = inferred_dict['prefix']
     suffix = inferred_dict['suffix']
     category = inferred_dict['category']
+    new_dict = {
+        'prefix': prefix,
+        'suffix': suffix,
+        'category': category,
+        'species': validate_correct_species(inferred_dict['species']),
+    }
 
     suffix_type = phrase_dict[category]['suffix_type']
     if suffix_type == 'genestring':
@@ -251,14 +271,14 @@ def interpret_text(text):
     elif suffix_type == 'timepoint':
         suffix_corrected = validate_correct_timepoint(suffix)
         question = 'timepoint'
+    elif suffix_type == "species_genestring":
+        suffix_corrected = validate_correct_species_genestr(new_dict['species'], suffix)
+        question = 'species_gene_string'
     else:
         raise ValueError('Category not implemented')
 
-    return {
-        'prefix': prefix,
-        'suffix': suffix,
+    new_dict.update({
         'suffix_corrected': suffix_corrected,
-        'category': category,
         'question': question,
-        'species': inferred_dict['species'],
-    }
+    })
+    return new_dict

@@ -41,7 +41,7 @@ class geneExp(Resource):
         if new_species is not None:
             gene_names = get_orthologs(
                 gene_names, species, new_species,
-            )
+            )[new_species]
             species = new_species
             missing_genes = 'skip'
         else:

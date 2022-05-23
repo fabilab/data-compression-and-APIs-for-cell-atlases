@@ -468,11 +468,18 @@ def get_orthologs(genes, species, new_species):
     '''Connect orthologs from a species to another'''
     # Mouse lemur seems to use same gene names as human... is it a primate thing?
     if species == new_species:
-        return list(genes)
+        return {
+            species: list(genes),
+            new_species: list(genes),
+            }
     elif species == 'lemur':
-        return get_orthologs(genes, 'human', new_species)
+        dic = get_orthologs(genes, 'human', new_species)
+        dic[species] = dic.pop('human')
+        return dic
     elif new_species == 'lemur':
-        return get_orthologs(genes, species, 'human')
+        dic = get_orthologs(genes, species, 'human')
+        dic[new_species] = dic.pop('human')
+        return dic
     elif (species == 'mouse') and (new_species == 'human'):
         fn = fdn_data+'mouse_gene_names.tsv'
         conv = pd.read_csv(fn, sep='\t', index_col=0, usecols=[0, 3])
@@ -515,6 +522,7 @@ def get_data_species_comparison(species, species_baseline, genes):
     Genes with no ortholog will be ignored.
     '''
     gene_species = guess_genes_species(genes)
+
     # Several species could have the same
     if (species in gene_species) and (species_baseline in gene_species):
         genes_baseline = genes
@@ -527,9 +535,18 @@ def get_data_species_comparison(species, species_baseline, genes):
         genes = dic[species]
         genes_baseline = dic[species_baseline]
 
+    # NOTE: Now genes are synched via orthology
+
     # Get both dataframes
     dfs = [
         read_counts_from_file('celltype', genes, species),
         read_counts_from_file('celltype', genes_baseline, species_baseline),
         ]
+
+    # Restrict to common cell types
+    celltypes_shared = set(dfs[0].columns.values) & set(dfs[1].columns.values)
+    celltypes0 = [ct for ct in dfs[0].columns if ct in celltypes_shared]
+    celltypes1 = [ct for ct in dfs[1].columns if ct in celltypes_shared]
+    dfs = [dfs[0].loc[:, celltypes0], dfs[1].loc[:, celltypes1]]
+
     return dfs

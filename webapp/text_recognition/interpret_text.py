@@ -250,16 +250,17 @@ def interpret_text(text):
     prefix = inferred_dict['prefix']
     suffix = inferred_dict['suffix']
     category = inferred_dict['category']
+    species = validate_correct_species(inferred_dict['species'])
     new_dict = {
         'prefix': prefix,
         'suffix': suffix,
         'category': category,
-        'species': validate_correct_species(inferred_dict['species']),
+        'species': species,
     }
 
     suffix_type = phrase_dict[category]['suffix_type']
     if suffix_type == 'genestring':
-        suffix_corrected = validate_correct_genestr(suffix)
+        suffix_corrected = validate_correct_genestr(suffix, species=species)
         question = 'gene_string'
     elif suffix_type == 'celltypestring':
         suffix_corrected = validate_correct_celltypestr(suffix)
@@ -272,7 +273,7 @@ def interpret_text(text):
         suffix_corrected = validate_correct_timepoint(suffix)
         question = 'timepoint'
     elif suffix_type == "species_genestring":
-        suffix_corrected = validate_correct_species_genestr(new_dict['species'], suffix)
+        suffix_corrected = validate_correct_species_genestr(species, suffix)
         question = 'species_gene_string'
     else:
         raise ValueError('Category not implemented')

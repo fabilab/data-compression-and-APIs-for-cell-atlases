@@ -32,12 +32,20 @@ def validate_correct_species_genestr(species, text):
         return None
 
     idx = text.index(sep)
-    genestr = text[:idx]
-    genestr = validate_correct_genestr(genestr)
 
+    # Find out other species
     # TODO: expand to more complex syntax, e.g. specific time points
     species_baseline = text[idx+len(sep):]
     species_baseline = validate_correct_species(species_baseline)
+
+    genestr = text[:idx]
+    # Try validating/correcting for either species
+    tmp = validate_correct_genestr(genestr, species=species)
+    if tmp is None:
+        tmp = validate_correct_genestr(genestr, species=species_baseline)
+    if tmp is None:
+        raise ValueError('Genes not recognized in either species')
+    genestr = tmp
 
     return {
         'species': species,

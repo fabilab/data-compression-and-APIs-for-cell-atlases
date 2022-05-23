@@ -1,6 +1,6 @@
 // Plot heatmap by celltype as a callback for the AJAX request
 // Use global variables to store persistent data
-function HeatmapDifferential(result, html_element_id, dataScale, order) {
+function HeatmapSpeciesComparison(result, html_element_id, dataScale, order) {
     if (!result) {
         alert("Error: Nothing to plot or gene names invalid")
         return;
@@ -9,10 +9,18 @@ function HeatmapDifferential(result, html_element_id, dataScale, order) {
     let x_axis, y_axis;
     if (order == "original") {
         x_axis = result['celltypes'];
-        y_axis = result['genes'];
+        if ((dataScale == "originalBaseline") | (dataScale == "log10Baseline")) {
+            y_axis = result['genes_baseline'];
+        } else {
+            y_axis = result['genes'];
+        }
     } else {
         x_axis = result['celltypes_hierarchical'];
-        y_axis = result['genes_hierarchical'];
+        if ((dataScale == "originalBaseline") | (dataScale == "log10Baseline")) {
+            y_axis = result['genes_hierarchical_baseline'];
+        } else {
+            y_axis = result['genes_hierarchical'];
+        }
     }
     var ngenes =  y_axis.length;
     var graph_width = 1300;
@@ -21,7 +29,7 @@ function HeatmapDifferential(result, html_element_id, dataScale, order) {
     // Add hyperlinks to gene names
     let yticktext = [];
     for (let i = 0; i < y_axis.length; i++) {
-        const gene = y_axis[i];
+        const gene = result['genes'][i];
         const geneId = result['gene_ids'][gene];
         if (geneId === "") {
             yticktext.push(gene);
@@ -41,15 +49,23 @@ function HeatmapDifferential(result, html_element_id, dataScale, order) {
     let data_content = [];
     for (let i = 0; i < y_axis.length; i++) {
         const gene = y_axis[i];
+        const geneBaseline = result['genes_baseline'][i];
         data_content.push([]);
         for (let j = 0; j < x_axis.length; j++) {
             const ct = x_axis[j];
-            let geneExp = result['data'][gene][ct];
-            if (dataScale == "log10") {
-                geneExp = Math.log10(geneExp + 0.5);
+            let geneExp;
+            if (dataScale == "original") {
+                geneExp = result['data'][gene][ct];
+            } else if (dataScale == "log10") {
+                geneExp = Math.log10(result['data'][gene][ct] + 0.5);
             } else if (dataScale == "log2FC") {
-                let geneExpBaseline = result['data_baseline'][gene][ct];
+                geneExp = result['data'][gene][ct];
+                let geneExpBaseline = result['data_baseline'][geneBaseline][ct];
                 geneExp = Math.log2(geneExp + 0.5) - Math.log2(geneExpBaseline + 0.5);
+            } else if (dataScale == "originalBaseline") {
+                geneExp = result['data_baseline'][gene][ct];
+            } else if (dataScale == "log10Baseline") {
+                geneExp = Math.log10(result['data_baseline'][gene][ct] + 0.5);
             }
             data_content[i].push(geneExp);
         }
@@ -58,6 +74,8 @@ function HeatmapDifferential(result, html_element_id, dataScale, order) {
     let title;
     if (dataScale == "log2FC") {
         title = 'Differential expression '+heatmapData['species']+' vs '+heatmapData['species_baseline'];
+    } else if ((dataScale == "originalBaseline") | (dataScale == "log10Baseline")) {
+        title = 'Expression in '+heatmapData['species_baseline'];
     } else {
         title = 'Expression in '+heatmapData['species'];
     }
@@ -122,6 +140,8 @@ function HeatmapDifferential(result, html_element_id, dataScale, order) {
                 title: title,
                 yaxis: {
                     autorange: "reversed",
+                    tickvals: y_axis,
+                    ticktext: yticktext,
                 },
             },
             [0],
@@ -137,6 +157,10 @@ function updatePlot() {
         dataScale = "log2FC";
     } else if ($("#logTab").hasClass('is-active')) {
         dataScale = "log10";
+    } else if ($("#cpmBaselineTab").hasClass('is-active')) {
+        dataScale = "originalBaseline";
+    } else if ($("#logBaselineTab").hasClass('is-active')) {
+        dataScale = "log10Baseline";
     }
     let celltypeOrder = "original";
     if (!$("#originalOrderTab").hasClass('is-active')) {
@@ -144,7 +168,7 @@ function updatePlot() {
     }
 
     // NOTE: heatmapData is the global persistent object
-    HeatmapDifferential(
+    HeatmapSpeciesComparison(
         heatmapData, 
         "h5_data_plot",
         dataScale,
@@ -156,16 +180,15 @@ function updatePlot() {
 // gene of interest: Car4,Vwf,Col1a1,Ptprc,Ms4a1
 // Col1a1,Fsd1l
 function AssembleAjaxRequest() {
-
     // Get the list of genes to plot from the search box
     let geneNames = $('#searchGeneName').val();
     // NOTE: you cannot cache the genes because the hierarchical clustering
     // will differ anyway
 
     let requestData = {
-        genestr: geneNames,
+        genes: geneNames,
         species: species,
-        speciesBaseline: heatmapData['species_baseline'];
+        species_baseline: heatmapData['species_baseline'],
     }
 
     // sent conditions and gene names to the API
@@ -196,45 +219,24 @@ $("#searchOnClick").click(function() {
   // action here when clicking the search button
   AssembleAjaxRequest();
 });
+$("body").keyup(function(event) {
+    if (event.keyCode === 13) {
+        $("#searchOnClick").click();
+    }
+});
 
 // On load, the heatmap data are already embedded in the template
 $(document).ready(updatePlot);
 
-
 // normalization
-$("#log2FCOnClick" ).click(function() {
-    $("#log2FCTab").addClass('is-active');
-    $("#cpmTab").removeClass('is-active');
-    $("#logTab").removeClass('is-active');
+$(".dataScaleButton" ).click(function() {
+    $(".dataScaleButton").removeClass('is-active');
+    $(this).addClass('is-active');
     updatePlot()
 });
-
-$("#log10OnClick" ).click(function() {
-    $("#log2FCTab").removeClass('is-active');
-    $("#cpmTab").removeClass('is-active');
-    $("#logTab").addClass('is-active');
-    updatePlot()
-});
-
-$("#CPMOnClick" ).click(function() {
-    $("#log2FCTab").removeClass('is-active');
-    $("#cpmTab").addClass('is-active');
-    $("#logTab").removeClass('is-active');
-    updatePlot()
-});
-
-
 // order of cell types
-$("#hClusterOnClick" ).click(function() {
-    $("#hierachicalTab").addClass('is-active');
-    $("#originalOrderTab").removeClass('is-active');
+$(".dataOrderButton" ).click(function() {
+    $(".dataOrderButton").removeClass('is-active');
+    $(this).addClass('is-active');
     updatePlot();
 });
-
-
-$("#originalOnClick" ).click(function() {
-    $("#originalOrderTab").addClass('is-active');
-    $("#hierachicalTab").removeClass('is-active');
-    updatePlot();
-});
-

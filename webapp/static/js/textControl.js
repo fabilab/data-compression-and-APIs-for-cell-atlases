@@ -25,3 +25,8 @@ $("#askOnClick").click(function() {
   // action here when clicking the search button
   AssembleAjaxRequest();
 });
+$("body").keyup(function(event) {
+    if (event.keyCode === 13) {
+        $("#askOnClick").click();
+    }
+});

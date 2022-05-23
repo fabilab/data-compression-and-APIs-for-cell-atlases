@@ -108,6 +108,8 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 height: graph_height,
                 yaxis: {
                     autorange: "reversed",
+                    tickvals: y_axis,
+                    ticktext: yticktext,
                 },
             },
             [0],
@@ -262,6 +264,11 @@ $("#originalOnClick" ).click(function() {
 
 // Both on click and load, plot the heatmap
 $("#searchOnClick").click(AssembleAjaxRequest);
+$("body").keyup(function(event) {
+    if (event.keyCode === 13) {
+        $("#searchOnClick").click();
+    }
+});
 $(document).ready(AssembleAjaxRequest);
 $("#geneSuggestions").click(onClickGeneSuggestions);
 $(".speciesSuggestion").click(onClickSpeciesSuggestions);

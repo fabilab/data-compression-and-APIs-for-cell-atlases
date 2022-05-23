@@ -58,7 +58,6 @@ def convert_numbers_in_gene_name(gene):
             gene = gene[:-sfx-len(ntext)] + str(ndigit) + gene[-sfx:]
             break
 
-    print(gene)
     return gene
 
 
@@ -104,6 +103,12 @@ def validate_correct_genestr(genestr, species='mouse'):
 
     # TODO: check punctuation more accurately
     genes = genestr.strip(' ').replace('.', ',').replace(';', ',').split(',')
+
+    # Make everything with the right capitalisation at the very least
+    if species == 'mouse':
+        genes = [g.capitalize() for g in genes]
+    else:
+        genes = [g.upper() for g in genes]
 
     # Validate
     genesv = []

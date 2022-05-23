@@ -22,6 +22,7 @@ from models import (
         get_data_hyperoxia,
         get_celltype_abundances,
         get_data_differential,
+        get_data_species_comparison,
         get_gene_ids,
         get_orthologs,
     )
@@ -53,34 +54,35 @@ class geneExp(Resource):
                     genes=gene_names,
                     species=species,
                     missing=missing_genes,
-                    ).T
+                    )
         except KeyError:
             return None
 
         # Just in case we skipped some
         gene_names = df.index.tolist()
-        gene_ids = get_gene_ids(df.columns, species=species)
+        gene_ids = get_gene_ids(df.index, species=species)
 
         dfl = np.log10(df + 0.5)
 
         celltypes_hierarchical = leaves_list(linkage(
-            pdist(dfl.values),
+            pdist(dfl.T.values),
             optimal_ordering=True),
         )
+
         if len(gene_names) <= 2:
             genes_hierarchical = list(range(len(gene_names)))
         else:
             genes_hierarchical = leaves_list(linkage(
-                pdist(dfl.values.T),
+                pdist(dfl.values),
                 optimal_ordering=True),
             )
 
         result = {
-            'data': df.to_dict(),
-            'genes': df.columns.tolist(),
-            'celltypes': df.index.tolist(),
-            'celltypes_hierarchical': df.index[celltypes_hierarchical].tolist(),
-            'genes_hierarchical': df.columns[genes_hierarchical].tolist(),
+            'data': df.T.to_dict(),
+            'genes': df.index.tolist(),
+            'celltypes': df.columns.tolist(),
+            'celltypes_hierarchical': df.columns[celltypes_hierarchical].tolist(),
+            'genes_hierarchical': df.index[genes_hierarchical].tolist(),
             'gene_ids': gene_ids,
             'species': species,
         }
@@ -207,6 +209,66 @@ class geneExpDifferential(Resource):
             'genes_hierarchical': genes_hierarchical,
             'celltypes_hierarchical': celltypes_hierarchical,
             'gene_ids': gene_ids,
+        }
+        return heatmap_data
+
+
+class geneExpSpeciesComparison(Resource):
+    '''Comparison between species'''
+    def get(self):
+        species = request.args.get('species')
+        species_baseline = request.args.get('species_baseline')
+        genes = request.args.get('genes').split(',')
+
+        # Get the counts
+        # NOTE: this function restricts to the intersection of cell types,
+        # which makes the hierarchical clustering easy. In summary, both
+        # genes and cell types are fully synched now
+        dfs = get_data_species_comparison(species, species_baseline, genes)
+
+        # Hierarchical clustering
+        df = np.log10(dfs[0] + 0.5)
+
+        # Get hierarchical clustering of genes
+        if len(genes) > 2:
+            new_order = leaves_list(linkage(
+                        pdist(df.values),
+                        optimal_ordering=True,
+                        ))
+            genes_hierarchical = df.index[new_order].tolist()
+            genes_hierarchical_baseline = dfs[1].index[new_order].tolist()
+        else:
+            genes_hierarchical = dfs[0].index.tolist()
+            genes_hierarchical_baseline = dfs[1].index.tolist()
+
+        # Get hierarchical clustering of cell types
+        # NOTE: both dfs have the same celltypes (see above note)
+        new_order = leaves_list(linkage(
+                    pdist(df.values.T),
+                    optimal_ordering=True,
+                    ))
+        celltypes_hierarchical = df.columns[new_order].tolist()
+
+        # Gene hyperlinks (they hold for both)
+        gene_ids = get_gene_ids(df.index, species)
+
+        # Inject dfs into template
+        # NOTE: the whole converting DataFrame to dict of dict makes this quite
+        # a bit more heavy than it should be... just use a list of lists and
+        # accompanying lists of indices
+        heatmap_data = {
+            'data': dfs[0].T.to_dict(),
+            'data_baseline': dfs[1].T.to_dict(),
+            'genes': dfs[0].index.tolist(),
+            'genes_baseline': dfs[1].index.tolist(),
+            'celltypes': dfs[0].columns.tolist(),
+            'celltypes_baseline': dfs[1].columns.tolist(),
+            'genes_hierarchical': genes_hierarchical,
+            'celltypes_hierarchical': celltypes_hierarchical,
+            'genes_hierarchical_baseline': genes_hierarchical_baseline,
+            'gene_ids': gene_ids,
+            'species': species,
+            'species_baseline': species_baseline,
         }
         return heatmap_data
 

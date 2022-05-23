@@ -26,6 +26,7 @@ from api import (
     geneExpTimeUnified,
     geneExpHyperoxia,
     geneExpDifferential,
+    geneExpSpeciesComparison,
     checkGenenames,
     markerGenes,
     celltypeAbundance,
@@ -36,6 +37,7 @@ from models import (
         get_gene_ids,
         get_friends,
         get_data_species_comparison,
+        get_orthologs,
 )
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
@@ -84,14 +86,17 @@ def heatmap_by_celltype():
         species = 'mouse'
     genestring = request.args.get("genestring")
     if genestring is None:
-        genestring = ','.join([
+        genes = [
             'Col1a1,Col2a1',
             'Adh1,Col13a1,Col14a1',
             'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
             'Pecam1,Gja5,Vwf,Car8,Car4',
             'Ptprc,Cd19,Gzma,Cd3d,Cd68',
             'Epcam',
-            ])
+            ]
+        if species in ('human', 'lemur'):
+            genes = get_orthologs(genes, 'mouse', species)
+        genestring = ','.join(genes)
     searchstring = genestring.replace(" ", "")
     return render_template(
             "heatmap_by_celltype.html",
@@ -256,26 +261,36 @@ def heatmap_species_comparison():
     genes = request.args.get('genes').split(',')
 
     # Get the counts
+    # NOTE: this function restricts to the intersection of cell types,
+    # which makes the hierarchical clustering easy. In summary, both
+    # genes and cell types are fully synched now
     dfs = get_data_species_comparison(species, species_baseline, genes)
 
-    # Get hierarchical clustering of cell types and genes
+    # Hierarchical clustering
     df = np.log10(dfs[0] + 0.5)
-    new_order = leaves_list(linkage(
-                pdist(df.values),
-                optimal_ordering=True,
-                ))
-    genes_hierarchical = df.index[new_order].tolist()
-    genes_hierarchical_baseline = dfs[1].index[new_order].tolist()
+
+    # Get hierarchical clustering of genes
+    if len(genes) > 2:
+        new_order = leaves_list(linkage(
+                    pdist(df.values),
+                    optimal_ordering=True,
+                    ))
+        genes_hierarchical = df.index[new_order].tolist()
+        genes_hierarchical_baseline = dfs[1].index[new_order].tolist()
+    else:
+        genes_hierarchical = dfs[0].index.tolist()
+        genes_hierarchical_baseline = dfs[1].index.tolist()
+
+    # Get hierarchical clustering of cell types
+    # NOTE: both dfs have the same celltypes (see above note)
     new_order = leaves_list(linkage(
                 pdist(df.values.T),
                 optimal_ordering=True,
                 ))
     celltypes_hierarchical = df.columns[new_order].tolist()
-    # FIXME: this needs a 1-1 mapping between cell types or some logic to skip/fill
-    celltypes_hierarchical_baseline = dfs[1].columns[new_order].tolist()
 
-    # Gene hyperlinks
-    gene_ids = get_gene_ids(df.index)
+    # Gene hyperlinks (they hold for both)
+    gene_ids = get_gene_ids(df.index, species)
 
     # Inject dfs into template
     # NOTE: the whole converting DataFrame to dict of dict makes this quite
@@ -291,7 +306,6 @@ def heatmap_species_comparison():
         'genes_hierarchical': genes_hierarchical,
         'celltypes_hierarchical': celltypes_hierarchical,
         'genes_hierarchical_baseline': genes_hierarchical_baseline,
-        'celltypes_hierarchical_baseline': celltypes_hierarchical_baseline,
         'gene_ids': gene_ids,
         'species': species,
         'species_baseline': species_baseline,
@@ -338,6 +352,7 @@ app_api.add_resource(geneFriends, "/gene_friends")
 app_api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
 app_api.add_resource(geneExpDifferential, "/data/differential")
+app_api.add_resource(geneExpSpeciesComparison, "/data/speciescomparison")
 app_api.add_resource(checkGenenames, "/check_genenames")
 app_api.add_resource(markerGenes, "/data/marker_genes")
 app_api.add_resource(celltypeAbundance, "/data/celltype_abundance")

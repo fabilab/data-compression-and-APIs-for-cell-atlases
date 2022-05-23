@@ -8,14 +8,20 @@
       <div class="control">
         <div class="tabs is-toggle is-centered">
           <ul>
-            <li id="log2FCTab" class="is-active">
-              <a id="log2FCOnClick">Log2 Fold Change</a>
+            <li id="log2FCTab" class="dataScaleButton is-active">
+              <a id="log2FCOnClick">Log2FC</a>
             </li>
-            <li id="cpmTab">
-              <a id="CPMOnClick">CPM(count/million)</a>
+            <li id="cpmTab" class="dataScaleButton">
+              <a id="CPMOnClick">CPM</a>
             </li>
-            <li id="logTab">
+            <li id="cpmBaselineTab" class="dataScaleButton">
+              <a id="CPMBaselineOnClick">CPM Base</a>
+            </li>
+            <li id="logTab" class="dataScaleButton">
               <a id="log10OnClick">Log10</a>
+            </li>
+            <li id="logBaselineTab" class="dataScaleButton">
+              <a id="log10BaselineOnClick">Log10 Base</a>
             </li>
           </ul>
         </div>
@@ -26,10 +32,10 @@
       <div class="control">
         <div class="tabs is-toggle is-centered">
           <ul>
-            <li id="originalOrderTab" class="is-active">
+            <li id="originalOrderTab" class="dataOrderButton is-active">
               <a id="originalOnClick">Original</a>
             </li>
-            <li id="hierachicalTab">
+            <li id="hierachicalTab" class="dataOrderButton">
               <a id="hClusterOnClick">Hierachical Clustered</a>
             </li>
           </ul>

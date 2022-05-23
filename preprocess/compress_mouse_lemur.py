@@ -12,13 +12,23 @@ import h5py
 import anndata
 
 
+data_fdn = '../webapp/static/scData/'
+
 
 if __name__ == '__main__':
 
     # Load data
+    print('Load single cell data')
     fn_atlas = '../data/tabula_microcebus/Lung_FIRM_hvg.h5ad'
     adata = anndata.read_h5ad(fn_atlas)
 
+    # NOTE: the lemur data is in some weird normalization between 0 and 8.79,
+    # and adata.raw is None. Hmm, there must be a logp1 there, let's try to
+    # undo that transformation by hand. After np.expm1 the sum of each cell is
+    # 10000, so there you go, multiply by 100 and done.
+    adata.X = 100 * np.expm1(adata.X)
+
+    print('Compress')
     # Find cell type column
     column = 'cell_ontology_class_v1'
     # NOTE: there is a free annotation column that is informative, basically
@@ -39,15 +49,15 @@ if __name__ == '__main__':
     # Set cell type order
     #celltypes = adata.obs[column].unique()
     celltypes = [
-        'Fibroblast I',
-        'Fibroblast II',
         'Mesothelial',
-        'MyoF',
+        'Adventitial FB',
+        'Alveolar FB',
+        'ASM',
         'VSM',
         'Pericyte',
         'Venous',
         'Cap',
-        'Art',
+        'Art II',
         'Lymphatic',
         'Schwann cell',
         'Plasmablast',
@@ -74,10 +84,11 @@ if __name__ == '__main__':
 
     # Merge some annotations together
     annotation_merges = {
-        'Fibroblast I': ['fibroblast'],
-        'Fibroblast II': ['fibroblast of lung'],
         'Mesothelial': ['mesothelial cell'],
-        'MyoF': ['myofibroblast cell'],
+        'Adventitial FB': ['fibroblast'],
+        'Alveolar FB': ['fibroblast of lung'],
+        # NOTE: they express HHIP, no PDGFRA...
+        'ASM': ['myofibroblast cell'],
         'VSM': ['vascular associated smooth muscle cell'],
         'Pericyte': ['pericyte cell'],
         'Schwann cell': [
@@ -86,7 +97,7 @@ if __name__ == '__main__':
         ],
         'Venous': ['vein endothelial cell'],
         'Cap': ['capillary endothelial cell'],
-        'Art': ['endothelial cell of artery'],
+        'Art II': ['endothelial cell of artery'],
         'Lymphatic': ['endothelial cell of lymphatic vessel'],
         'Plasmablast': ['plasma cell'],
         'NK cell': ['natural killer cell'],
@@ -142,9 +153,52 @@ if __name__ == '__main__':
         ncells[ct] = (adata.obs[column+'_compressed'] == ct).sum()
 
     # Store to file
-    fn_out = '../webapp/static/scData/mouselemur_condensed_lung_atlas_in_cpm.h5'
+    print('Store compressed atlas')
+    fn_out = data_fdn + 'mouselemur_condensed_lung_atlas_in_cpm.h5'
     with pd.HDFStore(fn_out) as h5_data:
         h5_data.put('celltype/gene_expression_average', avg_exp.T)
         h5_data.put('celltype/gene_proportion_expression', frac_exp.T)
         h5_data.put('celltype/cell_count', ncells)
+
+
+    print('Compute gene friends')
+    # Compute top correlated genes
+    counts = avg_exp.values.T
+    genes = avg_exp.index
+
+    # focus on highly expressed genes
+    idx = counts.max(axis=0) > 30
+    counts = counts[:, idx]
+    genes = genes[idx]
+
+    ngenes = len(genes)
+    mu = counts.mean(axis=0)
+    countsc = counts - mu
+    sigma = counts.std(axis=0)
+
+    friends = {}
+    for i in range(ngenes):
+        if ((i+1) % 100) == 0:
+            print(f'Gene {i+1} out of {ngenes}', end='\r')
+        corr_i = (countsc[:, i] * counts.T).mean(axis=1) / (sigma[i] * sigma.T)
+        corr_i[np.isnan(corr_i)] = 0
+        # Self is always the highest
+        itop = np.argsort(corr_i)[::-1][1:6]
+
+        # Cutoff at 20%
+        tmp = corr_i[itop]
+        tmp = tmp[tmp >= 0.2]
+        itop = itop[:len(tmp)]
+
+        friends_i = genes[itop]
+        friends[genes[i]] = np.array(friends_i)
+    print(f'Gene {i+1} out of {ngenes}')
+
+    print('Store gene friends')
+    output_fn = data_fdn + 'human_gene_friends.h5'
+    with h5py.File(output_fn, 'w') as f:
+        for gene, friends_i in friends.items():
+            lmax = max(len(x) for x in friends_i)
+            friends_i = friends_i.astype('S'+str(lmax))
+            dset = f.create_dataset(gene, data=friends_i)
 

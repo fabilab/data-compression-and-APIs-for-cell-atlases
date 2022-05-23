@@ -64,30 +64,31 @@ class geneExp(Resource):
 
         dfl = np.log10(df + 0.5)
 
-        celltypes_hierarchical = leaves_list(linkage(
+        idx_ct_hierarchical = leaves_list(linkage(
             pdist(dfl.T.values),
             optimal_ordering=True),
         )
+        idx_ct_hierarchical = [int(x) for x in idx_ct_hierarchical]
 
         if len(gene_names) <= 2:
-            genes_hierarchical = list(range(len(gene_names)))
+            idx_genes_hierarchical = list(range(len(gene_names)))
         else:
-            genes_hierarchical = leaves_list(linkage(
+            idx_genes_hierarchical = leaves_list(linkage(
                 pdist(dfl.values),
                 optimal_ordering=True),
             )
+            idx_genes_hierarchical = [int(x) for x in idx_genes_hierarchical]
 
         result = {
-            'data': df.T.to_dict(),
+            'data': df.values.tolist(),
             'genes': df.index.tolist(),
             'celltypes': df.columns.tolist(),
-            'celltypes_hierarchical': df.columns[celltypes_hierarchical].tolist(),
-            'genes_hierarchical': df.index[genes_hierarchical].tolist(),
+            'celltypes_hierarchical': idx_ct_hierarchical,
+            'genes_hierarchical': idx_genes_hierarchical,
             'gene_ids': gene_ids,
             'species': species,
         }
-
-        return jsonify(result)
+        return result
 
 
 class geneExpTime(Resource):

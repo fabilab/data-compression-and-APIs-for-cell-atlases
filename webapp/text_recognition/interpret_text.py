@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 
 from models import (
-    gene_order,
     celltypes as celltypes_all,
     )
 from validation.genes import validate_correct_genestr

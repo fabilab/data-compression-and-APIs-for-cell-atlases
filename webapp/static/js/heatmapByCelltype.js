@@ -8,13 +8,21 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         return;
     }
 
-    let x_axis;
+    let x_axis, y_axis;
     if (celltypeOrder == "original") {
         x_axis = result['celltypes'];
         y_axis = result['genes'];
     } else {
-        x_axis = result['celltypes_hierarchical'];
-        y_axis = result['genes_hierarchical'];
+        x_axis = [];
+        for (let i = 0; i < result['celltypes_hierarchical'].length; i++) {
+            const ct = result['celltypes'][result['celltypes_hierarchical'][i]];
+            x_axis.push(ct);
+        }
+        y_axis = [];
+        for (let i = 0; i < result['genes_hierarchical'].length; i++) {
+            const gene = result['genes'][result['genes_hierarchical'][i]];
+            y_axis.push(gene);
+        }
     }
 
     var ngenes =  y_axis.length;
@@ -42,16 +50,29 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
 
     // Fill heatmap data
     let data_content = [];
-    for (let i = 0; i < y_axis.length; i++) {
-        const gene = y_axis[i];
-        data_content.push([]);
-        for (let j = 0; j < x_axis.length; j++) {
-            const ct = x_axis[j];
-            let gene_exp = result['data'][gene][ct]; 
-            if (dataScale == "log10") {
-                gene_exp = Math.log10(gene_exp + 0.5);
+    if (celltypeOrder == "original") {
+        for (let i = 0; i < y_axis.length; i++) {
+            data_content.push([]);
+            for (let j = 0; j < x_axis.length; j++) {
+                let geneExp = result['data'][i][j];
+                if (dataScale == "log10") {
+                    geneExp = Math.log10(geneExp + 0.5);
+                }
+                data_content[i].push(geneExp);
             }
-            data_content[i].push(gene_exp);
+        }
+    } else {
+        for (let i = 0; i < y_axis.length; i++) {
+            const ii = result['genes_hierarchical'][i];
+            data_content.push([]);
+            for (let j = 0; j < x_axis.length; j++) {
+                const jj = result['celltypes_hierarchical'][j];
+                let geneExp = result['data'][ii][jj]; 
+                if (dataScale == "log10") {
+                    geneExp = Math.log10(geneExp + 0.5);
+                }
+                data_content[i].push(geneExp);
+            }
         }
     }
     var data = {

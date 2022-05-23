@@ -6,9 +6,11 @@ content:    Validate gene names et al.
 '''
 import pandas as pd
 
-from models import gene_order
+from models import gene_orderd
 
 
+# FIXME
+gene_order = gene_orderd['mouse']
 genes_idx = gene_order.index
 gene_matrix = (pd.Series(gene_order.index)
                  .str

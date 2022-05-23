@@ -22,8 +22,6 @@ if __name__ == '__main__':
     fn_atlas = '../data/tabula_sapiens/TS_Lung.h5ad'
     adata = anndata.read_h5ad(fn_atlas)
 
-    sys.exit()
-
     # NOTE: the human data is in some weird normalization between 0 and 10,
     # use adata.raw.X for computations to avoid log trasformations and whatnot
 

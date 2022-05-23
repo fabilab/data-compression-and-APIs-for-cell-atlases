@@ -39,7 +39,7 @@ def read_cell_types(species='mouse'):
     return celltypes
 
 
-gene_order = read_gene_order()
+gene_orderd = {key: read_gene_order(species=key) for key in fn_atlasd}
 celltypes = read_cell_types()
 
 
@@ -49,7 +49,7 @@ def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw')
     gives the name of dataset we want as an input
     celltype / celltype_dataset / celltype_dataset_timepoint
     '''
-    gene_order = read_gene_order(data_type=df_type, species=species)
+    gene_order = gene_orderd[species]
 
     fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas, "r") as h5_data:
@@ -60,6 +60,7 @@ def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw')
             columns, idx_cols = adjust_celltypes(columns)
         else:
             idx_cols = np.arange(len(columns))
+
         counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
         if genes is not None:
             index = []
@@ -98,6 +99,7 @@ def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw')
             index=index,
             columns=columns,
             )
+
     return df
 
 

@@ -22,6 +22,8 @@ if __name__ == '__main__':
     fn_atlas = '../data/tabula_sapiens/TS_Lung.h5ad'
     adata = anndata.read_h5ad(fn_atlas)
 
+    sys.exit()
+
     # NOTE: the human data is in some weird normalization between 0 and 10,
     # use adata.raw.X for computations to avoid log trasformations and whatnot
 
@@ -42,9 +44,9 @@ if __name__ == '__main__':
         'VSM',
         'Pericyte',
         'Venous',
-        'Cap',
+        'gCap',
         'Aerocyte',
-        'Art II',
+        'Arterial II',
         'Lymphatic',
         'Bronchial EC',
         'Plasmablast',
@@ -77,12 +79,12 @@ if __name__ == '__main__':
         'VSM': ['vascular associated smooth muscle cell'],
         'Pericyte': ['pericyte cell'],
         'Venous': ['vein endothelial cell'],
-        'Cap': [
+        'gCap': [
             'capillary endothelial cell',
             'lung microvascular endothelial cell',
         ],
         'Aerocyte': ['capillary aerocyte'],
-        'Art II': ['endothelial cell of artery'],
+        'Arterial II': ['endothelial cell of artery'],
         'Lymphatic': ['endothelial cell of lymphatic vessel'],
         'Bronchial EC': ['bronchial vessel endothelial cell'],
         'Ionocyte': ['pulmonary ionocyte'],

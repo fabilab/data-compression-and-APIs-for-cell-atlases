@@ -30,7 +30,7 @@ celltype_tuples = [
     ('Nonproliferative embryonic EC', 'Embryonic cap'),
     ('Proliferative EC', 'Proliferative cap'),
     ('Early Car4- capillaries', 'Early gCap'),
-    ('Late Car4- capillaries', 'Late gCap'),
+    ('Late Car4- capillaries', 'gCap'),
     ('Car4+ capillaries', 'Aerocyte'),
     'B cell',
     'NK cell',

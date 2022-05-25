@@ -20,9 +20,9 @@ import numpy as np
 
 from api import (
     geneExp,
-    geneExpTime,
     plotsForSeachGenes,
     geneFriends,
+    genesInGOTerm,
     geneExpTimeUnified,
     geneExpHyperoxia,
     geneExpDifferential,
@@ -347,8 +347,8 @@ app.register_blueprint(voice_control_blueprint)
 
 # API endpoints
 app_api.add_resource(geneExp, "/data/by_celltype")
-app_api.add_resource(geneExpTime, "/data_timepoint")
-app_api.add_resource(geneFriends, "/gene_friends")
+app_api.add_resource(geneFriends, "/data/gene_friends")
+app_api.add_resource(genesInGOTerm, "/data/genes_in_go_term")
 app_api.add_resource(geneExpTimeUnified, "/data_heatmap_unified")
 app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
 app_api.add_resource(geneExpDifferential, "/data/differential")

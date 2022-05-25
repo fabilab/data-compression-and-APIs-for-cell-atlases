@@ -24,6 +24,8 @@ from models import (
         get_data_differential,
         get_data_species_comparison,
         get_gene_ids,
+        get_gene_ontology_terms,
+        get_genes_in_GO_term,
         get_orthologs,
     )
 from validation.genes import validate_correct_genestr
@@ -62,6 +64,8 @@ class geneExp(Resource):
         gene_names = df.index.tolist()
         gene_ids = get_gene_ids(df.index, species=species)
 
+        go_terms = get_gene_ontology_terms(gene_names, species=species)
+
         dfl = np.log10(df + 0.5)
 
         idx_ct_hierarchical = leaves_list(linkage(
@@ -86,24 +90,10 @@ class geneExp(Resource):
             'celltypes_hierarchical': idx_ct_hierarchical,
             'genes_hierarchical': idx_genes_hierarchical,
             'gene_ids': gene_ids,
+            'GO_terms': go_terms,
             'species': species,
         }
         return result
-
-
-class geneExpTime(Resource):
-    def get(self):
-        genename = request.args.get("gene")
-        datatype = request.args.get("datatype")
-        plottype = request.args.get("plottype")
-
-        data = dataset_by_timepoint(
-            genename,
-            "celltype_dataset_timepoint",
-            datatype,
-            plottype,
-        )
-        return data
 
 
 class geneExpTimeUnified(Resource):
@@ -114,6 +104,12 @@ class geneExpTimeUnified(Resource):
 
         data = dataset_unified(gene)
         data['gene_id'] = gene_id
+
+        similar_genes = get_friends([gene]).split(',')
+        if similar_genes[0] == gene:
+            similar_genes = similar_genes[1:]
+        data['similarGenes'] = similar_genes
+
         return data
 
 
@@ -308,6 +304,14 @@ class geneFriends(Resource):
         genenames = genenames.replace(" ", "").split(",")
         data = get_friends(genenames)
         return data
+
+
+class genesInGOTerm(Resource):
+    def get(self):
+        go_term = request.args.get("goTerm")
+        species = request.args.get("species")
+        genes = get_genes_in_GO_term(go_term, species)
+        return ','.join(genes)
 
 
 class checkGenenames(Resource):

@@ -2,7 +2,7 @@
 '''
 author:     Fabio Zanini
 date:       16/05/22
-content:    Compress mouse lemur atlas.
+content:    Compress Tabula Sapiens.
 '''
 import os
 import sys

@@ -3,6 +3,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import json
+import pickle
 import re
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
@@ -21,6 +22,7 @@ fn_atlasd = {
     'lemur': fdn_data + "mouselemur_condensed_lung_atlas_in_cpm.h5",
     'human': fdn_data + "human_condensed_lung_atlas_in_cpm.h5",
 }
+fn_GO = fdn_data + 'mouse_GO_tables.pkl'
 
 
 def read_gene_order(data_type='celltype', species='mouse'):
@@ -464,6 +466,38 @@ def get_gene_ids(genes, species='mouse'):
         raise NotImplementedError
 
     return id_dict
+
+
+def get_gene_ontology_terms(genes, species='mouse'):
+    '''Get the GO terms for these genes'''
+    genesd = get_orthologs(genes, species, 'mouse')
+
+    print(genesd)
+
+    with open(fn_GO, 'rb') as fin:
+        table = pickle.load(fin)['genes_to_GO']
+
+    result = {}
+    for gene_mouse, gene_orig in zip(genesd['mouse'], genesd[species]):
+        if gene_mouse in table:
+            result[gene_orig] = table[gene_mouse]
+
+    return result
+
+
+def get_genes_in_GO_term(go_term, species='mouse'):
+    '''Get the genes in a GO term'''
+    with open(fn_GO, 'rb') as fin:
+        table = pickle.load(fin)['GO_to_genes']
+
+    if go_term not in table:
+        raise KeyError("GO term not found")
+
+    genes = table[go_term]
+    if species != 'mouse':
+        genes = get_orthologs(genes, 'mouse', species)[species]
+
+    return genes
 
 
 def get_orthologs(genes, species, new_species):

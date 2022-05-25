@@ -152,6 +152,9 @@ function AssembleAjaxRequest() {
         dataType:'json',
         success: function(result) {
             plotData = result;
+            
+            updateSimilarGenes();
+
             updatePlot();
         },
         error: function (e) {
@@ -160,6 +163,19 @@ function AssembleAjaxRequest() {
     });
 }
 
+
+function updateSimilarGenes() {
+    let similarGenes = plotData['similarGenes'];
+    $('#geneSuggestions').text('Similar genes:');
+    for (let i = 0; i < similarGenes.length; i++) {
+        const gene = similarGenes[i];
+        $('#geneSuggestions').append(
+            '<span class="geneSuggestion suggestButton" id="suggest'+gene+'">'+gene+'</span>'
+        )
+    }
+    // Rebind the callback since the old elements are gone
+    $(".geneSuggestion").click(onClickGeneSuggestions);
+}
 
 // Check another species, same genes
 function onClickGeneSuggestions() {

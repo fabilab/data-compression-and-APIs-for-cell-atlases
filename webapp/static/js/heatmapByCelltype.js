@@ -136,7 +136,44 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             [0],
         ); 
     }
+
+    // Add tooltips to gene names
+    $(".ytick > text").mousemove(function(evt) {
+        let gene = $(this).text();
+        let goTerms = result['GO_terms'][gene];
+        if (goTerms === undefined) {
+            return;
+        }
+        let text = "<b>GO terms:</b></br>";
+        for (let i = 0; i < goTerms.length; i++) {
+            text += '<div><a class="goHyperlink">'+goTerms[i]+"</a></div>";
+        }
+        showTooltip(evt, text);
+    });
+    $(".ytick > text").mouseout(function(evt) { hideTooltip(); });
 } 
+
+function showTooltip(evt, text) {
+    let tooltip = document.getElementById("tooltip");
+    tooltip.innerHTML = text;
+    tooltip.style.background = "white";
+    tooltip.style.border = "1px solid black";
+    tooltip.style.borderRadius = "5px";
+    tooltip.style.padding = "5px";
+    tooltip.style.display = "block";
+    tooltip.style.left = evt.pageX - 2 + 'px';
+    tooltip.style.top = evt.pageY - 2 + 'px';
+
+    $(".goHyperlink").click(onClickGOTermSuggestions);
+}
+
+function hideTooltip() {
+    var tooltip = document.getElementById("tooltip");
+    setTimeout(function() {
+      tooltip.style.display = "none";
+    }, 3500);
+}
+
 
 // NOTE: this is why react was invented...
 function updatePlot() {
@@ -158,15 +195,23 @@ function updatePlot() {
     );
 }
 
-function AssembleAjaxRequest() {
+function AssembleAjaxRequest( genestring = "" ) {
     // Get the list of genes to plot from the search box
-    var gene_names = $('#searchGeneName').val();
+    // If too long for the search box, it should be supplied as a specialGenestring
+    let geneNames;
+    if (genestring !== "") {
+        geneNames = genestring;
+    } else {
+        geneNames = $('#searchGeneName').val();
+    }
+
     let requestData = {
-        gene_names: gene_names,
+        gene_names: geneNames,
         species: species,
     }
   
-      // sent gene names to the API
+    // sent gene names to the API
+    // FIXME: this fails at random times with large payloads?
     $.ajax({
         type:'GET',
         url:'/data/by_celltype',
@@ -177,6 +222,8 @@ function AssembleAjaxRequest() {
                 'result': result,
                 'div': 'h5_data_plot',
             };
+
+            console.log(result);
 
             // Update search box: corrected gene names, excluding missing genes
             $('#searchGeneName').val(result['genes']);
@@ -193,11 +240,11 @@ function AssembleAjaxRequest() {
 
 // Check another species, same genes
 function onClickSpeciesSuggestions() {
-    var gene_names = $('#searchGeneName').val();
+    var geneNames = $('#searchGeneName').val();
     const newSpecies = this.id.slice("suggest".length);
     let requestData = {
         newSpecies: newSpecies,
-        gene_names: gene_names,
+        gene_names: geneNames,
         species: species,
     }
     $.ajax({
@@ -220,21 +267,21 @@ function onClickSpeciesSuggestions() {
             updatePlot();
         },
         error: function (e) {
-          alert('Error: Could not find orthologs for '+gene_names+'.')
+          alert('Error: Could not find orthologs for '+geneNames+'.')
         }
     });
 }
 
 // SuggestGenes: create a div with a "suggest" button
 function onClickGeneSuggestions() {
-    var gene_names = $('#searchGeneName').val();
+    var geneNames = $('#searchGeneName').val();
     let requestData = {
-        gene_names: gene_names,
+        gene_names: geneNames,
         species: species,
     }
     $.ajax({
         type:'GET',
-        url:'/gene_friends',
+        url:'/data/gene_friends',
         data: $.param(requestData),
         success: function(result) {
             // Update search box: corrected gene names, excluding missing genes
@@ -244,7 +291,42 @@ function onClickGeneSuggestions() {
             AssembleAjaxRequest();
         },
         error: function (e) {
-          alert('Error: Could not find gene friends for '+gene_names+'.')
+          alert('Error: Could not find gene friends for '+geneNames+'.')
+        }
+    });
+}
+
+
+// Request genes in a clicked GO term and update plot
+function onClickGOTermSuggestions () {
+    let goTerm = $(this).text();
+    let requestData = {
+        goTerm: goTerm,
+        species: species,
+    }
+
+    hideTooltip();
+
+    $.ajax({
+        type:'GET',
+        url:'/data/genes_in_go_term',
+        data: $.param(requestData),
+        success: function(result) {
+
+            // Update search box: corrected gene names, excluding missing genes
+            // NOTE: this is a "short text" HTML element, so it can crash if we have
+            // many genes...
+            if (result.length > 200) {
+                $('#searchGeneName').val(result.slice(0, 10)+"...");
+                // Request data
+                AssembleAjaxRequest(result);
+            } else {
+                $('#searchGeneName').val(result);
+                AssembleAjaxRequest();
+            }
+        },
+        error: function (e) {
+          alert('Error: Could not find genes within GO term '+goTerm+'.')
         }
     });
 }
@@ -284,12 +366,12 @@ $("#originalOnClick" ).click(function() {
 });
 
 // Both on click and load, plot the heatmap
-$("#searchOnClick").click(AssembleAjaxRequest);
+$("#searchOnClick").click(function() { AssembleAjaxRequest() });
 $("body").keyup(function(event) {
     if (event.keyCode === 13) {
         $("#searchOnClick").click();
     }
 });
-$(document).ready(AssembleAjaxRequest);
+$(document).ready(function() { AssembleAjaxRequest() });
 $("#geneSuggestions").click(onClickGeneSuggestions);
 $(".speciesSuggestion").click(onClickSpeciesSuggestions);

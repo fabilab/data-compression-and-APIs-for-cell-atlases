@@ -13,6 +13,7 @@ from flask import (
     redirect,
     url_for,
     render_template,
+    abort,
 )
 from flask_restful import Api
 from flask_cors import CORS
@@ -92,7 +93,11 @@ def heatmap_by_celltype():
         if pathway is not None:
             if ' (GO' in pathway:
                 pathway = pathway[:pathway.find(' (GO')]
-            genes = get_genes_in_GO_term(pathway, species=species)
+            try:
+                genes = get_genes_in_GO_term(pathway, species=species)
+            except KeyError:
+                return abort(404)
+
         else:
             genes = [
                 'Col1a1,Col2a1',

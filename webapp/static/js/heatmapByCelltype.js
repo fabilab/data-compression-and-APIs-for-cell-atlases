@@ -67,7 +67,7 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
             data_content.push([]);
             for (let j = 0; j < x_axis.length; j++) {
                 const jj = result['celltypes_hierarchical'][j];
-                let geneExp = result['data'][ii][jj]; 
+                let geneExp = result['data'][ii][jj];
                 if (dataScale == "log10") {
                     geneExp = Math.log10(geneExp + 0.5);
                 }
@@ -110,12 +110,12 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 ticktext: yticktext,
             },
         };
-            
+
         Plotly.newPlot(
             document.getElementById(html_element_id),
             [data],
             layout,
-        ); 
+        );
 
     // Update existing plot if present
     } else {
@@ -134,7 +134,7 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
                 },
             },
             [0],
-        ); 
+        );
     }
 
     // Add tooltips to gene names
@@ -151,7 +151,7 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         showTooltip(evt, text);
     });
     $(".ytick > text").mouseout(function(evt) { hideTooltip(); });
-} 
+}
 
 function showTooltip(evt, text) {
     let tooltip = document.getElementById("tooltip");
@@ -188,7 +188,7 @@ function updatePlot() {
 
     // NOTE: heatmapData is the global persistent object
     HeatmapByCelltype(
-        heatmapData['result'], 
+        heatmapData['result'],
         heatmapData['div'],
         dataScale,
         celltypeOrder,
@@ -209,7 +209,7 @@ function AssembleAjaxRequest( genestring = "" ) {
         gene_names: geneNames,
         species: species,
     }
-  
+
     // sent gene names to the API
     // FIXME: this fails at random times with large payloads?
     $.ajax({
@@ -227,7 +227,7 @@ function AssembleAjaxRequest( genestring = "" ) {
 
             // Update search box: corrected gene names, excluding missing genes
             setSearchBox(result['genes']);
-  
+
             // Create heatmap
             updatePlot();
         },
@@ -262,7 +262,7 @@ function onClickSpeciesSuggestions() {
 
             // Update search box: corrected gene names, excluding missing genes
             setSearchBox(result['genes']);
-  
+
             // Create heatmap
             updatePlot();
         },
@@ -385,6 +385,11 @@ $("body").keyup(function(event) {
         $("#searchOnClick").click();
     }
 });
-$(document).ready(function() { AssembleAjaxRequest() });
+$(document).ready(function() {
+    $('#pathwaySuggestions > a').click(function() {
+        $("body").addClass("loading");
+    });
+    AssembleAjaxRequest();
+});
 $("#geneSuggestions").click(onClickGeneSuggestions);
 $(".speciesSuggestion").click(onClickSpeciesSuggestions);

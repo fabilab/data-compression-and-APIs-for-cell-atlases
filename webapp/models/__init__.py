@@ -586,3 +586,19 @@ def get_data_species_comparison(species, species_baseline, genes):
     dfs = [dfs[0].loc[:, celltypes0], dfs[1].loc[:, celltypes1]]
 
     return dfs
+
+
+def get_gsea(genes, species='mouse', gene_set='GO_Biological_Process_2021'):
+    '''Get GSEA (gene set enrichment analysis)'''
+    import gseapy as gp
+
+    res = gp.enrichr(gene_list=genes,
+                     gene_sets=[gene_set],
+                     description='pathway',
+                     outdir=None,
+                     )
+
+    res = res.results[['Term', 'Overlap', 'Adjusted P-value']]
+    res.set_index('Term', inplace=True)
+
+    return res

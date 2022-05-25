@@ -76,10 +76,10 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         }
     }
     var data = {
-            type: 'heatmap',
-            hoverongaps: false,
-            colorscale: 'Reds',
-        };
+        type: 'heatmap',
+        hoverongaps: false,
+        colorscale: 'Reds',
+    };
 
     // Make new plot if none is present
     if ($('#'+html_element_id).html() === "") {
@@ -226,7 +226,7 @@ function AssembleAjaxRequest( genestring = "" ) {
             console.log(result);
 
             // Update search box: corrected gene names, excluding missing genes
-            $('#searchGeneName').val(result['genes']);
+            setSearchBox(result['genes']);
   
             // Create heatmap
             updatePlot();
@@ -261,7 +261,7 @@ function onClickSpeciesSuggestions() {
             species = result['species'];
 
             // Update search box: corrected gene names, excluding missing genes
-            $('#searchGeneName').val(result['genes']);
+            setSearchBox(result['genes']);
   
             // Create heatmap
             updatePlot();
@@ -285,7 +285,7 @@ function onClickGeneSuggestions() {
         data: $.param(requestData),
         success: function(result) {
             // Update search box: corrected gene names, excluding missing genes
-            $('#searchGeneName').val(result);
+            setSearchBox(result);
 
             // Request data
             AssembleAjaxRequest();
@@ -317,11 +317,14 @@ function onClickGOTermSuggestions () {
             // NOTE: this is a "short text" HTML element, so it can crash if we have
             // many genes...
             if (result.length > 200) {
-                $('#searchGeneName').val(result.slice(0, 10)+"...");
+                setSearchBox(
+                    result.slice(0, 10)+"...",
+                    result.split(',').slice(0, 10).join(','),
+                );
                 // Request data
                 AssembleAjaxRequest(result);
             } else {
-                $('#searchGeneName').val(result);
+                setSearchBox(result);
                 AssembleAjaxRequest();
             }
         },
@@ -329,6 +332,16 @@ function onClickGOTermSuggestions () {
           alert('Error: Could not find genes within GO term '+goTerm+'.')
         }
     });
+}
+
+function setSearchBox(text, gseaText = "") {
+    $('#searchGeneName').val(text);
+    // Sync with GSEA box
+    if (gseaText == "") {
+        gseaText = text;
+    }
+    $('#pathwaySuggestions > a').attr(
+        'href', '/barplot_gsea?species='+species+'&genes='+gseaText);
 }
 
 ////////////////////

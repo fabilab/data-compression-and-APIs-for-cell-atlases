@@ -14,6 +14,8 @@
           {% endif %}
         {% endfor %}
       </span>
+      <span>|</span>
+      <span class="suggestButton suggestGroup" id="pathwaySuggestions"><a href="/barplot_gsea?species={{species}}&genes={{searchstring}}">GSEA</a></span>
     </div>
   </div>
 
@@ -50,6 +52,7 @@
       </div>
     </div>
   </div>
+
   <!-- Plots below -->
   <div class="container" id="dataDisplay">
     <div id="h5_data_plot"></div>   

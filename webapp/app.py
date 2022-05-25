@@ -38,6 +38,8 @@ from models import (
         get_friends,
         get_data_species_comparison,
         get_orthologs,
+        get_genes_in_GO_term,
+        get_gsea,
 )
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
@@ -86,16 +88,22 @@ def heatmap_by_celltype():
         species = 'mouse'
     genestring = request.args.get("genestring")
     if genestring is None:
-        genes = [
-            'Col1a1,Col2a1',
-            'Adh1,Col13a1,Col14a1',
-            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
-            'Pecam1,Gja5,Vwf,Car8,Car4',
-            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
-            'Epcam',
-            ]
-        if species in ('human', 'lemur'):
-            genes = get_orthologs(genes, 'mouse', species)
+        pathway = request.args.get("pathway")
+        if pathway is not None:
+            if ' (GO' in pathway:
+                pathway = pathway[:pathway.find(' (GO')]
+            genes = get_genes_in_GO_term(pathway, species=species)
+        else:
+            genes = [
+                'Col1a1,Col2a1',
+                'Adh1,Col13a1,Col14a1',
+                'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
+                'Pecam1,Gja5,Vwf,Car8,Car4',
+                'Ptprc,Cd19,Gzma,Cd3d,Cd68',
+                'Epcam',
+                ]
+            if species in ('human', 'lemur'):
+                genes = get_orthologs(genes, 'mouse', species)
         genestring = ','.join(genes)
     searchstring = genestring.replace(" ", "")
     return render_template(
@@ -248,6 +256,29 @@ def plot_celltype_abundance(timepoint):
             celltypes=celltype_dict,
             searchstring=timepoint,
             )
+
+
+@app.route("/barplot_gsea", methods=["GET"])
+def plot_barplot_GSEA():
+    '''Barplot for gene set enrichment analysis'''
+    genestring = request.args.get('genes')
+    species = request.args.get('species')
+
+    genes = validate_correct_genestr(genestring, species=species).split(',')
+    data = get_gsea(genes, species)
+
+    # Cut too long results
+    data = data.iloc[:15]
+
+    return render_template(
+        'barplot_gsea.html',
+        species=species,
+        plotData=dict(
+            pathways=data.index.tolist(),
+            overlap=data['Overlap'].values.tolist(),
+            neglog10_p_value=(-np.log10(data['Adjusted P-value'].values)).tolist(),
+            ),
+        )
 
 
 @app.route("/heatmap_species_comparison", methods=["GET"])

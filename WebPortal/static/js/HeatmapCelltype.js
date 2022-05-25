@@ -1,8 +1,8 @@
 var dataForPlots = {};
 
 function HeatmapCelltype(result_wrapper, html_element_id) {
-        const start = performance.now();
-        console.log("start plotting the heatmap");
+        // const start = performance.now();
+        // console.log("start plotting the heatmap");
         // check the button id active
         let useLog = dataForPlots['useLog'];
 
@@ -19,7 +19,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
         let result = result_wrapper['result'];
         let celltypes;
         let celltypeOrder = dataForPlots['celltypeOrder'];
-        console.log(!celltypeOrder);
+
         if (!celltypeOrder) {
             celltypes = Object.keys(result[Object.keys(result)[0]]);
         } else {

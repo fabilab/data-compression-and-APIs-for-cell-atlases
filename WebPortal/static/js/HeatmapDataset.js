@@ -1,4 +1,10 @@
+var dataForPlots = {};
+
 function HeatmapDataset(result, html_element_id,dataset_name) {
+    let useLog = dataForPlots['useLog'];
+    
+    
+    
     if (!result) {
         alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
     } else {

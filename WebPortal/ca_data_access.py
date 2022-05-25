@@ -97,7 +97,7 @@ def timepoint_reorder(tp1, tp2):
 #  function that get the cell type dataset timepoint as a dictionary
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
-def dataset_by_timepoint(genename,df_type,datatype,plottype):
+def dataset_by_timepoint(genename,df_type):
     # select and pre-preprocessing data
     df_tp = read_file(df_type)
 
@@ -136,14 +136,12 @@ def dataset_by_timepoint(genename,df_type,datatype,plottype):
                     # col_name not in df
                     pass
 
-        if datatype == "log10":
-            gene_exp_df = np.log10(0.1+gene_exp_df)  
-        if plottype == 'hieracical':
+            # celltype order for hierarchical clustered set
             distance = pdist(gene_exp_df.values)
-            # print(distance)
             Z = linkage(distance,optimal_ordering=True)
             new_order = leaves_list(Z)
-            gene_exp_df = gene_exp_df.iloc[new_order]
+            # gene_exp_df = gene_exp_df.iloc[new_order]
+            print(new_order)
         dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
     return dic_per_dataset
     # for each of the dataframe in dic_per_dataset, we convert it into json format
@@ -151,7 +149,7 @@ def dataset_by_timepoint(genename,df_type,datatype,plottype):
 
 # def dataset_by_timepoint_dataset(genename,datatype,plottype):
 ''' generate a dictionary for the unified heatmap data'''
-def dataset_unified(genename,datatype,plottype):
+def dataset_unified(genename):
     # ,datatype,plottype
     df = read_file('celltype_dataset_timepoint')
     filtered_df = df.filter(items=[genename],axis=0)
@@ -188,23 +186,20 @@ def dataset_unified(genename,datatype,plottype):
             else:
                 exp_value = float(filtered_df[name].values[0])
             
-            if datatype == "log10":
-                if(exp_value >= 0):
-                    exp_value = np.log10(0.1+exp_value)
+            # if datatype == "log10":
+            #     if(exp_value >= 0):
+            #         exp_value = np.log10(0.1+exp_value)
             # expression[dt][ct] = exp_value
             gene_exp_df[dt][ct] = exp_value
     
     cell_type_label = all_celltypes
-    if plottype == 'hieracical':
-        # print(df.values.shape)  #(41x5)
-        distance = pdist(gene_exp_df.values)
-        # print(distance)
-        Z = linkage(distance,optimal_ordering=True)
-        new_order = leaves_list(Z)
-        gene_exp_df = gene_exp_df.iloc[new_order]
-        cell_type_label = [ct for ct in gene_exp_df.index]
-    
+    # includes a hierarchical clustered celltype order in the result
+    distance = pdist(gene_exp_df.values)
+    Z = linkage(distance,optimal_ordering=True)
+    new_order = leaves_list(Z)
+    clustered_gene_exp_df = gene_exp_df.iloc[new_order]
+    new_cell_type_order = [ct for ct in clustered_gene_exp_df.index]
     dt_sorted = sorted([key for key in gene_exp_df.columns], key=functools.cmp_to_key(timepoint_reorder))
 
-    return {'expression': json.loads(gene_exp_df.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': cell_type_label, 'gene': genename}
+    return {'expression': json.loads(gene_exp_df.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': cell_type_label, 'gene': genename, 'hierarchicalCelltypeOrder':new_cell_type_order}
     

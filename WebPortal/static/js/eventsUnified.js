@@ -4,14 +4,16 @@ $("#log10OnClick" ).click(function() {
     // otherwise use the default data
     $("#logTab").addClass('is-active');
     $("#cpmTab").removeClass('is-active');
-    AssembleAjaxRequestUnified()
+    dataForPlotsUnified['useLog'] = true;
+    plotHeatmapUnified("","")
     
 });
 
 $("#CPMOnClick" ).click(function() {
     $("#logTab").removeClass('is-active');
     $("#cpmTab").addClass('is-active');
-    AssembleAjaxRequestUnified()
+    dataForPlotsUnified['useLog'] = false;
+    plotHeatmapUnified("","")
 });
 
 // Second set of buttons
@@ -20,12 +22,13 @@ $("#hClusterOnClick" ).click(function() {
     // otherwise use the default data
     $("#hierachicalTab").addClass('is-active');
     $("#originalOrderTab").removeClass('is-active');
-    AssembleAjaxRequestUnified()
+    dataForPlotsUnified['celltypeOrder'] = true;
+    plotHeatmapUnified("","")
 });
-
 
 $("#originalOnClick" ).click(function() {
     $("#originalOrderTab").addClass('is-active');
     $("#hierachicalTab").removeClass('is-active');
-    AssembleAjaxRequestUnified()
+    dataForPlotsUnified['celltypeOrder'] = false;
+    plotHeatmapUnified("","")
 });

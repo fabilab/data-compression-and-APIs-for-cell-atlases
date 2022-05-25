@@ -4,6 +4,7 @@ $("#log10OnClick" ).click(function() {
     // otherwise use the default data
     $("#logTab").addClass('is-active');
     $("#cpmTab").removeClass('is-active');
+    dataForPlots['useLog'] = true;
     AssembleAjaxRequestTimepoint()
     
 });
@@ -11,6 +12,7 @@ $("#log10OnClick" ).click(function() {
 $("#CPMOnClick" ).click(function() {
     $("#logTab").removeClass('is-active');
     $("#cpmTab").addClass('is-active');
+    dataForPlots['useLog'] = false;
     AssembleAjaxRequestTimepoint()
 });
 
@@ -20,6 +22,7 @@ $("#hClusterOnClick" ).click(function() {
     // otherwise use the default data
     $("#hierachicalTab").addClass('is-active');
     $("#originalOrderTab").removeClass('is-active');
+    dataForPlots['celltypeOrder'] = true;
     AssembleAjaxRequestTimepoint()
 });
 
@@ -27,5 +30,6 @@ $("#hClusterOnClick" ).click(function() {
 $("#originalOnClick" ).click(function() {
     $("#originalOrderTab").addClass('is-active');
     $("#hierachicalTab").removeClass('is-active');
+    dataForPlots['celltypeOrder'] = false;
     AssembleAjaxRequestTimepoint()
 });

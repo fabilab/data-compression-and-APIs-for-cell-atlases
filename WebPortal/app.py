@@ -1,4 +1,5 @@
 from base64 import decode
+from urllib import response
 from flask import Flask, send_from_directory,request,render_template
 from flask_restful import Resource, Api
 from flask_cors import CORS
@@ -51,12 +52,21 @@ class geneNames(Resource):
 class geneExpTime(Resource):
     def get(self):
         genename = request.args.get('gene')
-        datatype = request.args.get('datatype')
-        plottype = request.args.get('plottype')
+        # if plottype == 'hieracical':
+        #     distance = pdist(gene_exp_df.values)
+        #     # print(distance)
+        #     Z = linkage(distance,optimal_ordering=True)
+        #     new_order = leaves_list(Z)
+        #     gene_exp_df = gene_exp_df.iloc[new_order]
         
-        data = dataset_by_timepoint(genename,'celltype_dataset_timepoint',datatype,plottype)
-        return data
+        df = dataset_by_timepoint(genename,'celltype_dataset_timepoint')
 
+        # response = {
+        #     'result': df,
+        #     'hierarchicalCelltypeOrder': 
+        # }
+        print(data)
+        return data
 
 class geneExp(Resource):
     def get(self):
@@ -64,15 +74,12 @@ class geneExp(Resource):
         # start = time.time()
         # print("geneEXP start")
         gene_names = request.args.get('gene_names')
-        plot_type = request.args.get('plot_type')
-        data_type = request.args.get('data_type')
         df = None
         df = data_preprocessing(gene_names,'celltype')
         if df is None:
             return None
 
         distance = pdist(df.values)
-        # print(distance)
         Z = linkage(distance,optimal_ordering=True)
         new_order = leaves_list(Z)
         # df = df.iloc[new_order]
@@ -116,9 +123,8 @@ class plotsForSeachGenes(Resource):
 class geneExpUnified(Resource):
     def get(self):
         genename = request.args.get('gene')
-        datatype = request.args.get('datatype')
-        plottype = request.args.get('plottype')
-        return dataset_unified(genename,datatype,plottype)
+
+        return dataset_unified(genename)
 
 # this is an API endpoint (return data)
 api.add_resource(geneExp, '/data')

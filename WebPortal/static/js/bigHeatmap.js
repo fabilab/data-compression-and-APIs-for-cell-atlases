@@ -1,7 +1,33 @@
-function plotHeatmapUnified(result) {
-    const expression = result['expression']
+dataForPlotsUnified = {}
+
+function plotHeatmapUnified(result,html_element_id) {
+    
+    // flags passed by events.js
+    let useLog = dataForPlotsUnified['useLog'];
+    let celltypeOrder = dataForPlotsUnified['celltypeOrder'];
+    
+    if (result === "") {
+        result = dataForPlotsUnified['result'];
+    } else {
+        dataForPlotsUnified['result'] = result;
+    }
+
+    if (html_element_id === "") {
+        html_element_id = "bigHeatMap";
+    }
+
+    let celltypes;
+    if (!celltypeOrder) {
+        celltypes = result['cell_type'];
+    } else {
+        celltypes = result['hierarchicalCelltypeOrder'];
+    }
+    console.log(celltypes);
+
+    const expression = result['expression'];
+    
     // x-axis: celltypes
-    let x_axis = result['cell_type']
+    let x_axis = celltypes;
     //y-axis: timepoint
     let y_axis = [];
     //z: expression
@@ -11,9 +37,9 @@ function plotHeatmapUnified(result) {
     // timepoint that with duplicate:
     let y_axis_time = [];
     // plot only the timepoint on Y-axis
-
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
-        let dataset_timepoint = result['dataset_timepoint'][i];   // get the dataset timepoint as a string
+        // dataset timepoint combination: e.g TMS_24m
+        let dataset_timepoint = result['dataset_timepoint'][i];
         let time  = dataset_timepoint.split("_")[1];
         let dataset = dataset_timepoint.split("_")[0];
         if (y_axis.includes(time)) {
@@ -23,8 +49,21 @@ function plotHeatmapUnified(result) {
         }
         y_axis_time.push(time);
         y_axis_dataset.push(dataset);
-        expression_in_all_celltypes = expression[dataset_timepoint];  // find it from the dictionary as a key
-        data_content.push(Object.values(expression_in_all_celltypes));
+        
+        let expression_in_all_celltypes = [];
+        for (var k = 0; k < celltypes.length; k++) {
+            expression_in_all_celltypes.push(expression[dataset_timepoint][celltypes[k]]);
+        }
+
+        if (useLog) {
+            for (var j = 0; j < expression_in_all_celltypes.length; j++) {
+                if (expression_in_all_celltypes[j] !== -1) {
+                    expression_in_all_celltypes[j] = Math.log10(expression_in_all_celltypes[j] + 0.5);
+                }
+            }
+        }
+        
+        data_content.push(expression_in_all_celltypes);
     }
     // each with this format
     // Celltype: {ct}, Expression: {exp}, Dataset: {ds}, Timepoint: {tp}, 
@@ -48,16 +87,10 @@ function plotHeatmapUnified(result) {
     let ngenes = y_axis.length;
     let heatmap_width = 1300;
     let heatmap_height = 270 + 41 * ngenes;
-    var data = [
-        {
-            z: data_content,
-            x: x_axis,
-            y: y_axis,
-            text: hover_text,
-            type: 'heatmap',
-            hoverinfo: 'text'
-        }
-    ];
+    var data = {
+        type: 'heatmap',
+        hoverinfo: 'text',
+    };
     var layout = {
         title: 'Expression of ' + result['gene'] + ' gene over time',
         xaxis: {
@@ -72,9 +105,18 @@ function plotHeatmapUnified(result) {
         with: heatmap_width,
         height: heatmap_height,
     };
-        
-    Plotly.newPlot(document.getElementById('bigHeatMap'), data,layout); 
-}
+    if ($('#'+html_element_id).text() === "") {
+        data['z'] = data_content;
+        data['x'] = x_axis;
+        data['y'] = y_axis;
+        Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
+    } else {
+        data['z'] = [data_content];
+        data['x'] = [x_axis];
+        data['y'] = [y_axis];
+        Plotly.update(document.getElementById(html_element_id), data);
+    }
+};
 
 
 function AssembleAjaxRequestUnified() {
@@ -96,9 +138,9 @@ function AssembleAjaxRequestUnified() {
     $.ajax({
             type:'GET',
             url:'http://127.0.0.1:5000/data_unified',
-            data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
+            data: "gene=" + gene_name,
             success: function(result) {
-                plotHeatmapUnified(result);
+                plotHeatmapUnified(result,"bigHeatMap");
             },
             error: function (e) {
                 alert('Request data Failed !')

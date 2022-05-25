@@ -2,12 +2,12 @@ function ScatterPlot(result) {
     // compare the expression level of 2 specific genes across all cell types
     let expr1 = result["gene1_expr"];
     let expr2 = result["gene2_expr"];
-    let expr1_log = expr1.map(Math.log10);
-    let expr2_log = expr2.map(Math.log10);
+    // let expr1_log = expr1.map(Math.log10);
+    // let expr2_log = expr2.map(Math.log10);
     let cell_types =result["cell_types"];
     var trace1 = {
-        x: expr1_log,
-        y: expr2_log,
+        x: expr1,
+        y: expr2,
         mode: 'markers',
         type: 'scatter',
         text: cell_types,

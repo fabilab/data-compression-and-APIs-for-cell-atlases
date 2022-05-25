@@ -32,20 +32,17 @@ function plotHeatmapUnified(result) {
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
         let temp = [];
         for (var j = 0; j < result['cell_type'].length; j++) {
-            let ct = result['cell_type'][j];
             let dt = result['dataset_timepoint'][i];
+            let ct = result['cell_type'][j];
             
             let exp = expression[dt][ct];
+            // "ACZ_P21"
             let ds = dt.split("_")[0];
             let tp = dt.split("_")[1];
-
-            // let info = 'Celltype: '+result['cell_type'][j] + 
-            
             temp.push('Celltype: '+ct+', Expression: '+exp+', Dataset: '+ds+', Timepoint: '+tp);
         }
         hover_text.push(temp);
     }
-    console.log(hover_text);
 
     let ncelltypes = x_axis.length;
     let ngenes = y_axis.length;

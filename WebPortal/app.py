@@ -9,7 +9,7 @@ import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
 from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified
-
+import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
 api = Api(app)
@@ -60,6 +60,9 @@ class geneExpTime(Resource):
 
 class geneExp(Resource):
     def get(self):
+        ######### 2
+        # start = time.time()
+        # print("geneEXP start")
         gene_names = request.args.get('gene_names')
         plot_type = request.args.get('plot_type')
         data_type = request.args.get('data_type')
@@ -67,18 +70,22 @@ class geneExp(Resource):
         df = data_preprocessing(gene_names,'celltype')
         if df is None:
             return None
-        
-        if data_type == "log10":
-            df = np.log10(0.1+df)
-        
-        if plot_type == 'hieracical':
-            distance = pdist(df.values)
-            # print(distance)
-            Z = linkage(distance,optimal_ordering=True)
-            new_order = leaves_list(Z)
-            df = df.iloc[new_order]
-        
-        return json.loads(df.to_json())
+
+        distance = pdist(df.values)
+        # print(distance)
+        Z = linkage(distance,optimal_ordering=True)
+        new_order = leaves_list(Z)
+        # df = df.iloc[new_order]
+
+        response = {
+            'result': df.to_dict(),
+            'hierarchicalCelltypeOrder': df.index[new_order].tolist(),  # new order of the celltype
+        }
+        ######## 7 (store the result in a variable,print it)
+        # end = time.time()
+        # print("geneEXP end")
+        # print(end - start)
+        return response
 
 class plotsForSeachGenes(Resource):
     def get(self):

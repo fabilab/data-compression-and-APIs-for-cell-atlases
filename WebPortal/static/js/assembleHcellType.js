@@ -1,4 +1,7 @@
 function AssembleAjaxRequest() {
+  // const start = performance.now();
+  // console.log("Page start loading now");
+
   if(! $('#scatter_plot').is('empty')) {
     $('#scatter_plot').empty();
   }
@@ -45,6 +48,8 @@ function AssembleAjaxRequest() {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
     }
     });
+    // const duration = performance.now() - start;
+    // console.log("page loading end. Duration:" + duration);
   }
 $("#searchOnClick" ).click(AssembleAjaxRequest)
 $(document).ready(AssembleAjaxRequest)

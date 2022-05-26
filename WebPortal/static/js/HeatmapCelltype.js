@@ -55,7 +55,8 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
 
             var data = {
                 type: 'heatmap',
-                hoverongaps: false
+                hoverongaps: false,
+                colorscale: 'Reds',
             };
             var layout = {
                 autosize: true, 

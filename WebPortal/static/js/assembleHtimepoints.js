@@ -24,13 +24,7 @@ function AssembleAjaxRequestTimepoint() {
     url:'http://127.0.0.1:5000/data_timepoint',
     data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
     success: function(result) {
-        num = 1
-        for (key in Object.keys(result)) {
-            dataset = Object.keys(result)[key]
-            let div_id = 'dataset_' + num
-            HeatmapDataset(result[dataset], div_id,dataset);
-            num++
-        }
+        plotAll(result);
     },
     error: function (e) {
         alert('Request data Failed(in assemble timepoint)')

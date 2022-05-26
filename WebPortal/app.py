@@ -59,20 +59,14 @@ class geneExpTime(Resource):
         #     new_order = leaves_list(Z)
         #     gene_exp_df = gene_exp_df.iloc[new_order]
         
-        df = dataset_by_timepoint(genename,'celltype_dataset_timepoint')
-
-        # response = {
-        #     'result': df,
-        #     'hierarchicalCelltypeOrder': 
-        # }
-        print(data)
-        return data
+        result = dataset_by_timepoint(genename,'celltype_dataset_timepoint')
+        return result
 
 class geneExp(Resource):
     def get(self):
         ######### 2
-        # start = time.time()
-        # print("geneEXP start")
+        start = time.time()
+        print("geneEXP start")
         gene_names = request.args.get('gene_names')
         df = None
         df = data_preprocessing(gene_names,'celltype')
@@ -89,9 +83,9 @@ class geneExp(Resource):
             'hierarchicalCelltypeOrder': df.index[new_order].tolist(),  # new order of the celltype
         }
         ######## 7 (store the result in a variable,print it)
-        # end = time.time()
-        # print("geneEXP end")
-        # print(end - start)
+        end = time.time()
+        print("geneEXP end")
+        print(end - start)
         return response
 
 class plotsForSeachGenes(Resource):

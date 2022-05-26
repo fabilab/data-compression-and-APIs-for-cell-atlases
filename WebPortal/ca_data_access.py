@@ -9,20 +9,46 @@ from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
 import time
 
+with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+    L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
+
+
 # gives the name of dataset we want as an input
 # celltype / celltype_dataset / celltype_dataset_timepoint
-def read_file(df_type):
+def read_file(df_type,genes):
+    ####### 4
+    start = time.time()
+    print("read file start") 
+    genes = genes.split(",") 
     with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
-        ####### 4
-        start = time.time()
-        print("read file start")  
+        # List of genes
+        print("before L")
+        print("after L")
+        indexs = []
+        if isinstance(genes,list):
+            for gene in genes:
+                indexs.append(L.index(gene))
+        else:
+            indexs.append(L.index(genes))
+        print("after loop")
+        # sort the indexs
+        indexs.sort()
+        new_genes = []
+        for index in indexs:
+            new_gene = L[index]
+            new_genes.append(new_gene)
+        # expression table (only numbers,no index nor columns)
+        print("before data")
+        data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
+        columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
+        print("before dataframe")
         df = pd.DataFrame(
-            data=np.array(h5_data[df_type]['gene_expression_average']['block0_values']).astype(np.float32),
-            index=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr()),
-            columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'].asstr()),
-            ).T
+            data = data.T,
+            index = new_genes,
+            columns=columns,
+        )
         end = time.time()
-        print("ends here")
+        print("read file ends here")
         print(end - start)
 
     return df
@@ -31,7 +57,9 @@ def read_file(df_type):
 # always run the read_file() to get dataframe in the right format before running this 
 def data_preprocessing(input_gene_names,df_type):
     ######### 3
-    df = read_file(df_type)
+    start = time.time()
+    print("data preprocesisng start")
+    df = read_file(df_type,input_gene_names)
     df_genes = df.index # all the genes that available in the current dataframe
     for search_gene in input_gene_names.split(","):
         if search_gene not in df_genes:
@@ -44,6 +72,9 @@ def data_preprocessing(input_gene_names,df_type):
         a_gene_names = input_gene_names.split(",")
         plot_df = df.filter(items = a_gene_names,axis=0)
         plot_data = plot_df.T
+    end = time.time()
+    print("preprocessing ends here")
+    print(end - start)
     ######## 6
     return plot_data
 
@@ -99,13 +130,14 @@ def timepoint_reorder(tp1, tp2):
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
 def dataset_by_timepoint(genename,df_type):
     # select and pre-preprocessing data
-    df_tp = read_file(df_type)
+    df_tp = read_file(df_type,genename)
 
     # select data for a given gene name
     df_filtered=df_tp.loc[[genename]]
     # for each dataset name, we construct a new dataframe for it (celltypes x timepoints)
     datasets = set([name.split("_")[1] for name in df_filtered.columns])
     dic_per_dataset = {}
+    new_cell_type_order = {}
     # ACZ,Hur.2021,TMS
     for i in datasets:
         columns_with_this_dataset = []
@@ -136,14 +168,14 @@ def dataset_by_timepoint(genename,df_type):
                     # col_name not in df
                     pass
 
-            # celltype order for hierarchical clustered set
-            distance = pdist(gene_exp_df.values)
-            Z = linkage(distance,optimal_ordering=True)
-            new_order = leaves_list(Z)
-            # gene_exp_df = gene_exp_df.iloc[new_order]
-            print(new_order)
+        # celltype order for hierarchical clustered set
+        distance = pdist(gene_exp_df.values)
+        Z = linkage(distance,optimal_ordering=True)
+        new_order = leaves_list(Z)
+        clustered_gene_exp_df = gene_exp_df.iloc[new_order]
+        new_cell_type_order[i] = [ct for ct in clustered_gene_exp_df.index]
         dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
-    return dic_per_dataset
+    return {"result":dic_per_dataset, "hierarchicalCelltypeOrder":new_cell_type_order}
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
 
@@ -151,7 +183,7 @@ def dataset_by_timepoint(genename,df_type):
 ''' generate a dictionary for the unified heatmap data'''
 def dataset_unified(genename):
     # ,datatype,plottype
-    df = read_file('celltype_dataset_timepoint')
+    df = read_file('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []
     dt_combinations = []  # store all the existing dataset and timepoint combinations

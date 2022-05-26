@@ -1,6 +1,6 @@
 dataForPlotsUnified = {}
 
-function plotHeatmapUnified(result,html_element_id) {
+function plotHeatmapUnified(result,html_element_id,gene_name) {
     
     // flags passed by events.js
     let useLog = dataForPlotsUnified['useLog'];
@@ -22,7 +22,6 @@ function plotHeatmapUnified(result,html_element_id) {
     } else {
         celltypes = result['hierarchicalCelltypeOrder'];
     }
-    console.log(celltypes);
 
     const expression = result['expression'];
     
@@ -89,8 +88,11 @@ function plotHeatmapUnified(result,html_element_id) {
     let heatmap_height = 270 + 41 * ngenes;
     var data = {
         type: 'heatmap',
+        text: hover_text,
         hoverinfo: 'text',
+        colorscale: 'Reds',
     };
+    console.log(result['gene']);
     var layout = {
         title: 'Expression of ' + result['gene'] + ' gene over time',
         xaxis: {
@@ -109,12 +111,13 @@ function plotHeatmapUnified(result,html_element_id) {
         data['z'] = data_content;
         data['x'] = x_axis;
         data['y'] = y_axis;
-        Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
+        Plotly.newPlot(document.getElementById(html_element_id), [data], layout);
     } else {
         data['z'] = [data_content];
         data['x'] = [x_axis];
         data['y'] = [y_axis];
-        Plotly.update(document.getElementById(html_element_id), data);
+
+        Plotly.update(document.getElementById(html_element_id), data, layout);
     }
 };
 

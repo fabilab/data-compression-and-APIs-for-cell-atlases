@@ -15,7 +15,14 @@
         {% endfor %}
       </span>
       <span>|</span>
-      <span class="suggestButton suggestGroup" id="pathwaySuggestions"><a href="/barplot_gsea?species={{species}}&genes={{searchstring}}">GSEA</a></span>
+      <span class="suggestGroup" id="pathwaySuggestions">GSEA:
+        <span class="pathwaySuggestion suggestButton" id="suggestGO">
+          <a href="/barplot_gsea?species={{species}}&genes={{searchstring}}">GO</a>
+        </span>
+        <span class="pathwaySuggestion suggestButton" id="suggestKEGG">
+          <a href="/barplot_gsea?species={{species}}&gene_set=KEGG&genes={{searchstring}}">KEGG</a>
+        </span>
+      </span>
     </div>
   </div>
 

@@ -1,5 +1,5 @@
 # Web imports
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from flask_restful import Resource, Api
 import json
 
@@ -34,13 +34,32 @@ from validation.celltypes import validate_correct_celltypestr
 
 class geneExp(Resource):
     '''API for the compressed atlas data, to be visualized as a heatmap'''
-    def get(self):
-        species = request.args.get("species")
-        genestring = request.args.get("gene_names")
-        gene_names = genestring.replace(' ', '').split(',')
+    def post(self):
+        '''No data is actually posted, but this is uncached and can be longer
+
+        In particular, when many genes are requested at once, we run into the
+        length limitation of GET requests. The downside of using POST is that
+        there's no caching, bookmarking, and such.
+        '''
+        args = request.form
+        return self.get(args=args)
+
+    def get(self, args=None):
+        if args is None:
+            args = request.args
+        species = args.get("species")
+        genestring = args.get("gene_names")
+
+        # A cap on gene names to avoid overload is reasonable
+        genestring = ','.join(genestring.replace(' ', '').split(',')[:500])
+        genestring = validate_correct_genestr(
+                genestring, species=species, missing='skip')
+        if genestring is None:
+            abort(500)
+        gene_names = genestring.split(',')
 
         # If we are switching species, get orthologs
-        new_species = request.args.get("newSpecies")
+        new_species = args.get("newSpecies")
         if new_species is not None:
             gene_names = get_orthologs(
                 gene_names, species, new_species,

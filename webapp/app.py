@@ -41,6 +41,7 @@ from models import (
         get_orthologs,
         get_genes_in_GO_term,
         get_gsea,
+        get_kegg_urls,
 )
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
@@ -263,14 +264,28 @@ def plot_celltype_abundance(timepoint):
             )
 
 
-@app.route("/barplot_gsea", methods=["GET"])
+@app.route("/barplot_gsea", methods=["GET", "POST"])
 def plot_barplot_GSEA():
     '''Barplot for gene set enrichment analysis'''
-    genestring = request.args.get('genes')
-    species = request.args.get('species')
+    if request.method == "POST":
+        args = request.form
+    else:
+        args = request.args
+
+    genestring = args.get('genes')
+    species = args.get('species')
+    gene_set = args.get('gene_set')
 
     genes = validate_correct_genestr(genestring, species=species).split(',')
-    data = get_gsea(genes, species)
+    if gene_set is None:
+        data = get_gsea(genes, species)
+    else:
+        data = get_gsea(genes, species, gene_set=gene_set)
+
+    if 'KEGG' in gene_set:
+        pathway_urls = get_kegg_urls(data.index)
+    else:
+        pathway_urls = []
 
     # Cut too long results
     data = data.iloc[:15]
@@ -280,6 +295,7 @@ def plot_barplot_GSEA():
         species=species,
         plotData=dict(
             pathways=data.index.tolist(),
+            pathways_urls=pathway_urls,
             overlap=data['Overlap'].values.tolist(),
             neglog10_p_value=(-np.log10(data['Adjusted P-value'].values)).tolist(),
             ),

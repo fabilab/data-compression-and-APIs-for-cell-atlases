@@ -17,10 +17,15 @@ function barplotGSEA(result, html_element_id, xaxisType) {
     let yticktext = [];
     for (let i = 0; i < y_axis.length; i++) {
         const pathway = y_axis[i];
-        let url = '/heatmap_by_celltype?'+$.param({
-            species: species,
-            pathway: pathway,
-        })
+        let url;
+        if (result['pathways_urls'].length > 0) {
+            url = result['pathways_urls'][i];
+        } else {
+            url = '/heatmap_by_celltype?'+$.param({
+                species: species,
+                pathway: pathway,
+            })
+        }
         const tickText = '<a href="'+url+'">'+pathway+'</a>'
         yticktext.push(tickText);
     }

@@ -100,11 +100,13 @@ def validate_correct_gene(gene, species='mouse'):
         return None
 
 
-def validate_correct_genestr(genestr, species='mouse'):
+def validate_correct_genestr(genestr, species='mouse', missing='return_none'):
     '''Validate gene names and correct misspellings if possible'''
 
     # TODO: check punctuation more accurately
     genes = genestr.strip(' ').replace('.', ',').replace(';', ',').split(',')
+
+    print(genes)
 
     # Make everything with the right capitalisation at the very least
     if species == 'mouse':
@@ -117,7 +119,12 @@ def validate_correct_genestr(genestr, species='mouse'):
     for gene in genes:
         genev = validate_correct_gene(gene, species=species)
         if genev is None:
-            return None
+            if missing == 'return_none':
+                return None
+            elif missing == 'throw':
+                raise ValueError('Gene not found:', gene)
+            else:
+                continue
         genesv.append(genev)
 
     genestr = ','.join(genesv)

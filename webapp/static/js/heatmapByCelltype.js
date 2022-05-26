@@ -171,7 +171,7 @@ function hideTooltip() {
     var tooltip = document.getElementById("tooltip");
     setTimeout(function() {
       tooltip.style.display = "none";
-    }, 3500);
+    }, 4500);
 }
 
 
@@ -209,11 +209,13 @@ function AssembleAjaxRequest( genestring = "" ) {
         gene_names: geneNames,
         species: species,
     }
+    // HTML GET method length is capped at 4,000, but search box might be shorter
+    let htmlVerb = (geneNames.length > 500) ? 'POST' : 'GET';
 
     // sent gene names to the API
     // FIXME: this fails at random times with large payloads?
     $.ajax({
-        type:'GET',
+        type: htmlVerb,
         url:'/data/by_celltype',
         data: $.param(requestData),
         success: function(result) {
@@ -222,8 +224,6 @@ function AssembleAjaxRequest( genestring = "" ) {
                 'result': result,
                 'div': 'h5_data_plot',
             };
-
-            console.log(result);
 
             // Update search box: corrected gene names, excluding missing genes
             setSearchBox(result['genes']);
@@ -340,8 +340,10 @@ function setSearchBox(text, gseaText = "") {
     if (gseaText == "") {
         gseaText = text;
     }
-    $('#pathwaySuggestions > a').attr(
+    $('#suggestGO > a').attr(
         'href', '/barplot_gsea?species='+species+'&genes='+gseaText);
+    $('#suggestKEGG > a').attr(
+        'href', '/barplot_gsea?species='+species+'&gene_set=KEGG&genes='+gseaText);
 }
 
 ////////////////////
@@ -386,7 +388,7 @@ $("body").keyup(function(event) {
     }
 });
 $(document).ready(function() {
-    $('#pathwaySuggestions > a').click(function() {
+    $('#pathwaySuggestion > a').click(function() {
         $("body").addClass("loading");
     });
     AssembleAjaxRequest();

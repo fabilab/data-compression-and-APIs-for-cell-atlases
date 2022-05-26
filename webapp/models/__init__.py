@@ -592,6 +592,12 @@ def get_gsea(genes, species='mouse', gene_set='GO_Biological_Process_2021'):
     '''Get GSEA (gene set enrichment analysis)'''
     import gseapy as gp
 
+    if gene_set == 'KEGG':
+        if species == 'mouse':
+            gene_set = 'KEGG_2019_Mouse'
+        else:
+            gene_set = 'KEGG_2021_Human'
+
     res = gp.enrichr(gene_list=genes,
                      gene_sets=[gene_set],
                      description='pathway',
@@ -602,3 +608,13 @@ def get_gsea(genes, species='mouse', gene_set='GO_Biological_Process_2021'):
     res.set_index('Term', inplace=True)
 
     return res
+
+
+def get_kegg_urls(pathways):
+    '''Get URLs to KEGG pathways by name'''
+    kegg_df = pd.read_csv(
+        fdn_data+'kegg_pathway_dataframe.tsv', sep='\t', index_col='name')
+    kegg_url = kegg_df['url'].to_dict()
+
+    urls = [kegg_url.get(x, '') for x in pathways]
+    return urls

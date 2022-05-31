@@ -15,6 +15,24 @@ import anndata
 data_fdn = '../webapp/static/scData/'
 
 
+def correct_annotations(adata, column):
+    '''Overwrite annotations for macrophages and DCs'''
+    annotations = pd.read_csv(
+        '../data/tabula_microcebus/reannotations.tsv',
+        sep='\t',
+        index_col=0,
+    ).squeeze(axis=1)
+    annotations = pd.Series(annotations, dtype='category')
+
+    cats_old = adata.obs[column].cat.categories
+    cats_new = list(set(annotations.cat.categories) - set(cats_old))
+    adata.obs[column] = adata.obs[column].cat.add_categories(cats_new)
+    annotations = annotations.cat.set_categories(adata.obs[column].cat.categories)
+
+    adata.obs.loc[annotations.index, column] = annotations
+    adata.obs[column] = adata.obs[column].cat.remove_unused_categories()
+
+
 if __name__ == '__main__':
 
     # Load data
@@ -34,6 +52,9 @@ if __name__ == '__main__':
     # NOTE: there is a free annotation column that is informative, basically
     # a higher resolution clustering but with some questionable things like
     # CD4+ CD8+ T cells. Let's go trad for now
+
+    print('Reannotate aerocytes, DCs, etc.')
+    correct_annotations(adata, column)
 
     # Exclude unassigned/doublets
     unwanted_types = [
@@ -55,18 +76,21 @@ if __name__ == '__main__':
         'ASM',
         'VSM',
         'Pericyte',
+        'Lymphatic',
+        'Arterial II',
         'Venous',
         'gCap',
-        'Arterial II',
-        'Lymphatic',
+        'Aerocyte',
         'Schwann cell',
         'Plasmablast',
         'B cell',
         'NK cell',
+        'T cell',
         'IL cell',
         'pDC',
-        'cDC',
-        'DC X',
+        'DC I',
+        'DC II',
+        'DC III',
         'Alveolar mac',
         'Interstitial mac',
         'Monocyte',
@@ -97,6 +121,7 @@ if __name__ == '__main__':
         ],
         'Venous': ['vein endothelial cell'],
         'gCap': ['capillary endothelial cell'],
+        'Aerocyte': ['Aerocyte'],
         'Arterial II': ['endothelial cell of artery'],
         'Lymphatic': ['endothelial cell of lymphatic vessel'],
         'Plasmablast': ['plasma cell'],
@@ -120,8 +145,9 @@ if __name__ == '__main__':
         'Club': ['club cell'],
         'Brush': ['brush cell of bronchus'],
         'Basal': ['basal cell of epithelium of bronchus'],
-        'cDC': ['conventional dendritic cell'],
-        'DC X': ['dendritic cell'],
+        'DC I': ['DC I'],
+        'DC II': ['DC II'],
+        'DC III': ['DC III'],
         'pDC': ['plasmacytoid dendritic cell'],
         'Alveolar mac': ['alveolar macrophage'],
         'Interstitial mac': ['macrophage'],

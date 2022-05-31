@@ -52,10 +52,12 @@ class geneExp(Resource):
 
         # A cap on gene names to avoid overload is reasonable
         genestring = ','.join(genestring.replace(' ', '').split(',')[:500])
+
         genestring = validate_correct_genestr(
                 genestring, species=species, missing='skip')
-        if genestring is None:
-            abort(500)
+
+        if genestring is None or genestring == '':
+            return None
         gene_names = genestring.split(',')
 
         # If we are switching species, get orthologs

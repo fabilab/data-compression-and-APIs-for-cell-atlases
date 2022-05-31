@@ -16,7 +16,7 @@ from flask import (
     abort,
 )
 from flask_restful import Api
-#from flask_cors import CORS
+from flask_cors import CORS
 import numpy as np
 
 from api import (
@@ -52,8 +52,8 @@ from text_recognition import mod as text_control_blueprint
 ##############################
 app = Flask(__name__, static_url_path="/static", template_folder="templates")
 app_api = Api(app)
-# Note: this might be unsafe
-#CORS(app)
+# NOTE: this might be unsafe
+CORS(app)
 with open('secret_key.txt') as f:
     app.config['SECRET_KEY'] = f.read()
 ##############################

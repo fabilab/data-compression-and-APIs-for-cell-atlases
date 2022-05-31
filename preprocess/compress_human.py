@@ -15,12 +15,37 @@ import anndata
 data_fdn = '../webapp/static/scData/'
 
 
+def correct_annotations(adata):
+    '''Overwrite annotations for macrophages and DCs'''
+    annotations = pd.read_csv(
+        '../data/tabula_sapiens/reannotations_macrophages_DCs.tsv',
+        sep='\t',
+        index_col=0,
+    )
+    column = annotations.columns[0]
+    annotations = pd.Series(annotations.squeeze(axis=1), dtype='category')
+
+    cats_old = adata.obs[column].cat.categories
+    cats_new = list(set(annotations.cat.categories) - set(cats_old))
+    adata.obs[column] = adata.obs[column].cat.add_categories(cats_new)
+    annotations = annotations.cat.set_categories(adata.obs[column].cat.categories)
+
+    adata.obs.loc[annotations.index, column] = annotations
+    adata.obs[column] = adata.obs[column].cat.remove_unused_categories()
+
+
 if __name__ == '__main__':
 
     # Load data
     print('Load single cell data')
     fn_atlas = '../data/tabula_sapiens/TS_Lung.h5ad'
     adata = anndata.read_h5ad(fn_atlas)
+
+    # We reannotated a few things ourselves
+    print('Reannotate macrophages and DCs')
+    correct_annotations(adata)
+
+    # TODO: same for fibroblasts, etc.
 
     # NOTE: the human data is in some weird normalization between 0 and 10,
     # use adata.raw.X for computations to avoid log trasformations and whatnot
@@ -51,8 +76,11 @@ if __name__ == '__main__':
         'B cell',
         'NK cell',
         'pDC',
-        'cDC',
-        'Alv/interst mac',
+        'DC I',
+        'DC II',
+        'DC III',
+        'Alveolar mac',
+        'Interstitial mac',
         'Monocyte',
         'Neutrophil',
         'Basophil',
@@ -105,9 +133,13 @@ if __name__ == '__main__':
         'Basal': ['basal cell'],
         'Serous': ['serous cell of epithelium of bronchus'],
         'Mucous': ['respiratory mucous cell'],
-        'cDC': ['dendritic cell'],
+        'DC I': ['DC I'],
+        'DC II': ['DC II'],
+        'DC III': ['DC III'],
+        'Proliferating DC': ['Proliferating DC'],
         'pDC': ['plasmacytoid dendritic cell'],
-        'Alv/interst mac': ['macrophage'],
+        'Alveolar mac': ['Alveolar mac'],
+        'Interstitial mac': ['Interstitial mac'],
         'Monocyte': [
             'classical monocyte',
             'non-classical monocyte',

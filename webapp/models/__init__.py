@@ -472,8 +472,6 @@ def get_gene_ontology_terms(genes, species='mouse'):
     '''Get the GO terms for these genes'''
     genesd = get_orthologs(genes, species, 'mouse')
 
-    print(genesd)
-
     with open(fn_GO, 'rb') as fin:
         table = pickle.load(fin)['genes_to_GO']
 

@@ -14,21 +14,26 @@ COPY secret_key.txt .
 # Install any dependencies
 RUN pip install -r requirements.txt
 
-# Copy the content of the local src directory to the working directory
-# Python/Flask backend
-COPY app.py .
+# Templates
+ADD templates templates
+
+# Static assets
+ADD static static
+
+# Modules for backend
 ADD api api
 ADD models models
 ADD text_recognition text_recognition
 ADD validation validation
 ADD voice_recognition voice_recognition
 
-# Templates
-ADD templates templates
+# Google cloud key (NOTE: careful!!)
+# NOTE: CAREFUL CAREFUL
+ADD gcloud_key gcloud_key
+# NOTE: CAREFUL CAREFUL
 
-# Static assets
-# FIXME: get rid of 10X data et similia
-ADD static static
+# App file
+COPY app.py .
 
 # Specify the command to run on container start
 CMD [ "python", "./app.py" ]

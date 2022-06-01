@@ -11,15 +11,16 @@ from models import gene_orderd
 
 # FIXME
 gene_order = gene_orderd['mouse']
-genes_idx = gene_order.index
-gene_matrix = (pd.Series(gene_order.index)
+gene_matrixd = {}
+for species in ['mouse', 'human']:
+    mtx = (pd.Series(gene_orderd[species].index)
                  .str
                  .split('', expand=True)
                  .iloc[:, 1:-1]
                  .fillna('')
                  .values
                  .astype('U1'))
-gene_maxlen = gene_matrix.shape[1]
+    gene_matrixd[species] = mtx
 
 
 def convert_numbers_in_gene_name(gene):
@@ -73,14 +74,14 @@ def validate_correct_gene(gene, species='mouse'):
     else:
         gene = gene.upper()
 
-    if gene in genes_idx:
+    if gene in gene_orderd[species].index:
         return gene
 
     gene = convert_numbers_in_gene_name(gene)
 
     # Not found in whitelist, try to correct
-    gene_array = list(gene)[:gene_maxlen]
-    hamming = (gene_array != gene_matrix[:, :len(gene_array)]).sum(axis=1)
+    gene_array = list(gene)[:gene_matrixd[species].shape[1]]
+    hamming = (gene_array != gene_matrixd[species][:, :len(gene_array)]).sum(axis=1)
 
     # If the uncorrected gene is shorter (e.g. Col1) it can be a perfect match
     # for multiple whitelist genes (e.g. Col1a1, Col1a2), then ask for confirmation
@@ -92,7 +93,7 @@ def validate_correct_gene(gene, species='mouse'):
     # perfect matches, ask. If no perfect and one imperfect match, take it.
     # If multiple imperfect or no imperfect, ask.
     if len(idx) == 1:
-        gene_closest = genes_idx[idx[0]]
+        gene_closest = gene_orderd[species][idx[0]]
         print(gene, gene_closest)
         return gene_closest
     else:
@@ -104,15 +105,8 @@ def validate_correct_genestr(genestr, species='mouse', missing='return_none'):
     '''Validate gene names and correct misspellings if possible'''
 
     # TODO: check punctuation more accurately
+    # Capitalization is taken care of in "validate_correct_gene"
     genes = genestr.strip(' ').replace('.', ',').replace(';', ',').split(',')
-
-    print(genes)
-
-    # Make everything with the right capitalisation at the very least
-    if species == 'mouse':
-        genes = [g.capitalize() for g in genes]
-    else:
-        genes = [g.upper() for g in genes]
 
     # Validate
     genesv = []

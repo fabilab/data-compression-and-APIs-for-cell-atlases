@@ -1,6 +1,6 @@
 {
     "compressed-atlas-container": {
-        "image": ":compressed-atlas-service.compressed-atlas.14",
+        "image": ":compressed-atlas-service.compressed-atlas.15",
         "ports": {
             "5000": "HTTP"
         }

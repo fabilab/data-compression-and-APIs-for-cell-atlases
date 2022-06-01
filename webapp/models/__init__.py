@@ -23,6 +23,11 @@ fn_atlasd = {
     'human': fdn_data + "human_condensed_lung_atlas_in_cpm.h5",
 }
 fn_GO = fdn_data + 'mouse_GO_tables.pkl'
+fn_friendsd = {
+    'mouse': 'gene_friends.h5',
+    'human': 'human_gene_friends.h5',
+    'lemur': 'mouselemur_gene_friends.h5',
+}
 
 
 def read_gene_order(data_type='celltype', species='mouse'):
@@ -110,7 +115,6 @@ def read_number_cells_from_file(df_type, species='mouse'):
     fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas) as f:
         dic = f[df_type]
-
         labels = np.array(dic['cell_count']['axis0'].asstr())
         values = np.array(dic['cell_count']['block0_values'])[0]
         ncells = pd.Series(data=values, index=labels)
@@ -164,13 +168,25 @@ def dataset_unified(gene, species='mouse'):
     '''
     from plotly import colors as pcolors
 
-    ncells = read_number_cells_from_file('celltype_dataset_timepoint')
-    countg = read_counts_from_file('celltype_dataset_timepoint', genes=[gene]).iloc[0]
+    ncells = read_number_cells_from_file(
+            'celltype_dataset_timepoint',
+            species=species,
+            )
+    countg = read_counts_from_file(
+            'celltype_dataset_timepoint', genes=[gene],
+            species=species,
+            ).iloc[0]
 
     # Sort the rows
-    timepoint_order = ['E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
+    if species == 'mouse':
+        timepoint_order = [
+            'E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
+        dataset_order = ['ACZ', 'Hurskainen2021', 'TMS']
+    else:
+        timepoint_order = ['31wk', '3yr', '31yr', '~60yr']
+        dataset_order = ['Wang et al 2020', 'TS']
+
     timepoint_orderd = {x: i for i, x in enumerate(timepoint_order)}
-    dataset_order = ['ACZ', 'Hurskainen2021', 'TMS']
     dataset_orderd = {x: i for i, x in enumerate(dataset_order)}
     ncells.index = ncells.index.str.split('_', 1, expand=True)
     ncells = ncells.unstack(0, fill_value=0)
@@ -182,8 +198,8 @@ def dataset_unified(gene, species='mouse'):
     countg = countg.unstack(0, fill_value=-1).loc[ncells.index]
     ncells = ncells.loc[:, countg.columns]
 
-    # Set canonical celltype order
-    celltypes_adj, idx = adjust_celltypes(ncells.columns)
+    # Set canonical celltype names and order
+    celltypes_adj, idx = adjust_celltypes(ncells.columns, species=species)
     ncells = ncells.iloc[:, idx]
     countg = countg.iloc[:, idx]
     ncells.columns = celltypes_adj
@@ -227,7 +243,7 @@ def get_friends(genes, species="mouse"):
     if len(genes) == 0:
         return ''
 
-    with h5py.File(fdn_data + "gene_friends.h5", "r") as h5_data:
+    with h5py.File(fdn_data + fn_friendsd[species], "r") as h5_data:
         for gene in genes:
             friends.append(gene)
             # We only took decently expressed genes, but this might appear

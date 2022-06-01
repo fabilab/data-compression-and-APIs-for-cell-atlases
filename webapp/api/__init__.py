@@ -119,15 +119,33 @@ class geneExp(Resource):
 
 class geneExpTimeUnified(Resource):
     def get(self):
-        gene = request.args.get("gene")
+        gene_name = request.args.get("gene")
+        species = request.args.get("species")
 
-        gene_id = get_gene_ids([gene])[gene]
+        # If we are switching species, get orthologs
+        new_species = request.args.get("newSpecies")
+        if new_species is not None:
+            gene_name = get_orthologs(
+                [gene_name], species, new_species,
+            )[new_species]
 
-        data = dataset_unified(gene)
+            if len(gene_name) == 0:
+                return None
+            gene_name = gene_name[0]
+
+            species = new_species
+            missing_genes = 'skip'
+
+        else:
+            missing_genes = 'throw'
+
+        gene_id = get_gene_ids([gene_name], species=species)[gene_name]
+
+        data = dataset_unified(gene_name, species=species)
         data['gene_id'] = gene_id
 
-        similar_genes = get_friends([gene]).split(',')
-        if similar_genes[0] == gene:
+        similar_genes = get_friends([gene_name], species=species).split(',')
+        if similar_genes[0] == gene_name:
             similar_genes = similar_genes[1:]
         data['similarGenes'] = similar_genes
 

@@ -147,7 +147,7 @@ function AssembleAjaxRequest() {
     }
     $.ajax({
         type:'GET',
-        url:'/data_heatmap_unified',
+        url:'/data/development',
         data: $.param(requestData),
         dataType:'json',
         success: function(result) {
@@ -177,7 +177,41 @@ function updateSimilarGenes() {
     $(".geneSuggestion").click(onClickGeneSuggestions);
 }
 
-// Check another species, same genes
+// Check another species, same gene
+function onClickSpeciesSuggestions() {
+    var geneName = $('#searchGeneName').val();
+    const newSpecies = this.id.slice("suggest".length);
+    let requestData = {
+        newSpecies: newSpecies,
+        gene: geneName,
+        species: species,
+    }
+    $.ajax({
+        type:'GET',
+        url:'/data/development',
+        data: $.param(requestData),
+        success: function(result) {
+            // Store global variable
+            plotData = result;
+
+            $("#suggest"+newSpecies).text(species.slice(0, 1).toUpperCase()+species.slice(1)).prop('id', "suggest"+species);
+            species = newSpecies;
+
+            updateSimilarGenes();
+
+            // Update search box: corrected gene names, excluding missing genes
+            setSearchBox(result['gene']);
+
+            updatePlot();
+        },
+        error: function (e) {
+          alert('Error: Could not find orthologs for '+geneName+'.')
+        }
+    });
+}
+
+
+// Check out a similar gene
 function onClickGeneSuggestions() {
     var gene = $('#searchGeneName').val();
     var newGene = $(this).text();
@@ -191,6 +225,12 @@ function onClickGeneSuggestions() {
     // Get new data and plot
     AssembleAjaxRequest();
 }
+
+
+function setSearchBox(text, gseaText = "") {
+    $('#searchGeneName').val(text);
+}
+
 
 
 function updatePlot() {
@@ -214,6 +254,7 @@ function updatePlot() {
 $("#searchOnClick").click(AssembleAjaxRequest);
 $(document).ready(AssembleAjaxRequest);
 $(".geneSuggestion").click(onClickGeneSuggestions);
+$(".speciesSuggestion").click(onClickSpeciesSuggestions);
 
 // Normalise the data with log10 and generate a new plot (when user click the button)
 $("#log10OnClick" ).click(function() {
@@ -247,3 +288,8 @@ $("#originalOnClick" ).click(function() {
     updatePlot();
 });
 
+$("body").keyup(function(event) {
+    if (event.keyCode === 13) {
+        $("#searchOnClick").click();
+    }
+});

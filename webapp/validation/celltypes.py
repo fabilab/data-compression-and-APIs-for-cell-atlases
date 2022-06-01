@@ -49,6 +49,9 @@ celltype_tuples = [
     ('neutrophil', 'Neutrophil'),
     'Alveolar type I',
     'Alveolar type II',
+    'Club',
+    'Ciliated',
+    'Basal',
 ]
 celltype_dict = {}
 for ct in celltype_tuples:
@@ -59,7 +62,7 @@ for ct in celltype_tuples:
 celltype_dict_inv = {val: key for key, val in celltype_dict.items()}
 
 
-def adjust_celltypes(celltypes_raw):
+def adjust_celltypes(celltypes_raw, species='mouse'):
     # TODO: reorder even when it's stratified by dataset/timepoint
     for ct in celltypes_raw:
         if '_ACZ' in ct:
@@ -73,7 +76,10 @@ def adjust_celltypes(celltypes_raw):
             ct1, ct2 = ct, ct
         else:
             ct1, ct2 = ct
-        if ct1 in celltypes_raw:
+        if ct2 in celltypes_raw:
+            idx.append(celltypes_raw.index(ct2))
+            ct_adj.append(ct2)
+        elif ct1 in celltypes_raw:
             idx.append(celltypes_raw.index(ct1))
             ct_adj.append(ct2)
     return np.array(ct_adj), np.array(idx)

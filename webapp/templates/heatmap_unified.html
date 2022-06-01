@@ -10,6 +10,15 @@
           <span class="geneSuggestion suggestButton" id="suggest{{ g }}">{{ g }}</span>
         {% endfor %}
       </span>
+      <span>|</span>
+      <span class="suggestGroup" id="speciesSuggestions">
+        Other species: 
+        {% for spec in ["mouse", "human"] %}
+          {% if species != spec %}
+          <span class="speciesSuggestion suggestButton" id="suggest{{ spec }}">{{ spec|capitalize }}</span>
+          {% endif %}
+        {% endfor %}
+      </span>
     </div>
   </div>
 

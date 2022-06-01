@@ -145,17 +145,51 @@ if __name__ == '__main__':
             'cell_count': ncells,
         })
 
+    # Add an old age from Tabula Sapiens
+    age = '~60yr'
+    fn_out = data_fdn + 'human_condensed_lung_atlas_in_cpm.h5'
+    with pd.HDFStore(fn_out) as h5_data:
+        avg_exp = h5_data['celltype/gene_expression_average'].T
+        frac_exp = h5_data['celltype/gene_proportion_expression'].T
+        ncells = h5_data['celltype/cell_count'].T
+    columns = [x+'_TS_'+age for x in avg_exp.columns]
+    avg_exp.columns = columns
+    frac_exp.columns = columns
+    ncells.index = columns
+    genes = avg_exp.index
+
+    avgs.append({
+        'age': age,
+        'gene_expression_average': avg_exp,
+        'gene_proportion_expression': frac_exp,
+        'cell_count': ncells,
+    })
+
+    # align gene names with TS, that's the order we use in gene_orderd
+    for x in avgs[:-1]:
+        for key in ['gene_expression_average', 'gene_proportion_expression']:
+            # Default to zero
+            df = pd.DataFrame(
+                np.zeros((len(genes), x[key].shape[1]), np.float32),
+                index=genes,
+                columns=x[key].columns,
+            )
+            idx = list(set(genes) & set(x[key].index))
+            df.loc[idx] = x[key].loc[idx]
+            x[key] = df
+        
     # Restructure as a single dataframe for each category
     # celltype_dataset_timepoint
-    avg_exp = pd.concat([x['gene_expression_average'] for x in avgs]).fillna(0).astype(np.float32)
-    frac_exp = pd.concat([x['gene_proportion_expression'] for x in avgs]).fillna(0).astype(np.float32)
-    ncells = pd.concat([x['cell_count'] for x in avgs]).fillna(0)
+    avg_exp = pd.concat([x['gene_expression_average'] for x in avgs], axis=1).fillna(0).astype(np.float32)
+    frac_exp = pd.concat([x['gene_proportion_expression'] for x in avgs], axis=1).fillna(0).astype(np.float32)
+    ncells = pd.concat([x['cell_count'] for x in avgs]).fillna(0).to_frame(
+            'celltype_dataset_timepoint').T
 
     # Store to file (pandas can read/write from a previously touched file)
     print('Store compressed atlas')
     fn_out = data_fdn + 'human_condensed_lung_atlas_in_cpm.h5'
     with pd.HDFStore(fn_out) as h5_data:
-        h5_data.put('celltype_dataset_timepoint/gene_expression_average', avg_exp)
-        h5_data.put('celltype_dataset_timepoint/gene_proportion_expression', frac_exp)
+        h5_data.put('celltype_dataset_timepoint/gene_expression_average', avg_exp.T)
+        h5_data.put('celltype_dataset_timepoint/gene_proportion_expression', frac_exp.T)
         h5_data.put('celltype_dataset_timepoint/cell_count', ncells)
 

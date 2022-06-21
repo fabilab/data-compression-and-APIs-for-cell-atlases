@@ -26,7 +26,8 @@ function AssembleAjaxRequestMarker() {
             selected_id  = this.id;
         }
     });
-    var selected_cell = selected_id.split('_')[0]
+    var selected_cell = selected_id.split('_')[0];
+
 
     // Generate the plot
     $.ajax({
@@ -34,7 +35,11 @@ function AssembleAjaxRequestMarker() {
         url:'http://127.0.0.1:5000/markers_page',
         data: "celltype=" + selected_cell,
         success: function(result) {
+            $('#loadingtext').show();
+            $('#loadingbar').show();
             HeatmapMarkerGenes(result,'',selected_cell);
+            $('#loadingtext').hide();
+            $('#loadingbar').hide();
         },
         error: function (e) {
             alert('Request data fail (no cell types available)')

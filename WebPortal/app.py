@@ -9,7 +9,7 @@ import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified
+from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified, select_marker_genes
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -42,6 +42,15 @@ def page2():
 @app.route('/unified',methods=['GET'])
 def page3():
     return render_template('Unified.html',highlight='page3_button',search_box='Car4')
+
+@app.route('/marker',methods=['GET'])
+def page4():
+    return render_template('markerGenes.html',highlight='page4_button',search_box='Car4')
+
+class getAllCelltypes(Resource):
+    def get(self):
+        df = read_file('celltype','Car4')
+        return list(df.columns)
 
 class geneNames(Resource):
     def get(self):
@@ -120,12 +129,20 @@ class geneExpUnified(Resource):
 
         return dataset_unified(genename)
 
+class markerGenes(Resource):
+    def get(self):
+        celltype = request.args.get('celltype')
+        print('I am here ' + celltype)
+        return select_marker_genes(celltype)
+
 # this is an API endpoint (return data)
+api.add_resource(getAllCelltypes, '/all_cell_types')
 api.add_resource(geneExp, '/data')
 api.add_resource(geneNames, '/all_gene_names')
 api.add_resource(plotsForSeachGenes, '/2_genes')
 api.add_resource(geneExpTime, '/data_timepoint')
 api.add_resource(geneExpUnified, '/data_unified')
+api.add_resource(markerGenes, '/markers_page')
 
 if __name__ == '__main__':
     app.run(debug=True)

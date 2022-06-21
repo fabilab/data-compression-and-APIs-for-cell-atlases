@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Single Cell Compressed Atlas Webportal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.css">
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
@@ -40,6 +41,13 @@
     {% endif %}     
         Unified(Timepoint&Dataset)
       </a>
+      {% if highlight == 'page4_button' %}
+      <a href="http://127.0.0.1:5000/marker" class="button is-ghost has-text-info">
+    {% else %}    
+      <a href="http://127.0.0.1:5000/marker" class="button is-ghost has-text-grey-darker">
+    {% endif %}     
+        MarkerGenes
+      </a>
     </div>
     <div class="navbar-end">
       <div class="field has-addons">
@@ -50,11 +58,6 @@
           <input class="input is-info" id="searchGeneName" type="text" value={{search_box}} placeholder="gene">
           {% endif %}
         </div>
-        <!-- <div class="select is-multiple">
-          <select multiple size="8" id="matchNames">
-            
-          </select>
-        </div> -->
         <div class="control">
           <a class="button is-info" id="searchOnClick">
             <i class="fas fa-search"></i>

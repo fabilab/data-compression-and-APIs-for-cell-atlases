@@ -1,4 +1,3 @@
-from xml.dom import NotFoundErr
 import h5py
 import numpy as np
 import pandas as pd
@@ -15,50 +14,92 @@ with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
 
 # gives the name of dataset we want as an input
 # celltype / celltype_dataset / celltype_dataset_timepoint
-def read_file(df_type,genes):
-    ####### 4
-    start = time.time()
-    print("read file start") 
-    genes = genes.split(",") 
-    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
-        # List of genes
-        print("before L")
-        print("after L")
-        indexs = []
-        if isinstance(genes,list):
-            for gene in genes:
-                indexs.append(L.index(gene))
-        else:
-            indexs.append(L.index(genes))
-        print("after loop")
-        # sort the indexs
-        indexs.sort()
-        new_genes = []
-        for index in indexs:
-            new_gene = L[index]
-            new_genes.append(new_gene)
-        # expression table (only numbers,no index nor columns)
-        print("before data")
-        data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
-        columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
-        print("before dataframe")
-        df = pd.DataFrame(
-            data = data.T,
-            index = new_genes,
-            columns=columns,
-        )
-        end = time.time()
-        print("read file ends here")
-        print(end - start)
+def read_file(df_type,genes=None):
+    # Need to loop through all genes for the marker gene page
+    if genes is None:
+        with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+            df = pd.DataFrame(
+                    data=np.array(h5_data[df_type]['gene_expression_average']['block0_values']).astype(np.float32),
+                    index=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr()),
+                    columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'].asstr()),
+                ).T
+        return df 
+    # Only consider user input genes
+    else:
+        genes = genes.split(",") 
+        with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+            # List of genes
+            print("before L")
+            print("after L")
+            indexs = []
+            if isinstance(genes,list):
+                for gene in genes:
+                    indexs.append(L.index(gene))
+            else:
+                indexs.append(L.index(genes))
+            print("after loop")
+            # sort the indexs
+            indexs.sort()
+            new_genes = []
+            for index in indexs:
+                new_gene = L[index]
+                new_genes.append(new_gene)
+            # expression table (only numbers,no index nor columns)
+            print("before data")
+            data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
+            columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
+            print("before dataframe")
+            df = pd.DataFrame(
+                data = data.T,
+                index = new_genes,
+                columns=columns,
+            )
 
-    return df
+        return df
+
+# detect outlier in a list of values
+# returns the outlier value
+def detect_outlier(expression_list):
+    threshold=4.8
+    mean_1 = np.mean(expression_list)
+    std_1 =np.std(expression_list)
+    outliers = []
+    for y in expression_list:
+        z_score= (y - mean_1)/std_1 
+        if np.abs(z_score) > threshold:
+            outliers.append(y)
+    return outliers
+
+# given a gene name
+# find out which celltype has an abnormally high/low expression value
+def get_outlier_celltype(df,gene_name):
+    cell_type_candidate = []
+    target_df = df.loc[[gene_name]]
+    outlier_values = detect_outlier(target_df.values[0])
+    for celltype in target_df.columns:
+        if target_df[celltype].values[0] in outlier_values:
+            cell_type_candidate.append(celltype)
+    return cell_type_candidate
+
+
+# Return dataframe which contains only possible marker genes of a given celltype:
+def select_marker_genes(celltype):
+    # celltype = re.sub('\+', '\+', celltype)
+    print(celltype)
+    df = read_file("celltype")
+    possible_markers = []
+    for gene in df.index:
+        if celltype in get_outlier_celltype(df,gene):
+            possible_markers.append(gene)
+    df_markers = df.loc[possible_markers] 
+
+    return json.loads(df_markers.to_json())
+
 
 # this function is used when more multiple gene names are searched by the user
 # always run the read_file() to get dataframe in the right format before running this 
 def data_preprocessing(input_gene_names,df_type):
     ######### 3
-    start = time.time()
-    print("data preprocesisng start")
     df = read_file(df_type,input_gene_names)
     df_genes = df.index # all the genes that available in the current dataframe
     for search_gene in input_gene_names.split(","):
@@ -72,9 +113,7 @@ def data_preprocessing(input_gene_names,df_type):
         a_gene_names = input_gene_names.split(",")
         plot_df = df.filter(items = a_gene_names,axis=0)
         plot_data = plot_df.T
-    end = time.time()
-    print("preprocessing ends here")
-    print(end - start)
+
     ######## 6
     return plot_data
 

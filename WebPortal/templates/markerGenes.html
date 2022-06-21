@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+  <!-- Plots below -->
+  <div class="container" id="dataDisplay">
+    <div class="columns">
+      <div class="column is-3 is-multiline">
+        <div class="box">
+          <div class="block">
+            <p class="has-text-weight-bold">Available Cell Types</p>
+            <a class="is-size-7" href="https://www.ebi.ac.uk/ols/ontologies/cl">Cell Ontology</a>
+            <i class="fas fa-external-link-alt"></i>
+          </div>
+          <div class="block" id="celltypeFilter" style="overflow-y:scroll;height: 400px;"></div>
+          <div class="block has-text-centered">
+            <button class="button is-info is-outlined">APPLY</button>
+          </div>
+        </div>
+      </div>
+      <div class="column is-9">
+        <div id="HeatmapMarkerGene" class="box" style="width: 100%">
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="/js/MarkerGenes.js"></script>
+  <script src="/js/HeatmapMarkerGenes.js"></script>
+{% endblock %}

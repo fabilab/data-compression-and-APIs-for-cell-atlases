@@ -1,4 +1,4 @@
-function HeatmapMarkerGenes(result,html_element_id) {
+function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
         // const start = performance.now();
         // console.log("start plotting the heatmap");
         // check the button id active
@@ -42,7 +42,7 @@ function HeatmapMarkerGenes(result,html_element_id) {
             };
             var layout = {
                 autosize: true, 
-                title: 'Heatmap of gene expression level in selected cell types',
+                title: 'Heatmap of marker genes of ' + selected_cell,
                 xaxis: {
                     title: '<b>Cell types<b>',
                     automargin: true,

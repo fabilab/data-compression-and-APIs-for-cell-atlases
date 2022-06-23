@@ -28,7 +28,8 @@ function AssembleAjaxRequestMarker() {
     });
     var selected_cell = selected_id.split('_')[0];
 
-
+    $('#loadingtext').hide();
+    $('#loadingbar').hide();
     // Generate the plot
     $.ajax({
         type:'GET',
@@ -46,5 +47,11 @@ function AssembleAjaxRequestMarker() {
         }
     });
 }
-$("#applyOnClick" ).click(AssembleAjaxRequestMarker)
+$("#applyOnClick").click(AssembleAjaxRequestMarker)
 $(document).ready(AssembleAjaxRequestMarker)
+
+function clearCheckbox() {
+    $('input[type=checkbox]').prop('checked', false);
+}
+
+$("#clearOnClick").click(clearCheckbox)

@@ -132,7 +132,6 @@ class geneExpUnified(Resource):
 class markerGenes(Resource):
     def get(self):
         celltype = request.args.get('celltype')
-        print('I am here ' + celltype)
         return select_marker_genes(celltype)
 
 # this is an API endpoint (return data)

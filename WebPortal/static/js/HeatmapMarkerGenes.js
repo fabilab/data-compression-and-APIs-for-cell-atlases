@@ -17,12 +17,16 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
             let x_axis = celltypes;
             // y-axis: genes
             let y_axis = genes;
+            let y_ticks = [];
+            for (var i = 0; i < genes.length; i++) {
+                y_ticks[i] = `<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`;
+            }
             
             let ngenes = y_axis.length;
             let ncelltypes = x_axis.length;
 
             // let heatmap_width = 1300;
-            let heatmap_height = 270 + 10 * ngenes;
+            let heatmap_height = 270 + 20 * ngenes;
 
             let data_content = [];
             for (var i = 0; i < ngenes; i++) {
@@ -37,7 +41,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
 
             var data = {
                 type: 'heatmap',
-                hoverongaps: false,
+                // hoverongaps: false,
                 colorscale: 'Reds',
             };
             var layout = {
@@ -50,7 +54,8 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
                 },
                 yaxis: {
                     title: '<b>Genes<b>',
-                    automargin: true
+                    automargin: true,
+                    autotick: false,
                 },
                 // with: heatmap_width,
                 height: heatmap_height,
@@ -58,7 +63,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
             
             data['z'] = data_content;
             data['x'] = x_axis;
-            data['y'] = y_axis;
+            data['y'] = y_ticks;
             Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
         };
     } 

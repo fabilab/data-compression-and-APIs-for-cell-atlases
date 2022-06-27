@@ -20,7 +20,7 @@ function AssembleAjaxRequestMarker() {
     });
 
     // update the plot when a new cell type from the checkbox is selected 
-    var selected_id = 'B cell'
+    var selected_id = ''
     $('input[type=checkbox]').each(function () {
         if (this.checked === true) {
             selected_id  = this.id;
@@ -30,22 +30,25 @@ function AssembleAjaxRequestMarker() {
 
     $('#loadingtext').hide();
     $('#loadingbar').hide();
+    if (selected_id !== '') {
+        $('#markerWelcome').hide();
+        $('#loadingtext').show();
+        $('#loadingbar').show();
     // Generate the plot
-    $.ajax({
-        type:'GET',
-        url:'http://127.0.0.1:5000/markers_page',
-        data: "celltype=" + selected_cell,
-        success: function(result) {
-            $('#loadingtext').show();
-            $('#loadingbar').show();
-            HeatmapMarkerGenes(result,'',selected_cell);
-            $('#loadingtext').hide();
-            $('#loadingbar').hide();
-        },
-        error: function (e) {
-            alert('Request data fail (no cell types available)')
-        }
-    });
+        $.ajax({
+            type:'GET',
+            url:'http://127.0.0.1:5000/markers_page',
+            data: "celltype=" + selected_cell.replace('+','%2b'),
+            success: function(result) {
+                HeatmapMarkerGenes(result,'',selected_cell);
+            },
+            error: function (e) {
+                alert('Request data fail (no cell types available)')
+            }
+        });
+        $('#loadingtext').hide();
+        $('#loadingbar').hide();
+    }
 }
 $("#applyOnClick").click(AssembleAjaxRequestMarker)
 $(document).ready(AssembleAjaxRequestMarker)

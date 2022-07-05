@@ -66,7 +66,7 @@ def detect_outlier(expression_list):
     outliers = []
     for y in expression_list:
         z_score= (y - mean_1)/std_1 
-        if np.abs(z_score) > threshold:
+        if z_score > threshold:
             outliers.append(y)
     return outliers
 
@@ -75,7 +75,7 @@ def detect_outlier(expression_list):
 def get_outlier_celltype(df,gene_name):
     cell_type_candidate = []
     target_df = df.loc[[gene_name]]
-    outlier_values = detect_outlier(target_df.values[0])
+    outlier_values = detect_outlier([val for val in target_df.values[0] if val > 0])
     for celltype in target_df.columns:
         if target_df[celltype].values[0] in outlier_values:
             cell_type_candidate.append(celltype)
@@ -87,6 +87,7 @@ def select_marker_genes(celltype):
     # celltype = re.sub('\+', '\+', celltype)
     print(celltype)
     df = read_file("celltype")
+    # df_log10 = np.log10(df)
     possible_markers = []
     for gene in df.index:
         if celltype in get_outlier_celltype(df,gene):

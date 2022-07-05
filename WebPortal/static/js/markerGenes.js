@@ -1,36 +1,34 @@
-function AssembleAjaxRequestMarker() {
-
-    // Load a list of cell types check box
+function pagesetup() {
+    $('#loadingtext').hide();
+    $('#loadingbar').hide();
     $.ajax({
         type:'GET',
         url:'http://127.0.0.1:5000/all_cell_types',
         success: function(result) {
-            for(var i=0;i<result.length;i++) {
-                var celltype = result[i];
-                // var $input = $("<input>", {id:`${celltype}_check`,type:'checkbox'});
-                var $label = $("<div>",{class:'block mgb-small',style:"margin-bottom: 0.0rem"});
-                $label.append(`<input id='${celltype}_check' type='checkbox'> ${celltype}`);
+            var celltype_categories = Object.keys(result);
 
-                $("#celltypeFilter").append($label);
+            for(var i=0;i<celltype_categories.length;i++) {
+                var category = celltype_categories[i];
+                $("#celltype_selection").append(`<label class='radio has-text-weight-bold' disabled>===== ${category} =====</label><br>`);
+                var celltypes = result[category];
+                for (var j=0;j<celltypes.length;j++) {
+                    $("#celltype_selection").append(`<label class='radio'><input type='radio' name='celltype_selection' value='${celltypes[j]}'/>${celltypes[j]}</label><br>`);
+                }
             }
         },
         error: function (e) {
             alert('Request data fail (no cell types available)')
         }
     });
+}
 
-    // update the plot when a new cell type from the checkbox is selected 
-    var selected_id = ''
-    $('input[type=checkbox]').each(function () {
-        if (this.checked === true) {
-            selected_id  = this.id;
-        }
-    });
-    var selected_cell = selected_id.split('_')[0];
+function AssembleAjaxRequestMarker() {
+
+    var selected_cell = $('input[name="celltype_selection"]:checked').val();
 
     $('#loadingtext').hide();
     $('#loadingbar').hide();
-    if (selected_id !== '') {
+    if (selected_cell) {
         $('#markerWelcome').hide();
         $('#loadingtext').show();
         $('#loadingbar').show();
@@ -40,21 +38,23 @@ function AssembleAjaxRequestMarker() {
             url:'http://127.0.0.1:5000/markers_page',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
+                $('#loadingtext').hide();
+                $('#loadingbar').hide();
                 HeatmapMarkerGenes(result,'',selected_cell);
             },
             error: function (e) {
                 alert('Request data fail (no cell types available)')
             }
         });
-        $('#loadingtext').hide();
-        $('#loadingbar').hide();
     }
 }
 $("#applyOnClick").click(AssembleAjaxRequestMarker)
-$(document).ready(AssembleAjaxRequestMarker)
+$(document).ready(pagesetup)
 
 function clearCheckbox() {
-    $('input[type=checkbox]').prop('checked', false);
+    $('input[name="celltype_selection"]:checked').each(function(){
+        $(this).prop('checked', false);
+    });
 }
 
 $("#clearOnClick").click(clearCheckbox)

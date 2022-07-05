@@ -27,6 +27,10 @@ def send_css(path):
     return send_from_directory('static/css', path)
 
 @app.route('/',methods=['GET'])
+def home():
+    return render_template('home.html')
+
+@app.route('/heatmap_by_celltypes',methods=['GET'])
 # def helloworld():
 def page1():
     return render_template('byCelltype.html',highlight='home_button',search_box='Car4,Vwf,Col1a1,Ptprc,Ms4a1')
@@ -49,8 +53,62 @@ def page4():
 
 class getAllCelltypes(Resource):
     def get(self):
-        df = read_file('celltype','Car4')
-        return list(df.columns)
+        result = {
+            'Connective tissue':[
+                'Adventitial fibroblast',
+                'Early adventitial fibroblast',
+                'Fibroblast precursor',
+                'Myofibroblast and smooth muscle precursor',
+                'Proliferating fibroblast'
+            ],
+            'Immune system':[
+                'B cell',
+                'DC I',
+                'DC II',
+                'DC III',
+                'IL cell',
+                'Mac I',
+                'Mac II',
+                'Mac III',
+                'Mac IV',
+                'Mac V',
+                'NK cell',
+                'T cell',
+                'basophil',
+                'mast cell',
+                'neutrophil'
+            ],
+            'Lungs':[
+                'Alveolar fibroblast',
+                'Alveolar type I',
+                'Alveolar type II',
+                'Early alveolar fibroblast'
+            ],
+            'Smooth muscle':[
+                'Airway smooth muscle',
+                'Early airway smooth muscle',
+                'Myofibroblast',
+                'Proliferating myofibroblast',
+                'Vascular smooth muscle'
+            ],
+            'Vasculature':[
+                'Arterial EC I',
+                'Arterial EC II',
+                'Car4+ capillaries',
+                'Early Car4- capillaries',
+                'Late Car4- capillaries',
+                'Lymphatic EC',
+                'Nonproliferative embryonic EC',
+                'Vasculature',
+                'Proliferating pericyte',
+                'Proliferative EC',
+                'Venous EC'
+            ],
+            'Others':[
+                'Striated muscle'
+            ]
+        }
+        return result
 
 class geneNames(Resource):
     def get(self):

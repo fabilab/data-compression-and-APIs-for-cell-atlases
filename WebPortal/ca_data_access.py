@@ -25,11 +25,16 @@ def get_marker_genes_list(celltype=None):
         
     return data[celltype]
 
-
-# gives the name of dataset we want as an input
-# celltype / celltype_dataset / celltype_dataset_timepoint
 def read_file(df_type,genes=None):
-    # Need to loop through all genes for the marker gene page
+    '''
+    read in a .h5 file from the source directory,
+    return a dataframe based on the user's specified dataset type and genes of interest
+        parameters:
+            dataset type(string):  celltype/celltype_dataset/celltype_dataset_timepoint
+            genes name (string)
+        Return:
+            a dataframe (df)
+    '''
     genes = genes.split(",") 
     with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
         # List of genes
@@ -56,14 +61,20 @@ def read_file(df_type,genes=None):
 
     return df
 
-# Return dataframe which contains only possible marker genes of a given celltype:
 def marker_genes_expression(celltype):
+    '''
+    return a dataframe containing expression level of a list of genes in all celltype
+    N rows(marker genes of the specified celltype) x M columns (all celltypes)
+        parameter:
+            celltype selected by the user (string)
+        return:
+            json object with genes as keys, value: list of celltype and gene expression values
+    '''
     
     gene_list = get_marker_genes_list(celltype)
     gene_list = ','.join(gene_list)
     df = read_file("celltype",gene_list)
     df['current'] = df[celltype]
-    print(df['current'])
     for column in df.columns:
         df[column] = (df[column] / df['current']).round(3)
     df.drop(['current'], axis=1,inplace=True)
@@ -73,7 +84,6 @@ def marker_genes_expression(celltype):
 # this function is used when more multiple gene names are searched by the user
 # always run the read_file() to get dataframe in the right format before running this 
 def data_preprocessing(input_gene_names,df_type):
-    ######### 3
     df = read_file(df_type,input_gene_names)
     df_genes = df.index # all the genes that available in the current dataframe
     for search_gene in input_gene_names.split(","):
@@ -88,16 +98,19 @@ def data_preprocessing(input_gene_names,df_type):
         plot_df = df.filter(items = a_gene_names,axis=0)
         plot_data = plot_df.T
 
-    ######## 6
     return plot_data
 
-# this is a requirement if you re using this function as a sorting criteria
-# return -1 if name_1 comes before name_2
-# return 1 if name_2 comes before name_1
-# return 0 if name_1 == name_2
-
-# output should be in this order: E18.5, P1 P3 P7 P14 P21, 3m 18m 24m
 def timepoint_reorder(tp1, tp2):
+    '''
+    sort the order of two given timepoints, such that timepoints are in order:
+    --> E18.5, P1 P3 P7 P14 P21, 3m 18m 24m -->
+        parameters:
+            2 timepoints (string)
+        return:
+            0 if tp_1 == tp_2
+            -1 if tp_1 comes before tp_2
+             1 if tp_2 comes before tp_1
+    '''
     if '_' in tp1:
         tp1 = tp1.split('_')[1]
     
@@ -192,10 +205,24 @@ def dataset_by_timepoint(genename,df_type):
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
 
-# def dataset_by_timepoint_dataset(genename,datatype,plottype):
 ''' generate a dictionary for the unified heatmap data'''
 def dataset_unified(genename):
-    # ,datatype,plottype
+    '''
+    generate a dictionary for the unified heatmap data
+        parameter: 
+            a single gene name (string)
+        return:
+            a dictionary contains expression value of a gene in different timepoints and celltypes
+            {
+            "ACZ_E18.5": {
+                "Adventitial FB": -1.0,
+                "Early adventitial FB": 0.020416259765625,
+            }
+            "TMS_P21:" {
+                "Adventitial FB": 0.23456,
+                "Early adventitial FB": -1,
+            }
+    '''
     df = read_file('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []
@@ -209,19 +236,6 @@ def dataset_unified(genename):
         if dataset_timepoint not in dt_combinations:
             dt_combinations.append(dataset_timepoint) 
 
-    # create a dictionary of dictionary that contains dataset+timepoint as first key, then celltypes as the second keys
-    '''
-    {
-    "ACZ_E18.5": {
-        "Adventitial FB": -1.0,
-        "Early adventitial FB": 0.020416259765625,
-    }
-    "TMS_P21:" {
-        "Adventitial FB": 0.23456,
-        "Early adventitial FB": -1,
-    }
-        '''
-    #  expression = {}
     gene_exp_df = pd.DataFrame(np.eye(len(all_celltypes),len(dt_combinations)), columns=dt_combinations, index=all_celltypes)
     for dt in dt_combinations:
         for ct in all_celltypes:
@@ -230,15 +244,10 @@ def dataset_unified(genename):
                 exp_value = -1
             else:
                 exp_value = float(filtered_df[name].values[0])
-            
-            # if datatype == "log10":
-            #     if(exp_value >= 0):
-            #         exp_value = np.log10(0.1+exp_value)
-            # expression[dt][ct] = exp_value
+
             gene_exp_df[dt][ct] = exp_value
     
     cell_type_label = all_celltypes
-    # includes a hierarchical clustered celltype order in the result
     distance = pdist(gene_exp_df.values)
     Z = linkage(distance,optimal_ordering=True)
     new_order = leaves_list(Z)

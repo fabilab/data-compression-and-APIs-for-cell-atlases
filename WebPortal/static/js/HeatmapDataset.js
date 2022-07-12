@@ -1,10 +1,10 @@
-var dataForPlots = {};
+var dataForPlotsDataset = {};
 
 function plotAll(result_wrapper) {
     if (result_wrapper === "") {
-        result_wrapper = dataForPlots['result_wrapper'];
+        result_wrapper = dataForPlotsDataset['result_wrapper'];
     } else {
-        dataForPlots['result_wrapper'] = result_wrapper;
+        dataForPlotsDataset['result_wrapper'] = result_wrapper;
     }
     
     let num = 1;
@@ -17,12 +17,12 @@ function plotAll(result_wrapper) {
 }
 
 function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
-    let useLog = dataForPlots['useLog'];
+    let useLog = dataForPlotsDataset['useLog'];
     
     const result = result_wrapper['result'][dataset_name];
     
     let celltypes;
-    let celltypeOrder = dataForPlots['celltypeOrder'];
+    let celltypeOrder = dataForPlotsDataset['celltypeOrder'];
 
     if (!celltypeOrder) {
         celltypes = Object.keys(result[Object.keys(result)[0]]);

@@ -49,6 +49,11 @@ def home():
 def dataExplore():
     return render_template('dataExplore.html')
 
+@app.route('/resources',methods=['GET'])
+def resources():
+    return render_template('resources.html')
+
+
 @app.route('/heatmap_by_celltypes',methods=['GET'])
 # def helloworld():
 def page1():

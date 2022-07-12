@@ -30,81 +30,106 @@
 		<a class="navbar-item" href="http://127.0.0.1:5000/about">
 			User Menu
 		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/about">     
-			Papers&Links
+		<a class="navbar-item" href="http://127.0.0.1:5000/resources">     
+			Resources
 		</a>
     </div>
   </nav>
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
   <div class="container">
     <div class="block">
-        <div class="tabs is-centered is-boxed mt-6">
-            <ul>
-              <li id="tabGeneral" class="is-active">
-                <a>
-                  <span>General</span>
-                </a>
-              </li>
-              <li id="tabDataset">
-                <a>
-                  <span>By Dataset</span>
-                </a>
-              </li >
-              <li id="tabTimepoints">
-                <a>
-                  <span>By timepoints</span>
-                </a>
-              </li>
-              <li id="tabMarker">
-                <a>
-                  <span>Marker Genes</span>
-                </a>
-              </li>
-            </ul>
-        </div>
+      <div class="tabs is-centered is-boxed mt-6">
+        <ul>
+          <li id="tabGeneral" class="is-active">
+            <a>
+              <span>General</span>
+            </a>
+          </li>
+          <li id="tabDataset">
+            <a>
+              <span>By Dataset</span>
+            </a>
+          </li >
+          <li id="tabTimepoints">
+            <a>
+              <span>Timepoint Unified</span>
+            </a>
+          </li>
+          <li id="tabMarker">
+            <a>
+              <span>Marker Genes</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>   
     <div class="block">
         <div class="columns">
-            <div class="column is-one-fifth">
-                <label class="label">Search Genes from database</label>
+          <div class="column is-one-fifth">
+              <div id="multiple_genes">
+                <label class="label">Search for multiple genes</label>
                 <div class="field has-addons">
-                    <div class="control">
-                        <a class="button is-info" id="searchOnClick">
-                            <i class="fas fa-search"></i>
-                        </a>
-                    </div>
-                    <div class="control">
-                      <input class="input" id="searchGeneName" type="text" placeholder="e.g.'Car4,Col1a1...'">
-                    </div>
+                  <div class="control">
+                    <a class="button is-info" id="searchOnClick_list">
+                        <i class="fas fa-search"></i>
+                    </a>
+                  </div>
+                  <div class="control">
+                    <input class="input" id="listGenes" type="text" placeholder="e.g.'Car4,Col1a1...'">
+                  </div>
                 </div>
-                <div class="field">
-                    <label class="label">Data type</label>
-                    <div class="control">
-                      <div class="select">
-                        <select id="selectDataType">
-                          <option value="cpm" selected>CPM(counts/million)</option>
-                          <option value="log">Log10 transformed</option>
-                        </select>
-                      </div>
-                    </div>
+              </div>
+              <div id="single_gene" hidden>
+                <label class="label">Search for ONE gene</label>
+                <div class="field has-addons">
+                  <div class="control">
+                      <a class="button is-info" id="searchOnClick_single">
+                        <i class="fas fa-search"></i>
+                      </a>
+                  </div>
+                  <div class="control">
+                    <input class="input" id="singleGene" type="text" placeholder="e.g.'Col1a1'">
+                  </div>
                 </div>
-                <div class="field">
-                    <label class="label">Data order</label>
-                    <div class="control">
-                      <div class="select">
-                        <select id="selectDataOrder">
-                          <option value="original">Original</option>
-                          <option value="clustered">Hierachical Clustered</option>
-                        </select>
-                      </div>
-                    </div>
+              </div>
+              <div class="field">
+                <label class="label">Data type</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="selectDataType">
+                      <option value="cpm" selected>CPM(counts/million)</option>
+                      <option value="log">Log10 transformed</option>
+                    </select>
+                  </div>
                 </div>
-            </div>
+              </div>
+              <div class="field">
+                <label class="label">Data order</label>
+                <div class="control">
+                  <div class="select">
+                    <select id="selectDataOrder">
+                      <option value="original">Original</option>
+                      <option value="clustered">Hierachical Clustered</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+          </div>
             <div class="column">                  
                 <!-- Display Plots belong this section -->
                 <div class="block">
-                    <div class="box mx-5 my-3" id="displayPlot"></div>
-                    <div class="box mx-5 my-3" id="scatter_plot"></div>
+
+                  <div class="box mx-5 my-3" id="displayPlot"></div>
+                  <div class="box mx-5 my-3" id="scatter_plot"></div>
+
+                  <div class="box mx-5 my-3" id="displayPlot_dataset">
+                    <div id="dataset_1"></div>
+                    <div id="dataset_2"></div>
+                    <div id="dataset_3"></div>
+                  </div>
+
+                  <div class="box mx-5 my-3" id="displayPlotUnified"></div>
+
                 </div>
             </div>
         </div>
@@ -113,6 +138,10 @@
   <script src="/js/scatterPlot.js"></script>
   <script src="/js/HeatmapCelltype.js"></script>
   <script src="/js/assembleHcellType.js"></script>
+  <script src="/js/assembleHtimepoints.js"></script>
+  <script src="/js/HeatmapDataset.js"></script>
+  <script src="/js/bigHeatmap.js"></script>
+  <script src="/js/HeatmapUnified.js"></script>
   <script src="/js/events.js"></script>
 </body>
 </html>

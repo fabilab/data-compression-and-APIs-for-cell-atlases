@@ -205,7 +205,6 @@ def dataset_by_timepoint(genename,df_type):
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
 
-''' generate a dictionary for the unified heatmap data'''
 def dataset_unified(genename):
     '''
     generate a dictionary for the unified heatmap data

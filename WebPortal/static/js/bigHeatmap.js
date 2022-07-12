@@ -1,7 +1,6 @@
 dataForPlotsUnified = {}
 
 function plotHeatmapUnified(result,html_element_id,gene_name) {
-    
     // flags passed by events.js
     let useLog = dataForPlotsUnified['useLog'];
     let celltypeOrder = dataForPlotsUnified['celltypeOrder'];
@@ -13,7 +12,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
     }
 
     if (html_element_id === "") {
-        html_element_id = "bigHeatMap";
+        html_element_id = "displayPlotUnified";
     }
 
     let celltypes;
@@ -123,6 +122,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
 
 
 function AssembleAjaxRequestUnified() {
+    console.log("swicth to unified");
     cpm_is_active = $("#cpmTab").hasClass('is-active');
     orginal_is_active = $("#originalOrderTab").hasClass('is-active')
     var plot_type = 'original';
@@ -136,14 +136,14 @@ function AssembleAjaxRequestUnified() {
         plot_type = "hieracical";
     }
     // action here when clicking the search button
-    var gene_name = $('#searchGeneName').val();
+    var gene_name = $('#singleGene').val();
 
     $.ajax({
             type:'GET',
             url:'http://127.0.0.1:5000/data_unified',
             data: "gene=" + gene_name,
             success: function(result) {
-                plotHeatmapUnified(result,"bigHeatMap");
+                plotHeatmapUnified(result,"displayPlotUnified");
             },
             error: function (e) {
                 alert('Request data Failed !')
@@ -151,5 +151,3 @@ function AssembleAjaxRequestUnified() {
         });
         $("#originalTab").addClass('is-active');
 }
-$("#searchOnClick" ).click(AssembleAjaxRequestUnified)
-$(document).ready(AssembleAjaxRequestUnified)

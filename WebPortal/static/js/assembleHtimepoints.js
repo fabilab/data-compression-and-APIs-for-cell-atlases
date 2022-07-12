@@ -1,5 +1,6 @@
 function AssembleAjaxRequestTimepoint() {
-
+  
+  console.log("switch by dataset");
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
   //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
   cpm_is_active = $("#cpmTab").hasClass('is-active');
@@ -15,10 +16,9 @@ function AssembleAjaxRequestTimepoint() {
     plot_type = "hieracical";
   }
   // action here when clicking the search button
-  var gene_name = $('#searchGeneName').val();
-
-  const gene_array = gene_name.split(",")
+  var gene_name = $('#singleGene').val();
   // sent gene names to the API
+  console.log(gene_name);
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data_timepoint',
@@ -31,5 +31,4 @@ function AssembleAjaxRequestTimepoint() {
     }
     });
   }
-$("#searchOnClick" ).click(AssembleAjaxRequestTimepoint)
-$(document).ready(AssembleAjaxRequestTimepoint)
+

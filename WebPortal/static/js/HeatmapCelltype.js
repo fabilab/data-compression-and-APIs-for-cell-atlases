@@ -1,15 +1,15 @@
-var dataForPlots = {};
+var dataForPlotsCellType = {};
 
 function HeatmapCelltype(result_wrapper, html_element_id) {
         // const start = performance.now();
         // console.log("start plotting the heatmap");
         // check the button id active
-        let useLog = dataForPlots['useLog'];
+        let useLog = dataForPlotsCellType['useLog'];
 
         if (result_wrapper === "") {
-            result_wrapper = dataForPlots['result_wrapper'];
+            result_wrapper = dataForPlotsCellType['result_wrapper'];
         } else {
-            dataForPlots['result_wrapper'] = result_wrapper;
+            dataForPlotsCellType['result_wrapper'] = result_wrapper;
         }
 
         if (html_element_id === "") {
@@ -18,7 +18,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
 
         let result = result_wrapper['result'];
         let celltypes;
-        let celltypeOrder = dataForPlots['celltypeOrder'];
+        let celltypeOrder = dataForPlotsCellType['celltypeOrder'];
 
         if (!celltypeOrder) {
             celltypes = Object.keys(result[Object.keys(result)[0]]);

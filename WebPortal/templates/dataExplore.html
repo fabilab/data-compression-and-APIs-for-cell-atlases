@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Escellearn</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  </head>
+  <body>
+  <!-- Navigation Bar -->
+  <nav class="navbar has-shadow is-spaced is-white" >
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <img src="./logo.png" style="max-height:2.5rem"/>
+      </div>
+    </div>
+    <div class="navbar-end">
+		<a class="navbar-item" href="http://127.0.0.1:5000/">
+			About
+		</a>
+		<a class="navbar-item is-active" href="http://127.0.0.1:5000/dataExplore">     
+			Explore Data
+		</a>
+		<a class="navbar-item" href="http://127.0.0.1:5000/about">
+			User Menu
+		</a>
+		<a class="navbar-item" href="http://127.0.0.1:5000/about">     
+			Papers&Links
+		</a>
+    </div>
+  </nav>
+  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
+  <div class="container">
+    <div class="block">
+        <div class="tabs is-centered is-boxed mt-6">
+            <ul>
+              <li id="tabGeneral" class="is-active">
+                <a>
+                  <span>General</span>
+                </a>
+              </li>
+              <li id="tabDataset">
+                <a>
+                  <span>By Dataset</span>
+                </a>
+              </li >
+              <li id="tabTimepoints">
+                <a>
+                  <span>By timepoints</span>
+                </a>
+              </li>
+              <li id="tabMarker">
+                <a>
+                  <span>Marker Genes</span>
+                </a>
+              </li>
+            </ul>
+        </div>
+    </div>   
+    <div class="block">
+        <div class="columns">
+            <div class="column is-one-fifth">
+                <label class="label">Search Genes from database</label>
+                <div class="field has-addons">
+                    <div class="control">
+                        <a class="button is-info" id="searchOnClick">
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </div>
+                    <div class="control">
+                      <input class="input" id="searchGeneName" type="text" placeholder="e.g.'Car4,Col1a1...'">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Data type</label>
+                    <div class="control">
+                      <div class="select">
+                        <select id="selectDataType">
+                          <option value="cpm" selected>CPM(counts/million)</option>
+                          <option value="log">Log10 transformed</option>
+                        </select>
+                      </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Data order</label>
+                    <div class="control">
+                      <div class="select">
+                        <select id="selectDataOrder">
+                          <option value="original">Original</option>
+                          <option value="clustered">Hierachical Clustered</option>
+                        </select>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column">                  
+                <!-- Display Plots belong this section -->
+                <div class="block">
+                    <div class="box mx-5 my-3" id="displayPlot"></div>
+                    <div class="box mx-5 my-3" id="scatter_plot"></div>
+                </div>
+            </div>
+        </div>
+    </div> 
+  </div>
+  <script src="/js/scatterPlot.js"></script>
+  <script src="/js/HeatmapCelltype.js"></script>
+  <script src="/js/assembleHcellType.js"></script>
+  <script src="/js/events.js"></script>
+</body>
+</html>

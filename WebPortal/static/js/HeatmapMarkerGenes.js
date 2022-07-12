@@ -33,7 +33,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
                 let each_gene_data = [];
                 for (var j = 0; j < ncelltypes; j++) {
                     exp = result[celltypes[j]][genes[i]];
-                    exp = Math.log10(exp + 0.5);
+                    // exp = Math.log10(exp + 0.5);
                     each_gene_data.push(exp);
                 }
                 data_content.push(each_gene_data);

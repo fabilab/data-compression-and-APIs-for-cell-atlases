@@ -1,21 +1,36 @@
 from base64 import decode
 from urllib import response
-from flask import Flask, send_from_directory,request,render_template
+from flask import Flask, send_from_directory,request,render_template, send_from_directory
 from flask_restful import Resource, Api
 from flask_cors import CORS
 import pandas as pd
 import h5py
 import numpy as np
-import json
+import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified, select_marker_genes
+from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified, marker_genes_expression
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
 api = Api(app)
 # Note: this might be unsafe
 CORS(app)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/img'),
+                          'favicon.ico',mimetype='image/x-icon')
+
+@app.route('/logo.png')
+def logo():
+    return send_from_directory(os.path.join(app.root_path, 'static/img'),
+                          'logo.png',mimetype='image/png')
+
+@app.route('/about_img1.png')
+def about():
+    return send_from_directory(os.path.join(app.root_path, 'static/img'),
+                          'about_img1.png',mimetype='image/png')
 
 # this is an endpoint (gives access to the file)
 @app.route('/js/<path:path>')
@@ -28,7 +43,11 @@ def send_css(path):
 
 @app.route('/',methods=['GET'])
 def home():
-    return render_template('home.html')
+    return render_template('about.html')
+
+@app.route('/dataExplore',methods=['GET'])
+def dataExplore():
+    return render_template('dataExplore.html')
 
 @app.route('/heatmap_by_celltypes',methods=['GET'])
 # def helloworld():
@@ -190,7 +209,7 @@ class geneExpUnified(Resource):
 class markerGenes(Resource):
     def get(self):
         celltype = request.args.get('celltype')
-        return select_marker_genes(celltype)
+        return marker_genes_expression(celltype)
 
 # this is an API endpoint (return data)
 api.add_resource(getAllCelltypes, '/all_cell_types')

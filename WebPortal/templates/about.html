@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Escellearn</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  </head>
+  <body>
+  <!-- Navigation Bar -->
+  <nav class="navbar is-fixed-top has-shadow is-spaced is-white" >
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <img src="./logo.png" style="max-height:2.5rem"/>
+      </div>
+    </div>
+    <div class="navbar-end">
+		<a class="navbar-item is-active" href="http://127.0.0.1:5000/">
+			About
+		</a>
+		<a class="navbar-item" href="http://127.0.0.1:5000/dataExplore">     
+			Explore Data
+		</a>
+		<a class="navbar-item" href="http://127.0.0.1:5000/about">
+			User Menu
+		</a>
+		<a class="navbar-item" href="http://127.0.0.1:5000/about">     
+			Papers&Links
+		</a>
+    </div>
+  </nav>
+  <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
+  <section class="hero is-medium" style="background-color:#f5f8fa">
+	<div class="hero-body mt-6">
+		<div class="columns">
+			<div class="column is-two-thirds">
+				<p class="title is-size-4">
+					Explore and visualise Single Cell Altas data in Neonatal Lung
+				</p>
+				<p class="subtitle has-text-justified mt-auto mr-6 is-italic">
+				Single cell RNA sequencing has emerged as a cutting-edge technology
+				to provide insights into the transcriptome of a tissue at single cell level. 
+				Here,we present 'Escellearn', providing heatmap visualisation of 
+				time dependent gene expression in different cell types with an 
+				easy-to-use interface. The portal will be demonstrated as a tool to 
+				explore the compressed dataset from a study about immune cell development in neonatal lung atlas.									
+				</p>
+				<button class="button is-success is-rounded mt-6">User Guide ></button>
+				<button class="button is-success is-outlined is-rounded mt-6 mx-4" onclick="window.location.href='/dataExplore'">Explore Now</button>
+			</div>
+			<div class="column">
+				<img src="./about_img1.png"/>
+			</div>
+		</div>
+	</div>
+  </section>
+  <footer class="footer" style="background-color:lightslategrey">
+	<div class="content has-text-centered">
+	</div>
+  </footer>  
+</body>
+</html>

@@ -12,89 +12,62 @@ with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
     L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
 
 
+def get_marker_genes_list(celltype=None):
+    '''
+    get a list of marker genes of the given celltype
+        Parameters:
+            celltype (string)
+        Returns:
+            a list of gene names (list)
+    '''
+    with open('./static/scData/celltypeMarkerGeneList.txt') as f:
+        data = json.load(f)
+        
+    return data[celltype]
+
+
 # gives the name of dataset we want as an input
 # celltype / celltype_dataset / celltype_dataset_timepoint
 def read_file(df_type,genes=None):
     # Need to loop through all genes for the marker gene page
-    if genes is None:
-        with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
-            df = pd.DataFrame(
-                    data=np.array(h5_data[df_type]['gene_expression_average']['block0_values']).astype(np.float32),
-                    index=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr()),
-                    columns=np.array(h5_data[df_type]['gene_expression_average']['axis0'].asstr()),
-                ).T
-        return df 
-    # Only consider user input genes
-    else:
-        genes = genes.split(",") 
-        with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
-            # List of genes
-            print("before L")
-            print("after L")
-            indexs = []
-            if isinstance(genes,list):
-                for gene in genes:
-                    indexs.append(L.index(gene))
-            else:
-                indexs.append(L.index(genes))
-            print("after loop")
-            # sort the indexs
-            indexs.sort()
-            new_genes = []
-            for index in indexs:
-                new_gene = L[index]
-                new_genes.append(new_gene)
-            # expression table (only numbers,no index nor columns)
-            print("before data")
-            data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
-            columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
-            print("before dataframe")
-            df = pd.DataFrame(
-                data = data.T,
-                index = new_genes,
-                columns=columns,
-            )
+    genes = genes.split(",") 
+    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+        # List of genes
+        indexs = []
+        if isinstance(genes,list):
+            for gene in genes:
+                indexs.append(L.index(gene))
+        else:
+            indexs.append(L.index(genes))
+        # sort the indexs
+        indexs.sort()
+        new_genes = []
+        for index in indexs:
+            new_gene = L[index]
+            new_genes.append(new_gene)
+        # expression table (only numbers,no index nor columns)
+        data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
+        columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
+        df = pd.DataFrame(
+            data = data.T,
+            index = new_genes,
+            columns=columns,
+        )
 
-        return df
-
-# detect outlier in a list of values
-# returns the outlier value
-def detect_outlier(expression_list):
-    threshold=4.8
-    mean_1 = np.mean(expression_list)
-    std_1 =np.std(expression_list)
-    outliers = []
-    for y in expression_list:
-        z_score= (y - mean_1)/std_1 
-        if z_score > threshold:
-            outliers.append(y)
-    return outliers
-
-# given a gene name
-# find out which celltype has an abnormally high/low expression value
-def get_outlier_celltype(df,gene_name):
-    cell_type_candidate = []
-    target_df = df.loc[[gene_name]]
-    outlier_values = detect_outlier([val for val in target_df.values[0] if val > 0])
-    for celltype in target_df.columns:
-        if target_df[celltype].values[0] in outlier_values:
-            cell_type_candidate.append(celltype)
-    return cell_type_candidate
-
+    return df
 
 # Return dataframe which contains only possible marker genes of a given celltype:
-def select_marker_genes(celltype):
-    # celltype = re.sub('\+', '\+', celltype)
-    print(celltype)
-    df = read_file("celltype")
-    # df_log10 = np.log10(df)
-    possible_markers = []
-    for gene in df.index:
-        if celltype in get_outlier_celltype(df,gene):
-            possible_markers.append(gene)
-    df_markers = df.loc[possible_markers] 
-
-    return json.loads(df_markers.to_json())
+def marker_genes_expression(celltype):
+    
+    gene_list = get_marker_genes_list(celltype)
+    gene_list = ','.join(gene_list)
+    df = read_file("celltype",gene_list)
+    df['current'] = df[celltype]
+    print(df['current'])
+    for column in df.columns:
+        df[column] = (df[column] / df['current']).round(3)
+    df.drop(['current'], axis=1,inplace=True)
+    return json.loads(df.to_json())
 
 
 # this function is used when more multiple gene names are searched by the user

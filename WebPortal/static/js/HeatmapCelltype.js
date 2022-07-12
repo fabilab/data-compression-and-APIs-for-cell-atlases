@@ -13,7 +13,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
         }
 
         if (html_element_id === "") {
-            html_element_id = "h5_data_plot";
+            html_element_id = "displayPlot";
         }
 
         let result = result_wrapper['result'];
@@ -37,7 +37,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
             let ngenes = y_axis.length;
             let ncelltypes = x_axis.length;
 
-            let heatmap_width = 1300;
+            let heatmap_width = 1050;
             let heatmap_height = 270 + 39 * ngenes;
 
             let data_content = [];
@@ -70,7 +70,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
                     title: '<b>Genes<b>',
                     automargin: true
                 },
-                with: heatmap_width,
+                width: heatmap_width,
                 height: heatmap_height,
             };
             
@@ -86,6 +86,4 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
                 Plotly.update(document.getElementById(html_element_id), data);
             }
         };
-        const duration = performance.now() - start;
-        console.log("heatmap done:" + duration/1000 + " second");
     } 

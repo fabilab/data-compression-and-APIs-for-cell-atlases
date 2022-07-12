@@ -23,7 +23,6 @@ function AssembleAjaxRequest() {
   
   // action here when clicking the search button
   var genes_string = $('#searchGeneName').val();
-
   const gene_array = genes_string.split(",")
   if (gene_array.length == 2) {
     $.ajax({
@@ -41,8 +40,9 @@ function AssembleAjaxRequest() {
     type:'GET',
     url:'http://127.0.0.1:5000/data',
     data: "gene_names=" + genes_string + "&plot_type=" + plot_type + "&data_type=" + data_type,
-    success: function(result) {  
-      HeatmapCelltype(result, "h5_data_plot");
+    success: function(result) { 
+      $("#displayPlot").empty();
+      HeatmapCelltype(result, "displayPlot");
     },
     error: function (e) {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
@@ -52,4 +52,4 @@ function AssembleAjaxRequest() {
     // console.log("page loading end. Duration:" + duration);
   }
 $("#searchOnClick" ).click(AssembleAjaxRequest)
-$(document).ready(AssembleAjaxRequest)
+// $(document).ready(AssembleAjaxRequest)

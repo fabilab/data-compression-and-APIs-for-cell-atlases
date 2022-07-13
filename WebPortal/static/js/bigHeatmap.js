@@ -82,9 +82,9 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
     }
 
     let ncelltypes = x_axis.length;
-    let ngenes = y_axis.length;
+    let nTimepoints = y_axis.length;
     let heatmap_width = 1300;
-    let heatmap_height = 270 + 41 * ngenes;
+    let heatmap_height = 270 + 30 * nTimepoints;
     var data = {
         type: 'heatmap',
         text: hover_text,
@@ -93,7 +93,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
     };
     console.log(result['gene']);
     var layout = {
-        title: 'Expression of ' + result['gene'] + ' gene over time',
+        title: 'Expression profile of ' + result['gene'] + ' gene in all cell types over development time',
         xaxis: {
             title: '<b>Celltypes<b>',
             automargin: true,

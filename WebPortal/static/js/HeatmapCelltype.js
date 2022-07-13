@@ -18,6 +18,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
 
         let result = result_wrapper['result'];
         let celltypes;
+        let genes = Object.keys(result);
         let celltypeOrder = dataForPlotsCellType['celltypeOrder'];
 
         if (!celltypeOrder) {
@@ -32,13 +33,17 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
             // x-axis: cell types
             let x_axis = celltypes;
             // y-axis: genes
-            let y_axis = Object.keys(result);
+            let y_axis = genes;
+            let y_ticks = [];
+            for (var i = 0; i < genes.length; i++) {
+                y_ticks[i] = `<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`;
+            }
             
             let ngenes = y_axis.length;
             let ncelltypes = x_axis.length;
 
             let heatmap_width = 1050;
-            let heatmap_height = 270 + 39 * ngenes;
+            let heatmap_height = 270 + 25 * ngenes;
 
             let data_content = [];
             for (var i = 0; i < ngenes; i++) {
@@ -60,7 +65,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
             };
             var layout = {
                 autosize: true, 
-                title: 'Heatmap of gene expression level in selected cell types',
+                title: 'Expression profile of selected genes in all cell types',
                 xaxis: {
                     title: '<b>Cell types<b>',
                     automargin: true,
@@ -77,12 +82,12 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
             if ($('#'+html_element_id).text() === "") {
                 data['z'] = data_content;
                 data['x'] = x_axis;
-                data['y'] = y_axis;
+                data['y'] = y_ticks;
                 Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
             } else {
                 data['z'] = [data_content];
                 data['x'] = [x_axis];
-                data['y'] = [y_axis];
+                data['y'] = [y_ticks];
                 Plotly.update(document.getElementById(html_element_id), data);
             }
         };

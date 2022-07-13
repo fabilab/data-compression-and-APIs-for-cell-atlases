@@ -53,9 +53,9 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
             data_content.push(all_gene_expression);
         }
         let ncelltypes = x_axis.length;
-        let ngenes = y_axis.length;
+        let nTimepoints = y_axis.length;
         let heatmap_width = 1300;
-        let heatmap_height = 270 + 41 * ngenes;
+        let heatmap_height = 270 + 20 * nTimepoints;
         var data = {
             type: 'heatmap',
             hoverongaps: false,

@@ -69,7 +69,7 @@
               <div id="marker_genes" hidden>
                 {% include 'markerGenes.html' %}  
               </div>   
-              <div id="multiple_genes">
+              <div class="field" id="multiple_genes">
                 <label class="label">Search for multiple genes</label>
                 <div class="field has-addons">
                   <div class="control">
@@ -82,7 +82,7 @@
                   </div>
                 </div>
               </div>
-              <div id="single_gene" hidden>
+              <div class="field" id="single_gene" hidden>
                 <label class="label">Search for ONE gene</label>
                 <div class="field has-addons">
                   <div class="control">
@@ -122,8 +122,10 @@
                 {% include 'tooltipTimepoint.html' %}     
                 <!-- Display Plots belong this section -->
                 <div class="block">
-                  <div class="box mx-5 my-3" id="displayPlot"></div>
+                  <div class="box mx-5 my-3" id="displayPlot">
+                  </div>
                   <div class="box mx-5 my-3" id="scatter_plot"></div>
+
                   <div class="box mx-5 my-3" id="displayPlot_dataset">
                     <div id="dataset_1"></div>
                     <div id="dataset_2"></div>

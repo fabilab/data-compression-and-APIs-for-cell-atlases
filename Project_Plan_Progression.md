@@ -145,6 +145,14 @@ Skills/Gaining:
 
 #### Marker Genes page: (23/Jun/2022)
 
+##### * Current Issue:
+
+![Screen Shot 2022-06-27 at 9.01.15 pm](/Users/yingxu/Desktop/Screen Shot 2022-06-27 at 9.01.15 pm.png)
+
+It is validated that the current algorithm does successfully selected the marker genes. However,
+
+
+
 ##### Algorithm Validation (Keyi's suggestion)
 
 1) Randomly pick 5 celltypes from the list
@@ -162,7 +170,7 @@ Skills/Gaining:
 
 
 
-suggestion from Afrina, the bioinformatician:
+##### suggestion from Afrina, the bioinformatician:
 
 1) Search paper for all the house keeping genes in Neonatal Lung of mice
 
@@ -176,11 +184,9 @@ suggestion from Afrina, the bioinformatician:
 
 
 
-
-
 - Adding an new tab on the top: order by: expression level of the selected cell (highest to lowest)
 
-##### House keeping genes
+
 
 
 
@@ -190,3 +196,40 @@ https://www.biorxiv.org/content/10.1101/2021.04.27.441649v1
 
 
 
+
+
+
+
+Package:
+
+- Go to where setup.py is, cd .. (back one step)
+- pip install cell_atlas_portal_2022 (for new user), pip install -e cell_atlas_portal_2022 (for update)
+- Go to the directory that contains the data file (h5)
+- python3
+- from package import class
+  - from cell_atlas_portal_2022 import h5Reader
+- h5_file = h5Reader('./condensed_lung_atlas_in_cpm.h5')
+
+
+
+#### Week7: Improve webpage usability and adding user guide and package documentation to the page
+
+- Combine all heatmap display into one html page: data explore
+
+- Switching tabs to generate different type of heatmap.
+
+
+
+#### Week8 Presentation prepare
+
+- create a new page: All data 
+
+  - (provide an option for the user to look at the entire dataset as the table)
+  - user should execute this page with caution, since the dataset is large
+  - provide sorting button to the page (sort by gene names (alphabetically), sort by expression level within a cell type)
+
+- Create a new page:
+
+  - Explain the compression alogirthm
+
+  

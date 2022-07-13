@@ -46,7 +46,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
             };
             var layout = {
                 autosize: true, 
-                title: 'Heatmap of marker genes of ' + selected_cell,
+                title: 'Expression profile of ' + selected_cell +'\'s marker genes in all cell types ',
                 xaxis: {
                     title: '<b>Cell types<b>',
                     automargin: true,

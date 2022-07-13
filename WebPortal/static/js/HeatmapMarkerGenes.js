@@ -4,7 +4,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
         // check the button id active
 
         if (html_element_id === "") {
-            html_element_id = "HeatmapMarkerGene";
+            html_element_id = "displayPlotMarkers";
         }
 
         let genes = Object.keys(result[Object.keys(result)[0]])

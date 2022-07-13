@@ -10,6 +10,9 @@ $("#tabGeneral").click(function() {
     $("#displayPlot").show();
     $("#scatter_plot").show();
     $("#displayPlotUnified").hide();
+    $("#timepoint_info").hide();
+    $("#marker_genes").hide();
+    $("#displayPlotMarkers").hide();
 });
 
 $("#tabDataset").click(function() {
@@ -25,6 +28,9 @@ $("#tabDataset").click(function() {
     $("#scatter_plot").hide();
     $("#displayPlotUnified").hide();
     $("#searchOnClick_single").click(AssembleAjaxRequestTimepoint);
+    $("#timepoint_info").show();
+    $("#marker_genes").hide();
+    $("#displayPlotMarkers").hide();
 });
 
 $("#tabTimepoints").click(function() {
@@ -38,7 +44,10 @@ $("#tabTimepoints").click(function() {
     $("#displayPlot_dataset").hide();
     $("#displayPlot").hide();
     $("#scatter_plot").hide();
-    $("#searchOnClick_single" ).click(AssembleAjaxRequestUnified);
+    $("#searchOnClick_single").click(AssembleAjaxRequestUnified);
+    $("#timepoint_info").show();
+    $("#marker_genes").hide();
+    $("#displayPlotMarkers").hide();
 });
 
 $("#tabMarker").click(function() {
@@ -46,6 +55,16 @@ $("#tabMarker").click(function() {
     $("#tabDataset").removeClass('is-active');
     $("#tabTimepoints").removeClass('is-active');
     $("#tabMarker").addClass('is-active');
+    $("#timepoint_info").hide();
+    $("#marker_genes").show();
+    $("#multiple_genes").hide()
+    $("#single_gene").hide();
+    $("#applyOnClick").click(AssembleAjaxRequestMarker);
+    $("#displayPlotMarkers").show();
+    $("#displayPlot_dataset").hide();
+    $("#scatter_plot").hide();
+    $("#displayPlotUnified").hide();
+    $("#displayPlot").hide();
 });
 
 $("#selectDataType").change(function() {

@@ -9,7 +9,7 @@ function pagesetup() {
 
             for(var i=0;i<celltype_categories.length;i++) {
                 var category = celltype_categories[i];
-                $("#celltype_selection").append(`<label class='radio has-text-weight-bold' disabled>===== ${category} =====</label><br>`);
+                $("#celltype_selection").append(`<label class='radio has-text-weight-bold mt-2 has-text-success' disabled>${category}</label><br>`);
                 var celltypes = result[category];
                 for (var j=0;j<celltypes.length;j++) {
                     $("#celltype_selection").append(`<label class='radio'><input type='radio' name='celltype_selection' value='${celltypes[j]}'/>${celltypes[j]}</label><br>`);
@@ -26,20 +26,13 @@ function AssembleAjaxRequestMarker() {
 
     var selected_cell = $('input[name="celltype_selection"]:checked').val();
 
-    $('#loadingtext').hide();
-    $('#loadingbar').hide();
     if (selected_cell) {
-        $('#markerWelcome').hide();
-        $('#loadingtext').show();
-        $('#loadingbar').show();
     // Generate the plot
         $.ajax({
             type:'GET',
             url:'http://127.0.0.1:5000/markers_page',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
-                $('#loadingtext').hide();
-                $('#loadingbar').hide();
                 HeatmapMarkerGenes(result,'',selected_cell);
             },
             error: function (e) {
@@ -48,7 +41,6 @@ function AssembleAjaxRequestMarker() {
         });
     }
 }
-$("#applyOnClick").click(AssembleAjaxRequestMarker)
 $(document).ready(pagesetup)
 
 function clearCheckbox() {

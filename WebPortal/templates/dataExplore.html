@@ -66,6 +66,9 @@
     <div class="block">
         <div class="columns">
           <div class="column is-one-fifth">
+              <div id="marker_genes" hidden>
+                {% include 'markerGenes.html' %}  
+              </div>   
               <div id="multiple_genes">
                 <label class="label">Search for multiple genes</label>
                 <div class="field has-addons">
@@ -115,21 +118,19 @@
                 </div>
               </div>
           </div>
-            <div class="column">                  
+            <div class="column">  
+                {% include 'tooltipTimepoint.html' %}     
                 <!-- Display Plots belong this section -->
                 <div class="block">
-
                   <div class="box mx-5 my-3" id="displayPlot"></div>
                   <div class="box mx-5 my-3" id="scatter_plot"></div>
-
                   <div class="box mx-5 my-3" id="displayPlot_dataset">
                     <div id="dataset_1"></div>
                     <div id="dataset_2"></div>
                     <div id="dataset_3"></div>
                   </div>
-
                   <div class="box mx-5 my-3" id="displayPlotUnified"></div>
-
+                  <div class="box mx-5 my-3" id="displayPlotMarkers"></div>
                 </div>
             </div>
         </div>
@@ -142,6 +143,8 @@
   <script src="/js/HeatmapDataset.js"></script>
   <script src="/js/bigHeatmap.js"></script>
   <script src="/js/HeatmapUnified.js"></script>
+  <script src="/js/MarkerGenes.js"></script>
+  <script src="/js/HeatmapMarkerGenes.js"></script>
   <script src="/js/events.js"></script>
 </body>
 </html>

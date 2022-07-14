@@ -92,7 +92,7 @@ function pagesetup() {
     });
 }
 
-function AssembleAjaxRequestMarker() {
+function AjaxExploreMarkers() {
 
     var selected_cell = $('input[name="celltype_selection"]:checked').val();
 
@@ -100,7 +100,7 @@ function AssembleAjaxRequestMarker() {
     // Generate the plot
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/markers_page',
+            url:'http://127.0.0.1:5000/data_markers',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
                 HeatmapMarkerGenes(result,'',selected_cell);

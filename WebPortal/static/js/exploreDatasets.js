@@ -90,9 +90,8 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
     };
 } 
 
-function AssembleAjaxRequestTimepoint() {
+function AjaxExploreDatasets() {
   
-  console.log("switch by dataset");
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
   //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
   cpm_is_active = $("#cpmTab").hasClass('is-active');
@@ -113,7 +112,7 @@ function AssembleAjaxRequestTimepoint() {
   console.log(gene_name);
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data_timepoint',
+    url:'http://127.0.0.1:5000/data_datasets',
     data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
     success: function(result) {
         plotAll(result);

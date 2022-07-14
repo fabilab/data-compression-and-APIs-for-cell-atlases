@@ -9,7 +9,7 @@ import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file,data_preprocessing, dataset_by_timepoint, dataset_unified, marker_genes_expression
+from ca_data_access import read_file, dataset_by_dataset, dataset_unified, marker_genes_expression
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -53,6 +53,9 @@ def dataExplore():
 def resources():
     return render_template('resources.html')
 
+@app.route('/package',methods=['GET'])
+def package():
+    return render_template('./showPackage/index.html')
 
 @app.route('/heatmap_by_celltypes',methods=['GET'])
 # def helloworld():
@@ -75,7 +78,7 @@ def page3():
 def page4():
     return render_template('markerGenes.html',highlight='page4_button',search_box='Car4')
 
-class getAllCelltypes(Resource):
+class getAllCellTypes(Resource):
     def get(self):
         result = {
             'Connective tissue':[
@@ -123,7 +126,7 @@ class getAllCelltypes(Resource):
                 'Late Car4- capillaries',
                 'Lymphatic EC',
                 'Nonproliferative embryonic EC',
-                'Vasculature',
+                'Pericyte',
                 'Proliferating pericyte',
                 'Proliferative EC',
                 'Venous EC'
@@ -134,33 +137,24 @@ class getAllCelltypes(Resource):
         }
         return result
 
-class geneNames(Resource):
+class getAllGeneNames(Resource):
     def get(self):
         df = read_file('celltype')
         return list(df.index)
 
 # new end point for timepoint dataset:
-class geneExpTime(Resource):
+class dataDatasets (Resource):
     def get(self):
         genename = request.args.get('gene')
-        # if plottype == 'hieracical':
-        #     distance = pdist(gene_exp_df.values)
-        #     # print(distance)
-        #     Z = linkage(distance,optimal_ordering=True)
-        #     new_order = leaves_list(Z)
-        #     gene_exp_df = gene_exp_df.iloc[new_order]
-        
-        result = dataset_by_timepoint(genename,'celltype_dataset_timepoint')
+        result = dataset_by_dataset(genename,'celltype_dataset_timepoint')
         return result
 
-class geneExp(Resource):
+class dataGeneral(Resource):
     def get(self):
-        ######### 2
-        start = time.time()
-        print("geneEXP start")
         gene_names = request.args.get('gene_names')
         df = None
-        df = data_preprocessing(gene_names,'celltype')
+        # df = data_preprocessing(gene_names,'celltype')
+        df = read_file("celltype",gene_names).T
         if df is None:
             return None
 
@@ -173,21 +167,16 @@ class geneExp(Resource):
             'result': df.to_dict(),
             'hierarchicalCelltypeOrder': df.index[new_order].tolist(),  # new order of the celltype
         }
-        ######## 7 (store the result in a variable,print it)
-        end = time.time()
-        print("geneEXP end")
-        print(end - start)
         return response
 
-class plotsForSeachGenes(Resource):
+class dataScatter(Resource):
     def get(self):
-
         gene_names = request.args.get('gene_names')
-        df = data_preprocessing(gene_names,'celltype')
+        # df = data_preprocessing(gene_names,'celltype')
+        df = read_file("celltype",gene_names)
         if df is None:
             return None
-        df = df.T
-        a_gene_names = gene_names.split(",")
+        a_gene_names = [name.capitalize() for name in gene_names.split(",")]
         if len(a_gene_names) == 2:
             result = {}
             plot_df = df.filter(items = a_gene_names, axis=0)
@@ -196,7 +185,7 @@ class plotsForSeachGenes(Resource):
 
             gene1_expr = list(plot_df.loc[gene1])
             gene2_expr = list(plot_df.loc[gene2])
-            # plot_data = plot_df.to_json()
+
             result["gene1_name"]= gene1
             result["gene2_name"] = gene2
             result["gene1_expr"] = gene1_expr
@@ -205,25 +194,25 @@ class plotsForSeachGenes(Resource):
 
         return result
 
-class geneExpUnified(Resource):
+class dataUnified(Resource):
     def get(self):
         genename = request.args.get('gene')
 
         return dataset_unified(genename)
 
-class markerGenes(Resource):
+class dataMarkerGenes(Resource):
     def get(self):
         celltype = request.args.get('celltype')
         return marker_genes_expression(celltype)
 
 # this is an API endpoint (return data)
-api.add_resource(getAllCelltypes, '/all_cell_types')
-api.add_resource(geneExp, '/data')
-api.add_resource(geneNames, '/all_gene_names')
-api.add_resource(plotsForSeachGenes, '/2_genes')
-api.add_resource(geneExpTime, '/data_timepoint')
-api.add_resource(geneExpUnified, '/data_unified')
-api.add_resource(markerGenes, '/markers_page')
+api.add_resource(getAllCellTypes, '/all_cell_types')
+api.add_resource(dataGeneral, '/data_general')
+api.add_resource(getAllGeneNames, '/all_gene_names')
+api.add_resource(dataScatter, '/data_scatter')
+api.add_resource(dataDatasets, '/data_datasets')
+api.add_resource(dataUnified, '/data_unified')
+api.add_resource(dataMarkerGenes, '/data_markers')
 
 if __name__ == '__main__':
     app.run(debug=True)

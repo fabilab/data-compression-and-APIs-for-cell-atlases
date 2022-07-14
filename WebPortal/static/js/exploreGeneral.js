@@ -93,7 +93,7 @@ function HeatmapCelltype(result_wrapper, html_element_id) {
         };
     } 
 
-function AssembleAjaxRequest() {
+function AjaxExploreGeneral() {
 
   if(! $('#scatter_plot').is('empty')) {
     $('#scatter_plot').empty();
@@ -120,7 +120,7 @@ function AssembleAjaxRequest() {
   if (gene_array.length == 2) {
     $.ajax({
       type:'GET',
-      url:'http://127.0.0.1:5000/2_genes',
+      url:'http://127.0.0.1:5000/data_scatter',
       data: "gene_names=" + genes_string,
       success: ScatterPlot,
       error: function (e) {
@@ -131,7 +131,7 @@ function AssembleAjaxRequest() {
     // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data',
+    url:'http://127.0.0.1:5000/data_general',
     data: "gene_names=" + genes_string + "&plot_type=" + plot_type + "&data_type=" + data_type,
     success: function(result) { 
       $("#displayPlot").empty();
@@ -141,7 +141,5 @@ function AssembleAjaxRequest() {
       alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
     }
     });
-    // const duration = performance.now() - start;
-    // console.log("page loading end. Duration:" + duration);
   }
-$("#searchOnClick_list" ).click(AssembleAjaxRequest)
+$("#searchOnClick_list" ).click(AjaxExploreGeneral)

@@ -35,7 +35,7 @@ def read_file(df_type,genes=None):
         Return:
             a dataframe (df)
     '''
-    genes = genes.split(",") 
+    genes = genes.split(",")
     with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
         # List of genes
         indexs = []
@@ -80,25 +80,6 @@ def marker_genes_expression(celltype):
     df.drop(['current'], axis=1,inplace=True)
     return json.loads(df.to_json())
 
-
-# this function is used when more multiple gene names are searched by the user
-# always run the read_file() to get dataframe in the right format before running this 
-def data_preprocessing(input_gene_names,df_type):
-    df = read_file(df_type,input_gene_names)
-    df_genes = df.index # all the genes that available in the current dataframe
-    for search_gene in input_gene_names.split(","):
-        if search_gene not in df_genes:
-            return None
-
-    # if user does not search for any specific genes, then plot everything
-    if input_gene_names is None:
-        plot_data = df.T
-    else:
-        a_gene_names = input_gene_names.split(",")
-        plot_df = df.filter(items = a_gene_names,axis=0)
-        plot_data = plot_df.T
-
-    return plot_data
 
 def timepoint_reorder(tp1, tp2):
     '''
@@ -154,7 +135,8 @@ def timepoint_reorder(tp1, tp2):
 #  function that get the cell type dataset timepoint as a dictionary
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
-def dataset_by_timepoint(genename,df_type):
+def dataset_by_dataset(genename,df_type):
+    genename = genename.capitalize()
     # select and pre-preprocessing data
     df_tp = read_file(df_type,genename)
 
@@ -222,6 +204,7 @@ def dataset_unified(genename):
                 "Early adventitial FB": -1,
             }
     '''
+    genename = genename.capitalize()
     df = read_file('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []

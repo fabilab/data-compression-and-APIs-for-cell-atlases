@@ -121,7 +121,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
 };
 
 
-function AssembleAjaxRequestUnified() {
+function AjaxExploreUnified() {
     console.log("swicth to unified");
     cpm_is_active = $("#cpmTab").hasClass('is-active');
     orginal_is_active = $("#originalOrderTab").hasClass('is-active')

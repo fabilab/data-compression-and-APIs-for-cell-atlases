@@ -27,7 +27,7 @@ $("#tabDataset").click(function() {
     $("#displayPlot").hide();
     $("#scatter_plot").hide();
     $("#displayPlotUnified").hide();
-    $("#searchOnClick_single").click(AssembleAjaxRequestTimepoint);
+    $("#searchOnClick_single").click(AjaxExploreDatasets);
     $("#timepoint_info").show();
     $("#marker_genes").hide();
     $("#displayPlotMarkers").hide();
@@ -44,7 +44,7 @@ $("#tabTimepoints").click(function() {
     $("#displayPlot_dataset").hide();
     $("#displayPlot").hide();
     $("#scatter_plot").hide();
-    $("#searchOnClick_single").click(AssembleAjaxRequestUnified);
+    $("#searchOnClick_single").click(AjaxExploreUnified);
     $("#timepoint_info").show();
     $("#marker_genes").hide();
     $("#displayPlotMarkers").hide();
@@ -59,7 +59,7 @@ $("#tabMarker").click(function() {
     $("#marker_genes").show();
     $("#multiple_genes").hide()
     $("#single_gene").hide();
-    $("#applyOnClick").click(AssembleAjaxRequestMarker);
+    $("#applyOnClick").click(AjaxExploreMarkers);
     $("#displayPlotMarkers").show();
     $("#displayPlot_dataset").hide();
     $("#scatter_plot").hide();

@@ -12,20 +12,7 @@ with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
     L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
 
 
-def get_marker_genes_list(celltype=None):
-    '''
-    get a list of marker genes of the given celltype
-        Parameters:
-            celltype (string)
-        Returns:
-            a list of gene names (list)
-    '''
-    with open('./static/scData/celltypeMarkerGeneList.txt') as f:
-        data = json.load(f)
-        
-    return data[celltype]
-
-def read_file(df_type,genes=None):
+def read_file_average_exp(df_type,genes=None):
     '''
     read in a .h5 file from the source directory,
     return a dataframe based on the user's specified dataset type and genes of interest
@@ -61,6 +48,54 @@ def read_file(df_type,genes=None):
 
     return df
 
+def read_file_proportion_exp(df_type,genes=None):
+    '''
+    read in a .h5 file from the source directory,
+    return a dataframe based on the user's specified dataset type and genes of interest
+        parameters:
+            dataset type(string):  celltype/celltype_dataset/celltype_dataset_timepoint
+            genes name (string)
+        Return:
+            a dataframe (df)
+    '''
+    genes = genes.split(",")
+    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+        # List of genes
+        indexs = []
+        if isinstance(genes,list):
+            for gene in genes:
+                indexs.append(L.index(gene))
+        else:
+            indexs.append(L.index(genes))
+        # sort the indexs
+        indexs.sort()
+        new_genes = []
+        for index in indexs:
+            new_gene = L[index]
+            new_genes.append(new_gene)
+        # expression table (only numbers,no index nor columns)
+        data = np.array(h5_data[df_type]['gene_proportion_expression']['block0_values'][:, indexs]).astype(np.float32)
+        columns=np.array(h5_data[df_type]['gene_proportion_expression']['axis1'].asstr())
+        df = pd.DataFrame(
+            data = data.T,
+            index = new_genes,
+            columns=columns,
+        )
+    return df
+
+def get_marker_genes_list(celltype=None):
+    '''
+    get a list of marker genes of the given celltype
+        Parameters:
+            celltype (string)
+        Returns:
+            a list of gene names (list)
+    '''
+    with open('./static/scData/celltypeMarkerGeneList.txt') as f:
+        data = json.load(f)
+
+    return data[celltype]
+
 def marker_genes_expression(celltype):
     '''
     return a dataframe containing expression level of a list of genes in all celltype
@@ -73,7 +108,7 @@ def marker_genes_expression(celltype):
     
     gene_list = get_marker_genes_list(celltype)
     gene_list = ','.join(gene_list)
-    df = read_file("celltype",gene_list)
+    df = read_file_average_exp("celltype",gene_list)
     df['current'] = df[celltype]
     for column in df.columns:
         df[column] = (df[column] / df['current']).round(3)
@@ -138,7 +173,7 @@ def timepoint_reorder(tp1, tp2):
 def dataset_by_dataset(genename,df_type):
     genename = genename.capitalize()
     # select and pre-preprocessing data
-    df_tp = read_file(df_type,genename)
+    df_tp = read_file_average_exp(df_type,genename)
 
     # select data for a given gene name
     df_filtered=df_tp.loc[[genename]]
@@ -205,7 +240,7 @@ def dataset_unified(genename):
             }
     '''
     genename = genename.capitalize()
-    df = read_file('celltype_dataset_timepoint',genename)
+    df = read_file_average_exp('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []
     dt_combinations = []  # store all the existing dataset and timepoint combinations

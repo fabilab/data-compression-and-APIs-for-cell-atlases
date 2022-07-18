@@ -1,4 +1,5 @@
 from base64 import decode
+from importlib.util import resolve_name
 from urllib import response
 from flask import Flask, send_from_directory,request,render_template, send_from_directory
 from flask_restful import Resource, Api
@@ -9,7 +10,7 @@ import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file, dataset_by_dataset, dataset_unified, marker_genes_expression
+from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, marker_genes_expression
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -139,7 +140,7 @@ class getAllCellTypes(Resource):
 
 class getAllGeneNames(Resource):
     def get(self):
-        df = read_file('celltype')
+        df = read_file_average_exp('celltype')
         return list(df.index)
 
 # new end point for timepoint dataset:
@@ -152,20 +153,24 @@ class dataDatasets (Resource):
 class dataGeneral(Resource):
     def get(self):
         gene_names = request.args.get('gene_names')
-        df = None
+        df_average = None
+        df_proportion = None
         # df = data_preprocessing(gene_names,'celltype')
-        df = read_file("celltype",gene_names).T
-        if df is None:
+        df_average = read_file_average_exp("celltype",gene_names).T
+        df_proportion = read_file_proportion_exp("celltype",gene_names).T
+        if df_average is None or df_proportion is None:
             return None
 
-        distance = pdist(df.values)
+        distance = pdist(df_average.values)
         Z = linkage(distance,optimal_ordering=True)
         new_order = leaves_list(Z)
         # df = df.iloc[new_order]
 
         response = {
-            'result': df.to_dict(),
-            'hierarchicalCelltypeOrder': df.index[new_order].tolist(),  # new order of the celltype
+            'result_average': df_average.to_dict(),
+            'max_expression': max(df_average.max()),
+            'result_proportion': df_proportion.to_dict(),
+            'hierarchicalCelltypeOrder': df_average.index[new_order].tolist(),  # new order of the celltype
         }
         return response
 
@@ -173,7 +178,7 @@ class dataScatter(Resource):
     def get(self):
         gene_names = request.args.get('gene_names')
         # df = data_preprocessing(gene_names,'celltype')
-        df = read_file("celltype",gene_names)
+        df = read_file_average_exp("celltype",gene_names)
         if df is None:
             return None
         a_gene_names = [name.capitalize() for name in gene_names.split(",")]

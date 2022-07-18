@@ -69,8 +69,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
 } 
 
 function pagesetup() {
-    $('#loadingtext').hide();
-    $('#loadingbar').hide();
+
     $.ajax({
         type:'GET',
         url:'http://127.0.0.1:5000/all_cell_types',
@@ -103,6 +102,7 @@ function AjaxExploreMarkers() {
             url:'http://127.0.0.1:5000/data_markers',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
+                $("#displayPlotMarkers").empty();
                 HeatmapMarkerGenes(result,'',selected_cell);
             },
             error: function (e) {

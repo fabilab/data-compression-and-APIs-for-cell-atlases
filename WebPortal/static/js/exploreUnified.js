@@ -143,6 +143,7 @@ function AjaxExploreUnified() {
             url:'http://127.0.0.1:5000/data_unified',
             data: "gene=" + gene_name,
             success: function(result) {
+                $("#displayPlotUnified").empty();
                 plotHeatmapUnified(result,"displayPlotUnified");
             },
             error: function (e) {

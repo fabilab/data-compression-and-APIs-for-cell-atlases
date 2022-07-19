@@ -28,7 +28,7 @@
 			Explore Data
 		</a>
 		<a class="navbar-item" href="http://127.0.0.1:5000/about">
-			User Menu
+			User Guide
 		</a>
 		<a class="navbar-item" href="http://127.0.0.1:5000/resources">     
 			Resources
@@ -115,11 +115,22 @@
                   </div>
                 </div>
               </div>
+              <div class="field" id="plotType">
+                <label class="label">Plot type</label>
+                <div class="control">
+                  <div class="select" style="width:80%;">
+                    <select id="selectPlotType" style="width:100%;">
+                      <option value="heatmap" selected>Heatmap</option>
+                      <option value="dot">Dot Plot</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               <div class="field">
                 <label class="label">Data type</label>
                 <div class="control">
-                  <div class="select">
-                    <select id="selectDataType">
+                  <div class="select" style="width:80%;">
+                    <select id="selectDataType" style="width:100%;">
                       <option value="cpm" selected>CPM(counts/million)</option>
                       <option value="log">Log10 transformed</option>
                     </select>
@@ -129,8 +140,8 @@
               <div class="field">
                 <label class="label">Data order</label>
                 <div class="control">
-                  <div class="select">
-                    <select id="selectDataOrder">
+                  <div class="select" style="width:80%;">
+                    <select id="selectDataOrder" style="width:100%;">
                       <option value="original">Original</option>
                       <option value="clustered">Hierachical Clustered</option>
                     </select>
@@ -143,8 +154,9 @@
                 <!-- Display Plots belong this section -->
                 <div class="block">
                   <div class="box mx-5 my-3" id="displayPlot"></div>
-                  <div class="box mx-5 my-3" id="scatter_plot"></div>
-                  <div class="box mx-5 my-3 is-hidden" id="displayPlot_dataset">
+                  <div class="box mx-5 my-3 is-hidden" id="dotPlot"></div>
+                  <div class="box mx-5 my-3" id="scatterPlot"></div>
+                  <div class="box mx-5 my-3 is-hidden" id="displayPlotDataset">
                     <div id="dataset_1"></div>
                     <div id="dataset_2"></div>
                     <div id="dataset_3"></div>
@@ -157,6 +169,7 @@
     </div> 
   </div>
   <script src="/js/scatterPlot.js"></script>
+  <script src="/js/dotPlot.js"></script>
   <script src="/js/exploreGeneral.js"></script>
   <script src="/js/exploreDatasets.js"></script>
   <script src="/js/exploreUnified.js"></script>

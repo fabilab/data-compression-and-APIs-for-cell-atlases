@@ -46,7 +46,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
         };
         var layout = {
             autosize: true, 
-            title: 'Expression profile of ' + selected_cell +'\'s marker genes in all cell types ',
+            title: 'Expression profile of <b>' + selected_cell +'\'s </b> marker genes in all cell types ',
             xaxis: {
                 title: '<b>Cell types<b>',
                 automargin: true,
@@ -81,7 +81,7 @@ function pagesetup() {
                 $("#celltype_selection").append(`<label class='radio has-text-weight-bold mt-2 has-text-success' disabled>${category}</label><br>`);
                 var celltypes = result[category];
                 for (var j=0;j<celltypes.length;j++) {
-                    $("#celltype_selection").append(`<label class='radio'><input type='radio' name='celltype_selection' value='${celltypes[j]}'/>${celltypes[j]}</label><br>`);
+                    $("#celltype_selection").append(`<label class='radio'><input type='radio' name='celltype_selection' value='${celltypes[j]}'/> ${celltypes[j]}</label><br>`);
                 }
             }
         },

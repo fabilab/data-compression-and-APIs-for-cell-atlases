@@ -1,78 +1,95 @@
-$("#tabGeneral").click(function() {
+function ShowGeneral() {
     $("#tabGeneral").addClass('is-active');
-    $("#tabDataset").removeClass('is-active');
-    $("#tabTimepoints").removeClass('is-active');
-    $("#tabMarker").removeClass('is-active');
-    // remove the single search button
-    $("#single_gene").addClass('is-hidden');
     $("#multiple_genes").removeClass('is-hidden');
-    $("#displayPlotDataset").addClass('is-hidden');
-    $("#displayPlot").removeClass('is-hidden');
     $("#scatterPlot").removeClass('is-hidden');
+    $("#plotType").removeClass('is-hidden');
+    let plot = $("#selectPlotType option:selected").val();
+    if (plot === "dot") {
+        $("#dotPlot").removeClass("is-hidden");
+    }
+    else {
+        $("#displayPlot").removeClass("is-hidden");
+    }
+}
+
+function HideGeneral() {
+    $("#tabGeneral").removeClass('is-active');
+    $("#multiple_genes").addClass('is-hidden');
+    $("#scatterPlot").addClass('is-hidden');
+    $("#plotType").addClass('is-hidden');
+    $("#dotPlot").addClass("is-hidden");
+    $("#displayPlot").addClass("is-hidden");
+}
+
+function ShowDataset() {
+    $("#tabDataset").addClass('is-active');
+    $("#single_gene").removeClass('is-hidden');
+    $("#displayPlotDataset").removeClass('is-hidden');
+    $("#timepoint_info").removeClass('is-hidden');
+    $("#searchOnClick_single").click(AjaxExploreDatasets);
+}
+
+function HideDataset() {
+    $("#tabDataset").removeClass('is-active');
+    $("#single_gene").addClass('is-hidden');
+    $("#displayPlotDataset").addClass('is-hidden');
+    $("#timepoint_info").addClass('is-hidden');
+}
+
+function ShowUnified() {
+    $("#tabTimepoints").addClass('is-active');
+    $("#single_gene").removeClass('is-hidden');
+    $("#displayPlotUnified").removeClass('is-hidden');
+    $("#timepoint_info").removeClass('is-hidden');
+    $("#searchOnClick_single").click(AjaxExploreUnified);
+}
+
+function HideUnified() {
+    $("#tabTimepoints").removeClass('is-active');
+    $("#single_gene").addClass('is-hidden');
     $("#displayPlotUnified").addClass('is-hidden');
     $("#timepoint_info").addClass('is-hidden');
+}
+
+
+function ShowMarker() {
+    $("#tabMarker").addClass('is-active');
+    $("#marker_genes").removeClass('is-hidden');
+    $("#displayPlotMarkers").removeClass('is-hidden');
+}
+
+function HideMarker() {
+    $("#tabMarker").removeClass('is-active');
     $("#marker_genes").addClass('is-hidden');
     $("#displayPlotMarkers").addClass('is-hidden');
-    $("#plotType").removeClass('is-hidden');
+}
+
+$("#tabGeneral").click(function() {
+    HideDataset();
+    HideUnified();
+    HideMarker();
+    ShowGeneral();
 });
 
 $("#tabDataset").click(function() {
-    $("#tabGeneral").removeClass('is-active');
-    $("#tabDataset").addClass('is-active');
-    $("#tabTimepoints").removeClass('is-active');
-    $("#tabMarker").removeClass('is-active');
-    // remove the multi-search button
-    $("#multiple_genes").addClass('is-hidden');
-    $("#single_gene").removeClass('is-hidden');
-    $("#displayPlotDataset").removeClass('is-hidden');
-    $("#displayPlot").addClass('is-hidden');
-    $("#scatterPlot").addClass('is-hidden');
-    $("#displayPlotUnified").addClass('is-hidden');
-    $("#searchOnClick_single").click(AjaxExploreDatasets);
-    $("#timepoint_info").removeClass('is-hidden');
-    $("#marker_genes").addClass('is-hidden');
-    $("#displayPlotMarkers").addClass('is-hidden');
-    $("#plotType").addClass('is-hidden');
-    $("#dotPlot").addClass("is-hidden");
-
+    HideGeneral();
+    HideUnified();
+    HideMarker();
+    ShowDataset();
 });
 
 $("#tabTimepoints").click(function() {
-    $("#tabGeneral").removeClass('is-active');
-    $("#tabDataset").removeClass('is-active');
-    $("#tabTimepoints").addClass('is-active');
-    $("#tabMarker").removeClass('is-active');
-    $("#multiple_genes").addClass('is-hidden')
-    $("#single_gene").removeClass('is-hidden')
-    $("#displayPlotUnified").removeClass('is-hidden');
-    $("#displayPlotDataset").addClass('is-hidden');
-    $("#displayPlot").addClass('is-hidden');
-    $("#scatterPlot").addClass('is-hidden');
-    $("#searchOnClick_single").click(AjaxExploreUnified);
-    $("#timepoint_info").removeClass('is-hidden');
-    $("#marker_genes").addClass('is-hidden');
-    $("#displayPlotMarkers").addClass('is-hidden');
-    $("#plotType").addClass('is-hidden');
-    $("#dotPlot").addClass("is-hidden");
+    HideGeneral();
+    HideDataset();
+    HideMarker();
+    ShowUnified();
 });
 
 $("#tabMarker").click(function() {
-    $("#tabGeneral").removeClass('is-active');
-    $("#tabDataset").removeClass('is-active');
-    $("#tabTimepoints").removeClass('is-active');
-    $("#tabMarker").addClass('is-active');
-    $("#timepoint_info").addClass('is-hidden');
-    $("#marker_genes").removeClass('is-hidden');
-    $("#multiple_genes").addClass('is-hidden')
-    $("#single_gene").addClass('is-hidden');
-    $("#applyOnClick").click(AjaxExploreMarkers);
-    $("#displayPlotMarkers").removeClass('is-hidden');
-    $("#displayPlotDataset").addClass('is-hidden');
-    $("#scatterPlot").addClass('is-hidden');
-    $("#displayPlotUnified").addClass('is-hidden');
-    $("#displayPlot").addClass('is-hidden');
-    $("#plotType").addClass('is-hidden');
-    $("#dotPlot").addClass("is-hidden");
+    HideGeneral();
+    HideDataset();
+    HideUnified();
+    ShowMarker();
 });
 
 $("#selectPlotType").change(function() {
@@ -145,3 +162,6 @@ $("#selectDataOrder").change(function() {
         plotHeatmapUnified("","");
     }
 });
+
+
+$("#applyOnClick").click(AjaxExploreMarkers);

@@ -11,6 +11,51 @@ import time
 with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
     L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
 
+# def re_order_celltypes(df):
+
+#     new_order = [
+#         'Adventitial fibroblast',
+#         'Early adventitial fibroblast',
+#         'Fibroblast precursor',
+#         'Myofibroblast and smooth muscle precursor',
+#         'Proliferating fibroblast',
+#         'B cell',
+#         'DC I',
+#         'DC II',
+#         'DC III',
+#         'IL cell',
+#         'Mac I',
+#         'Mac II',
+#         'Mac III',
+#         'Mac IV',
+#         'Mac V',
+#         'NK cell',
+#         'T cell',
+#         'basophil',
+#         'mast cell',
+#         'neutrophil',
+#         'Alveolar fibroblast',
+#         'Alveolar type I',
+#         'Alveolar type II',
+#         'Early alveolar fibroblast',
+#         'Airway smooth muscle',
+#         'Early airway smooth muscle',
+#         'Myofibroblast',
+#         'Proliferating myofibroblast',
+#         'Vascular smooth muscle',
+#         'Arterial EC I',
+#         'Arterial EC II',
+#         'Car4+ capillaries',
+#         'Early Car4- capillaries',
+#         'Late Car4- capillaries',
+#         'Lymphatic EC',
+#         'Nonproliferative embryonic EC',
+#         'Pericyte',
+#         'Proliferating pericyte',
+#         'Proliferative EC',
+#         'Venous EC',
+#     ]
+#     return df[new_order]
 
 def read_file_average_exp(df_type,genes=None):
     '''

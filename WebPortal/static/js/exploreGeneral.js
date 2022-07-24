@@ -97,21 +97,7 @@ function AjaxExploreGeneral() {
     $('#scatterPlot').empty();
   }
 
-  // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
-  //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
-  cpm_is_active = $("#cpmTab").hasClass('is-active');
-  orginal_is_active = $("#originalOrderTab").hasClass('is-active')
-  var plot_type = 'original';
-  var data_type = 'original';
-  
-  if (!cpm_is_active) {
-    data_type = 'log10';
-  } 
-  
-  if (!orginal_is_active) {
-    plot_type = "hieracical";
-  }
-  
+
   var genes_string = $('#listGenes').val();
   const gene_array = genes_string.split(",")
   if (gene_array.length == 2) {

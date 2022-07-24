@@ -122,19 +122,6 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
 
 
 function AjaxExploreUnified() {
-    console.log("swicth to unified");
-    cpm_is_active = $("#cpmTab").hasClass('is-active');
-    orginal_is_active = $("#originalOrderTab").hasClass('is-active')
-    var plot_type = 'original';
-    var data_type = 'original';
-
-    if (!cpm_is_active) {
-        data_type = 'log10';
-    } 
-
-    if (!orginal_is_active) {
-        plot_type = "hieracical";
-    }
     // action here when clicking the search button
     var gene_name = $('#singleGene').val();
 

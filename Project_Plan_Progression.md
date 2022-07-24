@@ -233,3 +233,149 @@ Package:
   - Explain the compression alogirthm
 
   
+
+
+
+background 2-3 slides
+
+- goal of the compression, how and why, 
+- the need for visualisation
+- the need for a simple to use interface (can show some example of currently available once but don't have too much detail here, the main point is to show that the current ones are slow and a bit difficult to use)
+
+design (DO NOT TALK ABOUT USER ACTION, you do that in demo)
+
+- what did you use for frontend
+  - jquery 
+    - lightweight, fast simple, no dependencies
+  - Plotly js
+    - powerful plotting package 
+- what did you use for backend
+  - flask api 
+  - Pandas for data manipulation 
+  - did you use scanpy? 
+- what types of plots and why
+  - scatter plot
+    - investigate linear relationship between expression values in cell types of two genes
+  - heatmap
+    - shows averaged expr values of multiple genes in multiple cell types simultaneously 
+    - Color => expression value
+    - support Clustering of cell types
+  - bubble map
+    - just like heatmap
+    - shows one more dimension: the proportion of cells expressing a specific gene
+  - Why?
+    - yes, there are more complicated ways to visualise sc rna data like t-SNE plots, but that may not be acheievable due to compressed data, which is done for easy sharing of experiment results
+    - this portal aims to support early investigation of data / target users may not have prior experience with bioinformatics  -> therefore we use simple diagram
+- what questions are the plots trying to answer
+  - I want to know the expression information (level, proportion) of a list of genes in different cell types  (by cell type)
+  - Given a gene, what is its expression level in different time points (development progression of this gene)
+  - What are the outlier genes for a given cell types threshold (mention later in 'future plan section' saying that you will improve this later by doing ...) 
+
+demo
+
+- Demo the portal
+- demo the package
+  - how to install
+  - how to import
+  - mention that you can can use your own compressed dataset
+  - show the user guide html
+
+future plan
+
+- your future plan
+  - Improvements (mainly for marker gene page I guess)
+  - documentation (better documentation)
+  - put to public domain? both portal and package
+  - test the portal using different cell atlas from other organs 
+- reflection
+  - compare to your industry training experience
+  - compare to your uni study experience
+  - Not just to get things down, but to think of better or smarter way to achieve it. 
+    - e.g: speed up the program, minimise duplicate things. 
+  - Learn to use different tools
+  - How does the result make sense biologically (
+    - e.g: when doing the marker genes page, I select the outlier genes of each celltype and called them 'marker genes', sometimes we can't trust the result, we must validate it using different resources. e.g: % of the genes in the list are actual marker genes that has been proofed by literature) ---> am I doing this correctly? 
+  - Always seek for other people (professional's help)
+  - At the begining, I was always relied on my supervisor and aks him what I should do next. If he told me to think of it myself, I would feel sad and don't know what to do. But now I realise that a research project should be something that what I want to do, and what I want to achieve through it. It is more like an opportunity...blabla
+  - Always start things from simple and make it work. 
+
+
+
+
+
+QR code (scan and use) -----> for poster in Thesis C
+
+
+
+Cell type oder (change)
+
+
+
+dataset(link to paper)
+
+ p7 -1, p7-2 (timepoint unified), hover over can not be displayed
+
+...Rik : not name () --> go to ncbi ---> unknot ---> find its functional (most of the naming is based on its functionality and families)
+
+
+
+case insensitive change is good 
+
+mouse: capitalise
+
+Human: 
+
+
+
+Celltype: link (or description)
+
+
+
+marker genes (rank) --> gives a filter (top 10/top30 high expression).
+
+
+
+Unknot genes ()RIK ----> obvious marker ---> meaning of research
+
+H5--->AnnData (convertor)
+
+
+
+dot plot title
+
+
+
+install package css
+
+
+
+Click on questions and redirected to the corresponded page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

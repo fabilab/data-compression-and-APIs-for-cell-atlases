@@ -94,18 +94,6 @@ function AjaxExploreDatasets() {
   
   // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
   //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
-  cpm_is_active = $("#cpmTab").hasClass('is-active');
-  orginal_is_active = $("#originalOrderTab").hasClass('is-active')
-  var plot_type = 'original';
-  var data_type = 'original';
-  
-  if (!cpm_is_active) {
-    data_type = 'log10';
-  } 
-  
-  if (!orginal_is_active) {
-    plot_type = "hieracical";
-  }
   // action here when clicking the search button
   var gene_name = $('#singleGene').val();
   // sent gene names to the API
@@ -113,7 +101,7 @@ function AjaxExploreDatasets() {
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data_datasets',
-    data: "gene=" + gene_name + "&plottype=" + plot_type + "&datatype=" + data_type,
+    data: "gene=" + gene_name,
     success: function(result) {
         plotAll(result);
     },

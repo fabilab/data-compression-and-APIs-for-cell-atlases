@@ -56,12 +56,14 @@ function ShowMarker() {
     $("#tabMarker").addClass('is-active');
     $("#marker_genes").removeClass('is-hidden');
     $("#displayPlotMarkers").removeClass('is-hidden');
+    $("#sum_markers").removeClass("is-hidden");
 }
 
 function HideMarker() {
     $("#tabMarker").removeClass('is-active');
     $("#marker_genes").addClass('is-hidden');
     $("#displayPlotMarkers").addClass('is-hidden');
+    $("#sum_markers").addClass("is-hidden");
 }
 
 $("#tabGeneral").click(function() {

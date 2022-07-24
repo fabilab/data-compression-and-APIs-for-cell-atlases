@@ -1,4 +1,4 @@
-function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
+function HeatmapMarkerGenes(result,html_element_id,selected_cell, gene_order) {
     // const start = performance.now();
     // console.log("start plotting the heatmap");
     // check the button id active
@@ -7,7 +7,7 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
         html_element_id = "displayPlotMarkers";
     }
 
-    let genes = Object.keys(result[Object.keys(result)[0]])
+    let genes = gene_order;
     let celltypes = Object.keys(result);
     
     if (!result) {
@@ -24,6 +24,8 @@ function HeatmapMarkerGenes(result,html_element_id,selected_cell) {
         
         let ngenes = y_axis.length;
         let ncelltypes = x_axis.length;
+        $("#num_markers").empty();
+        $("#num_markers").append(ngenes);
 
         // let heatmap_width = 1300;
         let heatmap_height = 270 + 20 * ngenes;
@@ -103,7 +105,7 @@ function AjaxExploreMarkers() {
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
                 $("#displayPlotMarkers").empty();
-                HeatmapMarkerGenes(result,'',selected_cell);
+                HeatmapMarkerGenes(result['data'],'',selected_cell, result['order']);
             },
             error: function (e) {
                 alert('Request data fail (no cell types available)')

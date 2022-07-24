@@ -136,7 +136,7 @@ def get_marker_genes_list(celltype=None):
         Returns:
             a list of gene names (list)
     '''
-    with open('./static/scData/celltypeMarkerGeneList.txt') as f:
+    with open('./static/scData/celltypeMarkerGeneList_descending.txt') as f:
         data = json.load(f)
 
     return data[celltype]
@@ -151,14 +151,16 @@ def marker_genes_expression(celltype):
             json object with genes as keys, value: list of celltype and gene expression values
     '''
     
-    gene_list = get_marker_genes_list(celltype)
-    gene_list = ','.join(gene_list)
+    original_gene_list = get_marker_genes_list(celltype)
+    gene_list = ','.join(original_gene_list)
     df = read_file_average_exp("celltype",gene_list)
     df['current'] = df[celltype]
     for column in df.columns:
         df[column] = (df[column] / df['current']).round(3)
     df.drop(['current'], axis=1,inplace=True)
-    return json.loads(df.to_json())
+    original_gene_list.reverse()
+    return {'data': json.loads(df.to_json()), 'order': original_gene_list}
+
 
 
 def timepoint_reorder(tp1, tp2):

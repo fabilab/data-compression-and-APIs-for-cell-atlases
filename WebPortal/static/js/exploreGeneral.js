@@ -43,22 +43,30 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
             let heatmap_height = 280 + 25 * ngenes;
 
             let data_content = [];
+            let hover_text = [];
             for (var i = 0; i < ngenes; i++) {
                 let each_gene_data = [];
+                let temp = [];
                 for (var j = 0; j < ncelltypes; j++) {
                     exp = result[y_axis[i]][x_axis[j]];
+                    let gn = genes[i]
+                    let ct = celltypes[j];
                     if (useLog) {
                         exp = Math.log10(exp + 0.5);
                     }
                     each_gene_data.push(exp);
+                    temp.push('Celltype: '+ct+'<br>Gene: '+gn+'<br>Expression: '+exp);
                 }
                 data_content.push(each_gene_data);
+                hover_text.push(temp);
             }
 
             var data = {
                 type: 'heatmap',
                 hoverongaps: false,
                 colorscale: 'Reds',
+                text:hover_text,
+                hoverinfo: 'text',
             };
             var layout = {
                 autosize: true, 

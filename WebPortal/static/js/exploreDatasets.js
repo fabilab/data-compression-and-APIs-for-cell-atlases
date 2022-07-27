@@ -52,6 +52,7 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
             }
             data_content.push(all_gene_expression);
         }
+
         let ncelltypes = x_axis.length;
         let nTimepoints = y_axis.length;
         let heatmap_width = 1300;
@@ -92,9 +93,6 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
 
 function AjaxExploreDatasets() {
   
-  // When doing the search gene name action, we want it to be change immediatly without switching back to the original heatmap,
-  //  for example, if we are looking at a log10 plot,and we do the search action, the tab stays at the log10 
-  // action here when clicking the search button
   var gene_name = $('#singleGene').val();
   // sent gene names to the API
   console.log(gene_name);

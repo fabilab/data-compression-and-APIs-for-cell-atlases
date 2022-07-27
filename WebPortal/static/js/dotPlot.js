@@ -32,16 +32,12 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
     let all_size = [];
     let all_hovertext = [];
     var desired_maximum_marker_size = 6.5;
-    let max_expr_value = result_wrapper['max_expression'];
+
 
     for (var i = 0; i < ngenes; i++) {
       let this_gene = genes[i];
       
-      // let marker_color = [];
-      // let marker_size = [];
-      //  let hovertext = [];
       for (var j = 0; j < ncelltypes; j++) {
-        // marker_size.push(result_proportion[this_gene][celltypes[j]]*100);
         
         let exp = result_avg[this_gene][celltypes[j]];
         if (useLog) {
@@ -54,25 +50,6 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
         all_color.push(exp);
         all_size.push(result_proportion[this_gene][celltypes[j]]*100);
       }
-      
-      // let gene_trace = {
-      //   x: celltypes,
-      //   y: Array(ncelltypes).fill(`<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`),
-      //   mode: 'markers',
-      //   marker: {
-      //     size: marker_size,
-      //     sizeref: 2 * Math.max(...marker_size) / (desired_maximum_marker_size**2),
-      //     color: marker_color,
-      //     colorscale: 'YlGnBu',
-      //   },
-      //   text: hovertext,
-      //   hoverinfo: 'text',
-      // }
-      // if (i === 0) {
-      //   gene_trace['marker']['colorbar'] = {thickness:15}
-      // }
-      // data.push(gene_trace);
-
     }
 
     let data = {

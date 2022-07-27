@@ -55,8 +55,15 @@ function HideUnified() {
 function ShowMarker() {
     $("#tabMarker").addClass('is-active');
     $("#marker_genes").removeClass('is-hidden');
-    $("#displayPlotMarkers").removeClass('is-hidden');
     $("#sum_markers").removeClass("is-hidden");
+    $("#plotType").removeClass('is-hidden');
+    let plot = $("#selectPlotType option:selected").val();
+    if (plot === "dot") {
+        $("#dotPlotMarker").removeClass("is-hidden");
+    }
+    else {
+        $("#displayPlotMarkers").removeClass("is-hidden");
+    }
 }
 
 function HideMarker() {
@@ -64,6 +71,8 @@ function HideMarker() {
     $("#marker_genes").addClass('is-hidden');
     $("#displayPlotMarkers").addClass('is-hidden');
     $("#sum_markers").addClass("is-hidden");
+    $("#plotType").addClass('is-hidden');
+    $("#dotPlotMarker").addClass('is-hidden');
 }
 
 $("#tabGeneral").click(function() {
@@ -97,13 +106,22 @@ $("#tabMarker").click(function() {
 $("#selectPlotType").change(function() {
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlot").removeClass("is-hidden");
-        $("#displayPlot").addClass("is-hidden");
-
+        if($("#tabGeneral").hasClass('is-active')) {
+            $("#dotPlot").removeClass("is-hidden");
+            $("#displayPlot").addClass("is-hidden");
+        } else if($("#tabMarker").hasClass('is-active')) {
+            $("#displayPlotMarkers").addClass("is-hidden");
+            $("#dotPlotMarker").removeClass("is-hidden");
+        }
     }
     else {
-        $("#dotPlot").addClass("is-hidden");
-        $("#displayPlot").removeClass("is-hidden");
+        if($("#tabGeneral").hasClass('is-active')) {
+            $("#dotPlot").addClass("is-hidden");
+            $("#displayPlot").removeClass("is-hidden");
+        } else if($("#tabMarker").hasClass('is-active')) {
+            $("#displayPlotMarkers").removeClass("is-hidden");
+            $("#dotPlotMarker").addClass("is-hidden");
+        }
     }
 });
 
@@ -165,5 +183,22 @@ $("#selectDataOrder").change(function() {
     }
 });
 
+$("#selectTopMarkers").change(function() {
+    let showNum = $("#selectTopMarkers option:selected").val();
+    if (showNum === 'top30') {
+        HeatmapMarkerGenes("","","","", "", 30);
+        DotplotProportionExpMarker("","","","","","", 30);
+    } else if (showNum === 'top20') {
+        HeatmapMarkerGenes("","","","", "", 20);
+        DotplotProportionExpMarker("","","","","","", 20);
+
+    } else if (showNum === 'top10') {
+        HeatmapMarkerGenes("","","","", "", 10);
+        DotplotProportionExpMarker("","","","","","", 10);
+    } else {
+        HeatmapMarkerGenes("","","","", "","");
+        DotplotProportionExpMarker("","","","","","", "");
+    }
+})
 
 $("#applyOnClick").click(AjaxExploreMarkers);

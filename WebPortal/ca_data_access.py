@@ -153,15 +153,16 @@ def marker_genes_expression(celltype):
     
     original_gene_list = get_marker_genes_list(celltype)
     gene_list = ','.join(original_gene_list)
-    df = read_file_average_exp("celltype",gene_list)
-    df['current'] = df[celltype]
-    for column in df.columns:
-        df[column] = (df[column] / df['current']).round(3)
-    df.drop(['current'], axis=1,inplace=True)
-    original_gene_list.reverse()
-    return {'data': json.loads(df.to_json()), 'order': original_gene_list}
+    df_original = read_file_average_exp("celltype",gene_list)
+    df_scaled = df_original.copy()
+    df_scaled['current'] = df_scaled[celltype]
+    for column in df_scaled.columns:
+        df_scaled[column] = (df_scaled[column] / df_scaled['current']).round(3)
+    df_scaled.drop(['current'], axis=1,inplace=True)
+    # also get the proportion data
+    df_proportion = read_file_proportion_exp("celltype",gene_list)
 
-
+    return {'data_original': json.loads(df_original.to_json()),'data_scaled':json.loads(df_scaled.to_json()), 'exp_proportion':json.loads(df_proportion.to_json()),'order': original_gene_list}
 
 def timepoint_reorder(tp1, tp2):
     '''

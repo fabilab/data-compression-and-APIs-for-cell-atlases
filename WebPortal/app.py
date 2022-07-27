@@ -181,13 +181,14 @@ class dataScatter(Resource):
         df = read_file_average_exp("celltype",gene_names)
         if df is None:
             return None
-        a_gene_names = [name.capitalize() for name in gene_names.split(",")]
+        a_gene_names = gene_names.split(",")
+        print(a_gene_names)
         if len(a_gene_names) == 2:
             result = {}
             plot_df = df.filter(items = a_gene_names, axis=0)
             gene1 = plot_df.index[0]
             gene2 = plot_df.index[1]
-
+            
             gene1_expr = list(plot_df.loc[gene1])
             gene2_expr = list(plot_df.loc[gene2])
 

@@ -63,7 +63,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
         
         data_content.push(expression_in_all_celltypes);
     }
-    // each with this format
+    // Generate hover text for each spot
     // Celltype: {ct}, Expression: {exp}, Dataset: {ds}, Timepoint: {tp}, 
     let hover_text = [];
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
@@ -76,7 +76,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
             // "ACZ_P21"
             let ds = dt.split("_")[0];
             let tp = dt.split("_")[1];
-            temp.push('Celltype: '+ct+', Expression: '+exp+', Dataset: '+ds+', Timepoint: '+tp);
+            temp.push('Celltype: '+ct+'<br>Dataset: '+ds+'<br>Timepoint: '+tp+'<br>Expression: '+exp);
         }
         hover_text.push(temp);
     }
@@ -87,11 +87,9 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
     let heatmap_height = 270 + 30 * nTimepoints;
     var data = {
         type: 'heatmap',
-        text: hover_text,
         hoverinfo: 'text',
         colorscale: 'Reds',
     };
-    console.log(result['gene']);
     var layout = {
         title: 'Expression profile of ' + result['gene'] + ' gene in all cell types over development time',
         xaxis: {
@@ -110,12 +108,13 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
         data['z'] = data_content;
         data['x'] = x_axis;
         data['y'] = y_axis;
+        data['text'] = hover_text;
         Plotly.newPlot(document.getElementById(html_element_id), [data], layout);
     } else {
         data['z'] = [data_content];
         data['x'] = [x_axis];
         data['y'] = [y_axis];
-
+        data['text'] = [hover_text];
         Plotly.update(document.getElementById(html_element_id), data, layout);
     }
 };

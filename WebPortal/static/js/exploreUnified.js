@@ -1,6 +1,6 @@
 dataForPlotsUnified = {}
 
-function plotHeatmapUnified(result,html_element_id,gene_name) {
+function plotHeatmapUnified(result,html_element_id) {
     // flags passed by events.js
     let useLog = dataForPlotsUnified['useLog'];
     let celltypeOrder = dataForPlotsUnified['celltypeOrder'];
@@ -34,14 +34,14 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
     let y_axis_dataset = [];
     // timepoint that with duplicate:
     let y_axis_time = [];
-    // plot only the timepoint on Y-axis
+    
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
         // dataset timepoint combination: e.g TMS_24m
         let dataset_timepoint = result['dataset_timepoint'][i];
         let time  = dataset_timepoint.split("_")[1];
         let dataset = dataset_timepoint.split("_")[0];
         if (y_axis.includes(time)) {
-            y_axis.push(" ");
+            y_axis.push(time+'\'\'');
         } else {
             y_axis.push(time);
         }
@@ -71,8 +71,12 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
         for (var j = 0; j < result['cell_type'].length; j++) {
             let dt = result['dataset_timepoint'][i];
             let ct = result['cell_type'][j];
-            
-            let exp = expression[dt][ct];
+            let exp;
+            if(useLog) {
+                exp = Math.log10(expression[dt][ct]+0.5);
+            } else{
+                exp = expression[dt][ct];
+            }
             // "ACZ_P21"
             let ds = dt.split("_")[0];
             let tp = dt.split("_")[1];
@@ -91,7 +95,7 @@ function plotHeatmapUnified(result,html_element_id,gene_name) {
         colorscale: 'Reds',
     };
     var layout = {
-        title: 'Expression profile of ' + result['gene'] + ' gene in all cell types over development time',
+        title: 'Expression profile of <b>' + result['gene'] + '</b> gene in all cell types over development time',
         xaxis: {
             title: '<b>Celltypes<b>',
             automargin: true,

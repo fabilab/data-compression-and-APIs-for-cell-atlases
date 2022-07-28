@@ -31,7 +31,7 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
     let all_color = [];
     let all_size = [];
     let all_hovertext = [];
-    var desired_maximum_marker_size = 6.5;
+    var desired_maximum_marker_size = 6.3;
 
 
     for (var i = 0; i < ngenes; i++) {
@@ -69,6 +69,7 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
     };
     
     var layout = {
+        title:"Dot Plot showing expression level and population faction of selected genes across 41 different cell types",
         autosize: true,
         showlegend: false,
         xaxis: {

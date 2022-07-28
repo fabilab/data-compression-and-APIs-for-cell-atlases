@@ -54,6 +54,10 @@ def dataExplore():
 def resources():
     return render_template('resources.html')
 
+@app.route('/userGuide',methods=['GET'])
+def userGuide():
+    return render_template('userGuide.html')
+
 @app.route('/package',methods=['GET'])
 def package():
     return render_template('./showPackage/index.html')
@@ -203,7 +207,6 @@ class dataScatter(Resource):
 class dataUnified(Resource):
     def get(self):
         genename = request.args.get('gene')
-
         return dataset_unified(genename)
 
 class dataMarkerGenes(Resource):

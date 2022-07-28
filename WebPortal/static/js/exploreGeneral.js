@@ -38,6 +38,8 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
             
             let ngenes = y_axis.length;
             let ncelltypes = x_axis.length;
+            $("#num_genes").empty();
+            $("#num_genes").append(ngenes);
 
             let heatmap_width = 1050;
             let heatmap_height = 280 + 25 * ngenes;

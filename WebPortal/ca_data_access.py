@@ -287,7 +287,6 @@ def dataset_unified(genename):
                 "Early adventitial FB": -1,
             }
     '''
-    genename = genename.capitalize()
     df = read_file_average_exp('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []

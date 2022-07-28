@@ -85,6 +85,7 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
     };
     
     var layout = {
+        title:"Dot Plot showing expression level and population faction of <b>"+selected_cell+"'s</b> marker genes across 41 different cell types",
         autosize: false,
         showlegend: false,
         xaxis: {

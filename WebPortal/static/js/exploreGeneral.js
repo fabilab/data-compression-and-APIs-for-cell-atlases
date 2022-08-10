@@ -117,7 +117,7 @@ function AjaxExploreGeneral() {
       data: "gene_names=" + genes_string,
       success: ScatterPlot,
       error: function (e) {
-        alert('Request data Failed')
+        Swal.fire('Invalid input', `${e.responseText.substring(1, e.responseText.length - 2)}is invalid, please make sure you type in the corrent gene names.`, 'error')
       }
     });
   }
@@ -133,8 +133,14 @@ function AjaxExploreGeneral() {
       DotplotProportionExp(result, "dotPlot");
     },
     error: function (e) {
-      alert('Error:Input gene name is invalid, please make sure you type in the corrent gene names.')
+        Swal.fire('Invalid input', `${e.responseText.substring(1, e.responseText.length - 2)}is invalid, please make sure you type in the correct gene names.`, 'error')
     }
     });
   }
 $("#searchOnClick_list" ).click(AjaxExploreGeneral)
+
+function clearTextArea() {
+    $("#listGenes").val('');
+}
+
+$("#clearOnClick_list").click(clearTextArea)

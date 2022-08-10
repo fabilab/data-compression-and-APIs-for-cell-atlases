@@ -50,12 +50,16 @@ function plotHeatmapUnified(result,html_element_id) {
         
         let expression_in_all_celltypes = [];
         for (var k = 0; k < celltypes.length; k++) {
-            expression_in_all_celltypes.push(expression[dataset_timepoint][celltypes[k]]);
+            if (expression[dataset_timepoint][celltypes[k]] === -1) {
+                expression_in_all_celltypes.push(null);
+            } else {
+                expression_in_all_celltypes.push(expression[dataset_timepoint][celltypes[k]]);
+            }
         }
 
         if (useLog) {
             for (var j = 0; j < expression_in_all_celltypes.length; j++) {
-                if (expression_in_all_celltypes[j] !== -1) {
+                if (expression_in_all_celltypes[j] !== null) {
                     expression_in_all_celltypes[j] = Math.log10(expression_in_all_celltypes[j] + 0.5);
                 }
             }
@@ -72,7 +76,7 @@ function plotHeatmapUnified(result,html_element_id) {
             let dt = result['dataset_timepoint'][i];
             let ct = result['cell_type'][j];
             let exp;
-            if(useLog) {
+            if(useLog && expression[dt][ct] !== null) {
                 exp = Math.log10(expression[dt][ct]+0.5);
             } else{
                 exp = expression[dt][ct];
@@ -137,7 +141,7 @@ function AjaxExploreUnified() {
                 plotHeatmapUnified(result,"displayPlotUnified");
             },
             error: function (e) {
-                alert('Request data Failed !')
+                Swal.fire('Invalid input','please make sure you type in the correct gene name','error');
             }
         });
         $("#originalTab").addClass('is-active');

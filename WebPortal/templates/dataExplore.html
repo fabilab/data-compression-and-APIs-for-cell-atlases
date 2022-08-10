@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v6.1.1/css/all.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
   </head>
@@ -27,7 +28,7 @@
 		<a class="navbar-item is-active" href="http://127.0.0.1:5000/dataExplore">     
 			Explore Data
 		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/about">
+		<a class="navbar-item" href="http://127.0.0.1:5000/userGuide">
 			User Guide
 		</a>
 		<a class="navbar-item" href="http://127.0.0.1:5000/resources">     
@@ -45,12 +46,12 @@
         <ul>
           <li id="tabGeneral" class="is-active">
             <a>
-              <span>General</span>
+              <span>Compressed</span>
             </a>
           </li>
           <li id="tabDataset">
             <a>
-              <span>By Dataset</span>
+              <span>With Dataset</span>
             </a>
           </li >
           <li id="tabTimepoints">
@@ -88,17 +89,21 @@
                     </div>
                   </div>  
                 </div>
-              </div>   
+              </div>
               <div class="field" id="multiple_genes">
                 <label class="label">Search for multiple genes</label>
-                <div class="field has-addons">
+                <div class="field">
                   <div class="control">
-                    <a class="button is-info" id="searchOnClick_list">
-                        <i class="fas fa-search"></i>
-                    </a>
+                    <textarea class="textarea" id="listGenes" type="text" placeholder="e.g.'Car4,Col1a1...'"></textarea>
+                    <!-- <input class="input" id="listGenes" type="text" placeholder="e.g.'Car4,Col1a1...'"> -->
+                  </div>
+                </div>
+                <div class="field is-grouped">
+                  <div class="control">
+                    <button class="button is-info" id="searchOnClick_list">Submit</button>
                   </div>
                   <div class="control">
-                    <input class="input" id="listGenes" type="text" placeholder="e.g.'Car4,Col1a1...'">
+                    <button class="button is-info is-light" id="clearOnClick_list">Clear</button>
                   </div>
                 </div>
               </div>
@@ -126,7 +131,7 @@
                   </div>
                 </div>
               </div>
-              <div class="field">
+              <div class="field" id="dataType">
                 <label class="label">Data type</label>
                 <div class="control">
                   <div class="select" style="width:80%;">
@@ -137,7 +142,7 @@
                   </div>
                 </div>
               </div>
-              <div class="field">
+              <div class="field" id="dataOrder">
                 <label class="label">Data order</label>
                 <div class="control">
                   <div class="select" style="width:80%;">

@@ -43,10 +43,11 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
             let all_gene_expression = [];        // find it from the dictionary as a key
             for (var j = 0; j < celltypes.length; j++) {
                 let exp = result[timepoint][celltypes[j]];
-                if (useLog) {
-                    if (exp !== -1) {
-                        exp = Math.log10(exp + 0.5);
-                    }
+                if (exp === -1) {
+                    exp = null;
+                }
+                if (useLog && exp !== null) {
+                    exp = Math.log10(exp + 0.5);
                 }
                 all_gene_expression.push(exp);
             }
@@ -104,7 +105,8 @@ function AjaxExploreDatasets() {
         plotAll(result);
     },
     error: function (e) {
-        alert('Request data Failed(in assemble timepoint)')
+        Swal.fire('Invalid input','please make sure you type in the correct gene name','error');
+
     }
     });
   }

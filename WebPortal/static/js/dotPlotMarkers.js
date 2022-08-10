@@ -122,8 +122,8 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
                     automargin: true,
                     range: [-1, showNumMarkers]
                 }
-            }
-        );
+            },
+        layout);
     }
   
   }

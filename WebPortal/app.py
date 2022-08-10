@@ -86,12 +86,25 @@ def page4():
 class getAllCellTypes(Resource):
     def get(self):
         result = {
-            'Connective tissue':[
+            'Fibroblast': [
                 'Adventitial fibroblast',
                 'Early adventitial fibroblast',
                 'Fibroblast precursor',
+                'Proliferating fibroblast',
+                'Alveolar fibroblast',
+                'Early alveolar fibroblast'
+            ],
+            'ASM and MyoF':[
                 'Myofibroblast and smooth muscle precursor',
-                'Proliferating fibroblast'
+                'Airway smooth muscle',
+                'Early airway smooth muscle',
+                'Myofibroblast',
+                'Proliferating myofibroblast'
+            ],
+            'Mural': [
+                'Vascular smooth muscle',
+                'Pericyte',
+                'Proliferating pericyte'
             ],
             'Immune system':[
                 'B cell',
@@ -111,17 +124,8 @@ class getAllCellTypes(Resource):
                 'neutrophil'
             ],
             'Lungs':[
-                'Alveolar fibroblast',
                 'Alveolar type I',
                 'Alveolar type II',
-                'Early alveolar fibroblast'
-            ],
-            'Smooth muscle':[
-                'Airway smooth muscle',
-                'Early airway smooth muscle',
-                'Myofibroblast',
-                'Proliferating myofibroblast',
-                'Vascular smooth muscle'
             ],
             'Vasculature':[
                 'Arterial EC I',
@@ -131,8 +135,6 @@ class getAllCellTypes(Resource):
                 'Late Car4- capillaries',
                 'Lymphatic EC',
                 'Nonproliferative embryonic EC',
-                'Pericyte',
-                'Proliferating pericyte',
                 'Proliferative EC',
                 'Venous EC'
             ],
@@ -144,7 +146,7 @@ class getAllCellTypes(Resource):
 
 class getAllGeneNames(Resource):
     def get(self):
-        df = read_file_average_exp('celltype')
+        _, df = read_file_average_exp('celltype')
         return list(df.index)
 
 # new end point for timepoint dataset:
@@ -160,10 +162,14 @@ class dataGeneral(Resource):
         df_average = None
         df_proportion = None
         # df = data_preprocessing(gene_names,'celltype')
-        df_average = read_file_average_exp("celltype",gene_names).T
-        df_proportion = read_file_proportion_exp("celltype",gene_names).T
-        if df_average is None or df_proportion is None:
-            return None
+        res, data = read_file_average_exp("celltype",gene_names)
+        if not res:
+            return data, 400
+        df_average = data.T
+        res, data = read_file_proportion_exp("celltype",gene_names)
+        if not res or df_average is None or data is None:
+            return None, 400
+        df_proportion = data.T
 
         distance = pdist(df_average.values)
         Z = linkage(distance,optimal_ordering=True)
@@ -182,9 +188,9 @@ class dataScatter(Resource):
     def get(self):
         gene_names = request.args.get('gene_names')
         # df = data_preprocessing(gene_names,'celltype')
-        df = read_file_average_exp("celltype",gene_names)
-        if df is None:
-            return None
+        res, df = read_file_average_exp("celltype",gene_names)
+        if not res or df is None:
+            return df, 400
         a_gene_names = gene_names.split(",")
         print(a_gene_names)
         if len(a_gene_names) == 2:

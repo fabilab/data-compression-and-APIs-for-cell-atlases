@@ -11,63 +11,40 @@ import time
 with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
     L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
 
-# def re_order_celltypes(df):
 
-#     new_order = [
-#         'Adventitial fibroblast',
-#         'Early adventitial fibroblast',
-#         'Fibroblast precursor',
-#         'Myofibroblast and smooth muscle precursor',
-#         'Proliferating fibroblast',
-#         'B cell',
-#         'DC I',
-#         'DC II',
-#         'DC III',
-#         'IL cell',
-#         'Mac I',
-#         'Mac II',
-#         'Mac III',
-#         'Mac IV',
-#         'Mac V',
-#         'NK cell',
-#         'T cell',
-#         'basophil',
-#         'mast cell',
-#         'neutrophil',
-#         'Alveolar fibroblast',
-#         'Alveolar type I',
-#         'Alveolar type II',
-#         'Early alveolar fibroblast',
-#         'Airway smooth muscle',
-#         'Early airway smooth muscle',
-#         'Myofibroblast',
-#         'Proliferating myofibroblast',
-#         'Vascular smooth muscle',
-#         'Arterial EC I',
-#         'Arterial EC II',
-#         'Car4+ capillaries',
-#         'Early Car4- capillaries',
-#         'Late Car4- capillaries',
-#         'Lymphatic EC',
-#         'Nonproliferative embryonic EC',
-#         'Pericyte',
-#         'Proliferating pericyte',
-#         'Proliferative EC',
-#         'Venous EC',
-#     ]
-#     return df[new_order]
+def gene_validation(all_genes,genes):
+    """for each gene in the given list, check if it's valid
+
+    :param all_genes: all genes in our dataset
+    :type all_genes: list
+    :param genes: input genes
+    :type genes: list
+    :return: invalid genes
+    :rtype: list
+    """
+    invalid_genes = []
+    for gene in genes:
+        if gene not in all_genes:
+            invalid_genes.append(gene)
+    return invalid_genes
 
 def read_file_average_exp(df_type,genes=None):
     '''
     read in a .h5 file from the source directory,
-    return a dataframe based on the user's specified dataset type and genes of interest
+    return 
+        1. if invalid input, return a list of invalid genes
+        2. if all inputs are valid, return a dataframe based on the user's specified dataset type and genes of interest
         parameters:
             dataset type(string):  celltype/celltype_dataset/celltype_dataset_timepoint
             genes name (string)
         Return:
-            a dataframe (df)
+            success (boolean)
+            a dataframe (df) / invalid genes (list)
     '''
     genes = genes.split(",")
+    invalid_genes = gene_validation(L,genes)
+    if len(invalid_genes) > 0:
+        return False, invalid_genes
     with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
         # List of genes
         indexs = []
@@ -82,7 +59,7 @@ def read_file_average_exp(df_type,genes=None):
         for index in indexs:
             new_gene = L[index]
             new_genes.append(new_gene)
-        # expression table (only numbers,no index nor columns)
+
         data = np.array(h5_data[df_type]['gene_expression_average']['block0_values'][:, indexs]).astype(np.float32)
         columns=np.array(h5_data[df_type]['gene_expression_average']['axis1'].asstr())
         df = pd.DataFrame(
@@ -91,7 +68,7 @@ def read_file_average_exp(df_type,genes=None):
             columns=columns,
         )
 
-    return df
+    return True, df
 
 def read_file_proportion_exp(df_type,genes=None):
     '''
@@ -104,6 +81,10 @@ def read_file_proportion_exp(df_type,genes=None):
             a dataframe (df)
     '''
     genes = genes.split(",")
+    invalid_genes = gene_validation(L,genes)
+    if len(invalid_genes) > 0:
+        return False, invalid_genes
+    
     with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
         # List of genes
         indexs = []
@@ -126,7 +107,7 @@ def read_file_proportion_exp(df_type,genes=None):
             index = new_genes,
             columns=columns,
         )
-    return df
+    return True, df
 
 def get_marker_genes_list(celltype=None):
     '''
@@ -153,14 +134,14 @@ def marker_genes_expression(celltype):
     
     original_gene_list = get_marker_genes_list(celltype)
     gene_list = ','.join(original_gene_list)
-    df_original = read_file_average_exp("celltype",gene_list)
+    res, df_original = read_file_average_exp("celltype",gene_list)
     df_scaled = df_original.copy()
     df_scaled['current'] = df_scaled[celltype]
     for column in df_scaled.columns:
         df_scaled[column] = (df_scaled[column] / df_scaled['current']).round(3)
     df_scaled.drop(['current'], axis=1,inplace=True)
     # also get the proportion data
-    df_proportion = read_file_proportion_exp("celltype",gene_list)
+    _, df_proportion = read_file_proportion_exp("celltype",gene_list)
 
     return {'data_original': json.loads(df_original.to_json()),'data_scaled':json.loads(df_scaled.to_json()), 'exp_proportion':json.loads(df_proportion.to_json()),'order': original_gene_list}
 
@@ -219,9 +200,8 @@ def timepoint_reorder(tp1, tp2):
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
 def dataset_by_dataset(genename,df_type):
-    genename = genename.capitalize()
     # select and pre-preprocessing data
-    df_tp = read_file_average_exp(df_type,genename)
+    res, df_tp = read_file_average_exp(df_type,genename)
 
     # select data for a given gene name
     df_filtered=df_tp.loc[[genename]]
@@ -239,9 +219,7 @@ def dataset_by_dataset(genename,df_type):
         timepoints = list(set([name.split("_")[2] for name in dataset_name.columns]))
         celltypes = set([name.split("_")[0] for name in dataset_name.columns])
         
-        # re-arrange the dataframe based on timepoint order:
-        # e.g: P21, P3
-        # sorted function depends on key(0,1,-1), output of the sorting function
+        # timepoint sorted function depends on key(0,1,-1), output of the sorting function
         timepoints = sorted(timepoints, key=functools.cmp_to_key(timepoint_reorder))
 
         # create a new empty dataframe for each dataset   
@@ -287,7 +265,7 @@ def dataset_unified(genename):
                 "Early adventitial FB": -1,
             }
     '''
-    df = read_file_average_exp('celltype_dataset_timepoint',genename)
+    res, df = read_file_average_exp('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []
     dt_combinations = []  # store all the existing dataset and timepoint combinations

@@ -37,7 +37,7 @@ function ScatterPlot(result) {
           },
           range: [y_min, y_max]
         },
-        title:'Comparison of gene expression level between ' + result['gene1_name'] + ' and ' + result['gene2_name'] + ' (Log10 Applied)',
+        title:'Comparison of gene expression level between ' + result['gene1_name'] + ' and ' + result['gene2_name'],
         height: 600
     };
     

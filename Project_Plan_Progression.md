@@ -355,9 +355,20 @@ Click on questions and redirected to the corresponded page.
 
 
 
+#### Project plan for Term 2 break
 
-
-
+- make functions to reduce dulplcate code. (even controller)
+- Meeting with Carsten to look at the algorithm
+- Note that 
+  - Primary or new data -----> Carsten's compression algorithmour 
+  - Secondary or published data (after celltype annotation has completed) -------> Our web portal
+- Adding Log2/Log10 transformation to marker genes's page
+- Use a sudo count of 1%
+- Making the ratio as 1-100% instead of 1 (the current version is using 1)
+- Apply hierarchical clustering to both genes and cell types
+  - in addition to the current version, we can transpose the data frame, and apply another H clutere to it.
+- See if plotly or other library that allow user to download the data plot in SVG format (current version only allows PNG)
+- Adding notes to timepoint Unified plot, explaining why there are blank in the plot (e.g: some cell type does not exit at specific timepoint, only embryonic / only adult)
 
 
 

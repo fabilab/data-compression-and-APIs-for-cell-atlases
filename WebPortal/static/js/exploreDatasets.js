@@ -96,12 +96,12 @@ function AjaxExploreDatasets() {
   
   var gene_name = $('#singleGene').val();
   // sent gene names to the API
-  console.log(gene_name);
   $.ajax({
     type:'GET',
     url:'http://127.0.0.1:5000/data_datasets',
     data: "gene=" + gene_name,
     success: function(result) {
+        // $("#displayPlotDataset").empty();
         plotAll(result);
     },
     error: function (e) {

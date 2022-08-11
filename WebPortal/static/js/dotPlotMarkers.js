@@ -101,7 +101,6 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
         width: 1000,
         height: 25 * showNumMarkers
     };
-    
     // Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
     if ($('#'+html_element_id).text() === "") {
         data['x'] = all_x;

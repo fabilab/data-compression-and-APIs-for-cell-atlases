@@ -247,25 +247,9 @@ def dataset_by_dataset(genename,df_type):
     return {"result":dic_per_dataset, "hierarchicalCelltypeOrder":new_cell_type_order}
     # for each of the dataframe in dic_per_dataset, we convert it into json format
     
+# giving a dataframe, extract the information needed for generate the corresponded plot
+def unified_process(df,genename):
 
-def dataset_unified(genename):
-    '''
-    generate a dictionary for the unified heatmap data
-        parameter: 
-            a single gene name (string)
-        return:
-            a dictionary contains expression value of a gene in different timepoints and celltypes
-            {
-            "ACZ_E18.5": {
-                "Adventitial FB": -1.0,
-                "Early adventitial FB": 0.020416259765625,
-            }
-            "TMS_P21:" {
-                "Adventitial FB": 0.23456,
-                "Early adventitial FB": -1,
-            }
-    '''
-    res, df = read_file_average_exp('celltype_dataset_timepoint',genename)
     filtered_df = df.filter(items=[genename],axis=0)
     all_celltypes = []
     dt_combinations = []  # store all the existing dataset and timepoint combinations
@@ -297,5 +281,14 @@ def dataset_unified(genename):
     new_cell_type_order = [ct for ct in clustered_gene_exp_df.index]
     dt_sorted = sorted([key for key in gene_exp_df.columns], key=functools.cmp_to_key(timepoint_reorder))
 
-    return {'expression': json.loads(gene_exp_df.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': cell_type_label, 'gene': genename, 'hierarchicalCelltypeOrder':new_cell_type_order}
+    return {'exp': json.loads(gene_exp_df.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': cell_type_label, 'gene': genename, 'hierarchicalCelltypeOrder':new_cell_type_order}
+
+def dataset_unified(genename):
     
+    res, df_avg = read_file_average_exp('celltype_dataset_timepoint',genename)
+    res, df_pro = read_file_proportion_exp('celltype_dataset_timepoint',genename)
+
+    exp_avg = unified_process(df_avg,genename)
+    exp_pro = unified_process(df_pro,genename)
+
+    return {'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'gene': exp_avg['gene'], 'hierarchicalCelltypeOrder':exp_avg['hierarchicalCelltypeOrder']}

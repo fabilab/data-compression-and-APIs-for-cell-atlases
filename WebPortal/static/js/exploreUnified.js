@@ -22,7 +22,7 @@ function plotHeatmapUnified(result,html_element_id) {
         celltypes = result['hierarchicalCelltypeOrder'];
     }
 
-    const expression = result['expression'];
+    const expression = result['exp_avg'];
     
     // x-axis: celltypes
     let x_axis = celltypes;
@@ -139,6 +139,8 @@ function AjaxExploreUnified() {
             success: function(result) {
                 $("#displayPlotUnified").empty();
                 plotHeatmapUnified(result,"displayPlotUnified");
+                $("#dotPlotUnified").empty();
+                DotplotProportionExpUnifed(result, "dotPlotUnified");
             },
             error: function (e) {
                 Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

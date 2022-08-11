@@ -31,14 +31,12 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
     let all_color = [];
     let all_size = [];
     let all_hovertext = [];
-    var desired_maximum_marker_size = 6.3;
+    var desired_maximum_marker_size = 6.2;
 
 
     for (var i = 0; i < ngenes; i++) {
       let this_gene = genes[i];
-      
       for (var j = 0; j < ncelltypes; j++) {
-        
         let exp = result_avg[this_gene][celltypes[j]];
         if (useLog) {
             exp = Math.log10(exp + 0.5);

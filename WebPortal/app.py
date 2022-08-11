@@ -149,7 +149,7 @@ class getAllGeneNames(Resource):
         _, df = read_file_average_exp('celltype')
         return list(df.index)
 
-# new end point for timepoint dataset:
+
 class dataDatasets (Resource):
     def get(self):
         genename = request.args.get('gene')

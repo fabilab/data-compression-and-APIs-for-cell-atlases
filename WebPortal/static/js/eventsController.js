@@ -73,7 +73,6 @@ function ShowMarker() {
     $("#marker_genes").removeClass('is-hidden');
     $("#sum_markers").removeClass("is-hidden");
     $("#num_genes_div").addClass('is-hidden');
-    $("#dataType").addClass('is-hidden');
     $("#dataOrder").addClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
@@ -89,7 +88,6 @@ function HideMarker() {
     $("#marker_genes").addClass('is-hidden');
     $("#displayPlotMarkers").addClass('is-hidden');
     $("#sum_markers").addClass("is-hidden");
-    $("#dataType").removeClass('is-hidden');
     $("#dataOrder").removeClass('is-hidden');
     $("#dotPlotMarker").addClass('is-hidden');
 }
@@ -162,6 +160,7 @@ $("#selectDataType").change(function() {
     dataProportionExp['useLog'] = (type === 'log');
     dataForPlotsDataset['useLog'] = (type === 'log');
     dataForPlotsUnified['useLog'] = (type === 'log');
+    dataMarker['useLog'] = (type === 'log');
 
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
@@ -183,6 +182,11 @@ $("#selectDataType").change(function() {
     if ($('#displayPlotUnified').text() !== "") {
         DotplotProportionExpUnifed("", "");
         plotHeatmapUnified("","");
+    }
+
+    if ($('#displayPlotMarkers').text() !== "") {
+        HeatmapMarkerGenes("","","","", "","");
+        DotplotProportionExpMarker("","","","","","", "");
     }
 });
 

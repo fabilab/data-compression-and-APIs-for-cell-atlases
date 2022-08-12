@@ -1,6 +1,7 @@
 var dataForPlot = {};
 
 function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion,html_element_id,selected_cell, gene_order, showNumMarkers) {
+    let useLog = dataMarker['useLog'];
 
     if (html_element_id === "") {
         html_element_id = "dotPlotMarker";
@@ -59,9 +60,10 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
     for (var i = showNumMarkers-1; i >= 0; i--) {
       let this_gene = genes[i];
       for (var j = 0; j < ncelltypes; j++) {
-        
         let exp = exp_scaled[celltypes[j]][this_gene];
-
+        if(useLog) {
+            exp = Math.log10(exp+0.5);
+        }
         // marker_color.push(exp);
         all_x.push(celltypes[j])
         all_hovertext.push(`Gene: ${this_gene}<br>Cell Type: ${celltypes[j]}<br>Avg Exp: ${exp.toPrecision(3)}<br>Proportion: ${result_proportion[celltypes[j]][this_gene].toPrecision(3)*100}%`);

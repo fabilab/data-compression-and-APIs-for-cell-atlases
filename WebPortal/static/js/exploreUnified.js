@@ -111,6 +111,7 @@ function plotHeatmapUnified(result,html_element_id) {
         },
         with: heatmap_width,
         height: heatmap_height,
+        hoverongaps: false,
     };
     if ($('#'+html_element_id).text() === "") {
         data['z'] = data_content;

@@ -1,6 +1,7 @@
 dataMarker = {};
 
 function HeatmapMarkerGenes(result_original,result_scaled,html_element_id,selected_cell, gene_order, showNumMarkers) {
+    let useLog = dataMarker['useLog'];
 
     if (html_element_id === "") {
         html_element_id = "displayPlotMarkers";
@@ -38,88 +39,81 @@ function HeatmapMarkerGenes(result_original,result_scaled,html_element_id,select
     let genes = gene_order;
     let celltypes = Object.keys(result_scaled);
     
-    if (!result_scaled) {
-        alert("Error:Input gene name is invalid, please make sure you type in the corrent gene names")
-    } else {
-        // x-axis: cell types
-        let x_axis = celltypes;
-        // y-axis: genes
-        let y_axis = [];
-        let y_ticks = [];
-        for (var i = showNumMarkers-1; i >= 0; i--) {
-            y_axis.push(genes[i]);
-            y_ticks.push(`<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`);
-        }
-        
-        let ngenes = y_axis.length;
-        let ncelltypes = x_axis.length;
-        $("#num_markers").empty();
-        $("#num_markers").append(ngenes);
-
-        // let heatmap_width = 1300;
-        let heatmap_height = 270 + 20 * ngenes;
-
-        let data_content = [];
-        for (var i = showNumMarkers-1; i >= 0; i--) {
-            let each_gene_data = [];
-            for (var j = 0; j < ncelltypes; j++) {
-                exp_scaled = result_scaled[celltypes[j]][genes[i]];
-                each_gene_data.push(exp_scaled);
-            }
-            data_content.push(each_gene_data);
-        }
-
-        // Generate hover text for each spot 
-        let hover_text = [];
-        for (var i = showNumMarkers-1; i >= 0; i--) {
-            let temp = [];
-            for (var j = 0; j < ncelltypes; j++) {
-                let gn = genes[i]
-                let ct = celltypes[j];
-                let original_exp = result_original[ct][gn];
-                let scaled_exp = result_scaled[ct][gn];
-                temp.push('Celltype: '+ct+'<br>Gene: '+gn+'<br>Actual Expression: '+original_exp.toPrecision(3)+'<br>Scaled Expression: '+scaled_exp.toPrecision(3));
-            }
-            hover_text.push(temp);
-        }
-
-        var data = {
-            type: 'heatmap',
-            colorscale: 'Reds',
-            hoverinfo: 'text'
-        };
-        var layout = {
-            autosize: true, 
-            title: 'Expression profile of <b>' + selected_cell +'\'s </b> marker genes in all cell types ',
-            xaxis: {
-                title: '<b>Cell types<b>',
-                automargin: true,
-                tickangle: 45
-            },
-            yaxis: {
-                title: '<b>Genes<b>',
-                automargin: true,
-                autotick: false,
-            },
-            // with: heatmap_width,
-            height: heatmap_height,
-        };
-
-        if ($('#'+html_element_id).text() === "") {
-            data['z'] = data_content;
-            data['x'] = x_axis;
-            data['y'] = y_ticks;
-            data['text'] = hover_text;
-            Plotly.newPlot(document.getElementById(html_element_id), [data],layout);   
-        } else {
-            data['z'] = [data_content];
-            data['x'] = [x_axis];
-            data['y'] = [y_ticks];
-            data['text'] = [hover_text];
+    // x-axis: cell types
+    let x_axis = celltypes;
+    // y-axis: genes
+    let y_axis = [];
+    let y_ticks = [];
+    for (var i = showNumMarkers-1; i >= 0; i--) {
+        y_axis.push(genes[i]);
+        y_ticks.push(`<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`);
+    }
     
-            Plotly.update(document.getElementById(html_element_id), data, layout);
+    let ngenes = y_axis.length;
+    let ncelltypes = x_axis.length;
+    $("#num_markers").empty();
+    $("#num_markers").append(ngenes);
+
+    // let heatmap_width = 1300;
+    let heatmap_height = 270 + 20 * ngenes;
+
+    let data_content = [];
+    let hover_text = [];
+    for (var i = showNumMarkers-1; i >= 0; i--) {
+        let each_gene_data = [];
+        let temp = [];
+        for (var j = 0; j < ncelltypes; j++) {
+            let gn = genes[i]
+            let ct = celltypes[j];
+            let exp_scaled = result_scaled[ct][gn];
+            let original_exp = result_original[ct][gn];
+            if(useLog) {
+                exp_scaled = Math.log10(exp_scaled+0.5);
+                original_exp = Math.log10(original_exp+0.5);
+            }
+            each_gene_data.push(exp_scaled);
+            temp.push('Celltype: '+ct+'<br>Gene: '+gn+'<br>Actual Expression: '+original_exp.toPrecision(3)+'<br>Scaled Expression: '+exp_scaled.toPrecision(3));
         }
+        data_content.push(each_gene_data);
+        hover_text.push(temp);
+    }
+
+    var data = {
+        type: 'heatmap',
+        colorscale: 'Reds',
+        hoverinfo: 'text'
     };
+    var layout = {
+        autosize: true, 
+        title: 'Expression profile of <b>' + selected_cell +'\'s </b> marker genes in all cell types ',
+        xaxis: {
+            title: '<b>Cell types<b>',
+            automargin: true,
+            tickangle: 45
+        },
+        yaxis: {
+            title: '<b>Genes<b>',
+            automargin: true,
+            autotick: false,
+        },
+        // with: heatmap_width,
+        height: heatmap_height,
+    };
+
+    if ($('#'+html_element_id).text() === "") {
+        data['z'] = data_content;
+        data['x'] = x_axis;
+        data['y'] = y_ticks;
+        data['text'] = hover_text;
+        Plotly.newPlot(document.getElementById(html_element_id), [data],layout);   
+    } else {
+        data['z'] = [data_content];
+        data['x'] = [x_axis];
+        data['y'] = [y_ticks];
+        data['text'] = [hover_text];
+
+        Plotly.update(document.getElementById(html_element_id), data, layout);
+    }
 } 
 
 function pagesetup() {

@@ -138,7 +138,7 @@ def marker_genes_expression(celltype):
     df_scaled = df_original.copy()
     df_scaled['current'] = df_scaled[celltype]
     for column in df_scaled.columns:
-        df_scaled[column] = (df_scaled[column] / df_scaled['current']).round(3)
+        df_scaled[column] = (df_scaled[column] / df_scaled['current']).round(3) * 100
     df_scaled.drop(['current'], axis=1,inplace=True)
     # also get the proportion data
     _, df_proportion = read_file_proportion_exp("celltype",gene_list)

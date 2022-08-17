@@ -48,6 +48,7 @@ function ShowUnified() {
     $("#tabUnified").addClass('is-active');
     $("#single_gene").removeClass('is-hidden');
     $("#timepoint_info").removeClass('is-hidden');
+    $("#blank_info").removeClass('is-hidden');
     $("#searchOnClick_single").click(AjaxExploreUnified);
     $("#num_genes_div").addClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
@@ -65,6 +66,7 @@ function HideUnified() {
     $("#displayPlotUnified").addClass('is-hidden');
     $("#dotPlotUnified").addClass("is-hidden");
     $("#timepoint_info").addClass('is-hidden');
+    $("#blank_info").addClass('is-hidden');
 
 }
 

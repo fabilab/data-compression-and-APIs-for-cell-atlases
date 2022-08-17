@@ -150,9 +150,9 @@ function AjaxExploreMarkers() {
             url:'http://127.0.0.1:5000/data_markers',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
-                // $("#displayPlotMarkers").empty();
+                $("#displayPlotMarkers").empty();
                 HeatmapMarkerGenes(result['data_original'],result['data_scaled'],'',selected_cell, result['order'], '');
-                // $("#dotPlotMarker").empty();
+                $("#dotPlotMarker").empty();
                 DotplotProportionExpMarker(result['data_original'],result['data_scaled'],result['exp_proportion'],'',selected_cell, result['order'], '');
             },
             error: function (e) {

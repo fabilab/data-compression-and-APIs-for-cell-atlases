@@ -171,16 +171,22 @@ class dataGeneral(Resource):
             return None, 400
         df_proportion = data.T
 
+        # new cell types order
         distance = pdist(df_average.values)
         Z = linkage(distance,optimal_ordering=True)
         new_order = leaves_list(Z)
-        # df = df.iloc[new_order]
+        
+        # new genes order
+        distance_g = pdist(data.values)
+        Z_g = linkage(distance_g,optimal_ordering=True)
+        new_order_g = leaves_list(Z_g)
 
+        print(data.index[new_order_g].tolist())
         response = {
             'result_average': df_average.to_dict(),
-            'max_expression': max(df_average.max()),
             'result_proportion': df_proportion.to_dict(),
-            'hierarchicalCelltypeOrder': df_average.index[new_order].tolist(),  # new order of the celltype
+            'hierarchicalGeneOrder': data.index[new_order_g].tolist(),  # new order of genes
+            'hierarchicalCelltypeOrder': df_average.index[new_order].tolist(),  # new order of cell types
         }
         return response
 

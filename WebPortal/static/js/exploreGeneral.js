@@ -15,13 +15,15 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
         }
         let result = result_wrapper['result_average'];
         let celltypes;
-        let genes = Object.keys(result);
+        let genes;
         let celltypeOrder = dataAverageExp['celltypeOrder'];
 
         if (!celltypeOrder) {
             celltypes = Object.keys(result[Object.keys(result)[0]]);
+            genes = Object.keys(result);
         } else {
             celltypes = result_wrapper['hierarchicalCelltypeOrder'];
+            genes = result_wrapper['hierarchicalGeneOrder'];
         }
 
         // x-axis: cell types

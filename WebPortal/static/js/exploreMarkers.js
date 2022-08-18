@@ -99,20 +99,29 @@ function HeatmapMarkerGenes(result_original,result_scaled,html_element_id,select
         // with: heatmap_width,
         height: heatmap_height,
     };
+    var tools = {
+        modeBarButtonsToAdd: [{
+            name: 'Download plot as an SVG',
+            icon: Plotly.Icons.camera,
+            click: function(gd) {
+              Plotly.downloadImage(gd, {format: 'svg'})
+            }
+          }]
+    };
 
     if ($('#'+html_element_id).text() === "") {
         data['z'] = data_content;
         data['x'] = x_axis;
         data['y'] = y_ticks;
         data['text'] = hover_text;
-        Plotly.newPlot(document.getElementById(html_element_id), [data],layout);   
+        Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);   
     } else {
         data['z'] = [data_content];
         data['x'] = [x_axis];
         data['y'] = [y_ticks];
         data['text'] = [hover_text];
 
-        Plotly.update(document.getElementById(html_element_id), data, layout);
+        Plotly.update(document.getElementById(html_element_id), data, layout,tools);
     }
 } 
 

@@ -84,6 +84,16 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
             width: heatmap_width,
             height: heatmap_height,
         };
+        // source code from: https://codepen.io/etpinard/pen/zzzBXv?editors=0010
+        var tools = {
+            modeBarButtonsToAdd: [{
+                name: 'Download plot as an SVG',
+                icon: Plotly.Icons.camera,
+                click: function(gd) {
+                  Plotly.downloadImage(gd, {format: 'svg'})
+                }
+              }]
+        }
 
         // var config = {responsive:true}
         
@@ -91,12 +101,12 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
             data['z'] = data_content;
             data['x'] = x_axis;
             data['y'] = y_ticks;
-            Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
+            Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);
         } else {
             data['z'] = [data_content];
             data['x'] = [x_axis];
             data['y'] = [y_ticks];
-            Plotly.update(document.getElementById(html_element_id), data);
+            Plotly.update(document.getElementById(html_element_id),data,tools);
         }
     } 
 

@@ -77,17 +77,26 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
             with: heatmap_width,
             height: heatmap_height,
         };
+        var tools = {
+            modeBarButtonsToAdd: [{
+                name: 'Download plot as an SVG',
+                icon: Plotly.Icons.camera,
+                click: function(gd) {
+                  Plotly.downloadImage(gd, {format: 'svg'})
+                }
+              }]
+        };
         
         if ($('#'+html_element_id).text() === "") {
             data['z'] = data_content;
             data['x'] = x_axis;
             data['y'] = y_axis;
-            Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
+            Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);
         } else {
             data['z'] = [data_content];
             data['x'] = [x_axis];
             data['y'] = [y_axis];
-            Plotly.update(document.getElementById(html_element_id), data);
+            Plotly.update(document.getElementById(html_element_id), data,tools);
         }
     };
 } 

@@ -82,7 +82,16 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
         width: 1050,
         height: 400 + 25 * ngenes,
     };
+    var tools = {
+      modeBarButtonsToAdd: [{
+          name: 'Download plot as an SVG',
+          icon: Plotly.Icons.camera,
+          click: function(gd) {
+            Plotly.downloadImage(gd, {format: 'svg'})
+          }
+        }]
+  }
     
-    Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
+    Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);
   
   }

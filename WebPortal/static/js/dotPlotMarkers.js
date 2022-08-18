@@ -103,12 +103,21 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
         width: 1000,
         height: 25 * showNumMarkers
     };
+    var tools = {
+        modeBarButtonsToAdd: [{
+            name: 'Download plot as an SVG',
+            icon: Plotly.Icons.camera,
+            click: function(gd) {
+              Plotly.downloadImage(gd, {format: 'svg'})
+            }
+          }]
+    };
     // Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
     if ($('#'+html_element_id).text() === "") {
         data['x'] = all_x;
         data['y'] = all_y;
         data['text'] = all_hovertext;
-        Plotly.newPlot(document.getElementById(html_element_id), [data],layout);   
+        Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);   
     } else {
         data['x'] = [all_x];
         data['y'] = [all_y];
@@ -124,7 +133,8 @@ function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion
                     range: [-1, showNumMarkers]
                 }
             },
-        layout);
+            layout,
+            tools);
     }
   
   }

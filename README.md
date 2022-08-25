@@ -11,5 +11,5 @@ Example Use Cases
 
 ![Alt text](./info/home.png "home page")
 ![Alt text](./info/useCase_1.png "use case 1")
-![Alt text](./info/useCase_timepoint "use case timepoint")
-![Alt text](./info/useCase_Marker "use case timepoint")
+![Alt text](./info/useCase_timepoint.png "use case timepoint")
+![Alt text](./info/useCase_Marker.png "use case timepoint")

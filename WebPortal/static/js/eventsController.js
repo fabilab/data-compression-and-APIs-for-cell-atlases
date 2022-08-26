@@ -3,6 +3,7 @@ function ShowGeneral() {
     $("#multiple_genes").removeClass('is-hidden');
     $("#scatterPlot").removeClass('is-hidden');
     $("#num_genes_div").removeClass('is-hidden');
+    $("#searchOnClick_list" ).click(AjaxExploreGeneral)
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
         $("#dotPlot").removeClass("is-hidden");
@@ -69,10 +70,25 @@ function HideUnified() {
     $("#blank_info").addClass('is-hidden');
 
 }
+function ShowUnifiedByCell() {
+    $("#tabUnifiedByCell").addClass('is-active');
+    $("#multiple_genes").removeClass('is-hidden');
+    $("#selectCelltypeUnified").removeClass('is-hidden');
+    $("#searchOnClick_list").click(AjaxExploreUnifiedByCell);
+    $("#displayPlotUnifiedByCell").removeClass('is-hidden');
+}
+
+function HideUnifiedByCell() {
+    $("#tabUnifiedByCell").removeClass('is-active');
+    $("#multiple_genes").addClass('is-hidden');
+    $("#selectCelltypeUnified").addClass('is-hidden');
+    $("#displayPlotUnifiedByCell").addClass('is-hidden');
+
+}
 
 function ShowMarker() {
     $("#tabMarker").addClass('is-active');
-    $("#marker_genes").removeClass('is-hidden');
+    $("#select_celltype").removeClass('is-hidden');
     $("#sum_markers").removeClass("is-hidden");
     $("#num_genes_div").addClass('is-hidden');
     $("#dataOrder").addClass('is-hidden');
@@ -87,7 +103,7 @@ function ShowMarker() {
 
 function HideMarker() {
     $("#tabMarker").removeClass('is-active');
-    $("#marker_genes").addClass('is-hidden');
+    $("#select_celltype").addClass('is-hidden');
     $("#displayPlotMarkers").addClass('is-hidden');
     $("#sum_markers").addClass("is-hidden");
     $("#dataOrder").removeClass('is-hidden');
@@ -98,6 +114,7 @@ $("#tabGeneral").click(function() {
     HideDataset();
     HideUnified();
     HideMarker();
+    HideUnifiedByCell();
     ShowGeneral();
 });
 
@@ -105,20 +122,32 @@ $("#tabDataset").click(function() {
     HideGeneral();
     HideUnified();
     HideMarker();
+    HideUnifiedByCell();
     ShowDataset();
+    
 });
 
 $("#tabUnified").click(function() {
     HideGeneral();
     HideDataset();
     HideMarker();
+    HideUnifiedByCell();
     ShowUnified();
+});
+
+$("#tabUnifiedByCell").click(function() {
+    HideGeneral();
+    HideDataset();
+    HideMarker();
+    HideUnified();
+    ShowUnifiedByCell();
 });
 
 $("#tabMarker").click(function() {
     HideGeneral();
     HideDataset();
     HideUnified();
+    HideUnifiedByCell();
     ShowMarker();
 });
 

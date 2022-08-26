@@ -56,7 +56,12 @@
           </li >
           <li id="tabUnified">
             <a>
-              <span>Timepoint Unified</span>
+              <span>Timepoint Unified (by Gene)</span>
+            </a>
+          </li>
+          <li id="tabUnifiedByCell">
+            <a>
+              <span>Timepoint Unified (by Celltype)</span>
             </a>
           </li>
           <li id="tabMarker">
@@ -70,14 +75,10 @@
     <div class="block">
         <div class="columns">
           <div class="column is-one-fifth">
-              <div class="is-hidden" id="marker_genes">
+              <div class="is-hidden" id="select_celltype">
                 <div class="field">
                   <label class="label">Select Cell Type</label>
                   <div class="box">
-                    <div class="block is-clipped">
-                      <a class="is-size-7" href="https://www.ebi.ac.uk/ols/ontologies/cl">Cell Ontology</a>
-                      <i class="fas fa-external-link-alt"></i>
-                    </div>
                     <div class="block" style="height:400px; overflow-y:scroll" id="celltypeFilter" >
                       <div id="celltype_selection" class="control">
                   
@@ -117,6 +118,16 @@
                   </div>
                   <div class="control">
                     <input class="input" id="singleGene" type="text" placeholder="e.g.'Col1a1'">
+                  </div>
+                </div>
+              </div>
+              <div class="field is-hidden" id="selectCelltypeUnified">
+                <label class="label">Select Cell Type</label>
+                <div class="control">
+                  <div class="select" style="width:80%;">
+                    <select id="celltypeSelection" style="width:100%;">
+                      
+                    </select>
                   </div>
                 </div>
               </div>
@@ -169,6 +180,8 @@
                   <div class="box mx-3 my-3 is-hidden" id="dotPlotDataset"></div>
                   <div class="box mx-3 my-3 is-hidden" id="displayPlotUnified"></div>
                   <div class="box mx-3 my-3 is-hidden" id="dotPlotUnified"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="displayPlotUnifiedByCell"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dotPlotUnifiedByCell"></div>
                   <div class="box mx-3 my-3 is-hidden" id="displayPlotMarkers"></div>
                   <div class="box mx-3 my-3 is-hidden" id="dotPlotMarker"></div>
                 </div>
@@ -181,6 +194,7 @@
   <script src="/js/exploreGeneral.js"></script>
   <script src="/js/exploreDatasets.js"></script>
   <script src="/js/exploreUnified.js"></script>
+  <script src="/js/exploreUnifiedByCell.js"></script>
   <script src="/js/exploreMarkers.js"></script>
   <script src="/js/dotPlotMarkers.js"></script>
   <script src="/js/dotPlotUnified.js"></script>

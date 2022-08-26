@@ -292,3 +292,14 @@ def dataset_unified(genename):
     exp_pro = unified_process(df_pro,genename)
 
     return {'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'gene': exp_avg['gene'], 'hierarchicalCelltypeOrder':exp_avg['hierarchicalCelltypeOrder']}
+
+def unified_by_cell(celltype,genes):
+    res,df = read_file_average_exp("celltype_dataset_timepoint",genes)
+    df_filtered = df.filter(regex=celltype)
+    dataset_timepoint = []
+    for column in df_filtered.columns:
+        dt = column.split('_',1)[1]
+        dataset_timepoint.append(dt)
+    df_filtered.columns = dataset_timepoint
+    dt_sorted = sorted([key for key in df_filtered.columns], key=functools.cmp_to_key(timepoint_reorder))
+    return {'exp_avg': json.loads(df_filtered.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': celltype, 'genes': genes.split(',')}

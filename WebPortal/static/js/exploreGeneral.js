@@ -147,7 +147,6 @@ function AjaxExploreGeneral() {
     }
     });
   }
-$("#searchOnClick_list" ).click(AjaxExploreGeneral)
 
 function clearTextArea() {
     $("#listGenes").val('');

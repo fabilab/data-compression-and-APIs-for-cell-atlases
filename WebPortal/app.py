@@ -10,7 +10,7 @@ import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, marker_genes_expression
+from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, unified_by_cell, marker_genes_expression
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -181,7 +181,6 @@ class dataGeneral(Resource):
         Z_g = linkage(distance_g,optimal_ordering=True)
         new_order_g = leaves_list(Z_g)
 
-        print(data.index[new_order_g].tolist())
         response = {
             'result_average': df_average.to_dict(),
             'result_proportion': df_proportion.to_dict(),
@@ -221,6 +220,14 @@ class dataUnified(Resource):
         genename = request.args.get('gene')
         return dataset_unified(genename)
 
+class UnifiedByCell(Resource):
+    def get(self):
+        celltype = request.args.get('celltype')
+        genes = request.args.get('genes')
+        print(celltype)
+        print("celltype_unified",genes)
+        return unified_by_cell(celltype,genes)
+
 class dataMarkerGenes(Resource):
     def get(self):
         celltype = request.args.get('celltype')
@@ -233,6 +240,7 @@ api.add_resource(getAllGeneNames, '/all_gene_names')
 api.add_resource(dataScatter, '/data_scatter')
 api.add_resource(dataDatasets, '/data_datasets')
 api.add_resource(dataUnified, '/data_unified')
+api.add_resource(UnifiedByCell, '/data_unified_by_cell')
 api.add_resource(dataMarkerGenes, '/data_markers')
 
 if __name__ == '__main__':

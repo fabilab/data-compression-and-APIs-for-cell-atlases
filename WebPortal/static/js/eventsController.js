@@ -192,6 +192,7 @@ $("#selectDataType").change(function() {
     dataForPlotsDataset['useLog'] = (type === 'log');
     dataForPlotsUnified['useLog'] = (type === 'log');
     dataMarker['useLog'] = (type === 'log');
+    plotDataUnifiedByCell['useLog'] = (type === 'log');
 
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
@@ -215,6 +216,11 @@ $("#selectDataType").change(function() {
         plotHeatmapUnified("","");
     }
 
+    if ($('#displayPlotUnifiedByCell').text() !== "") {
+        // DotplotProportionExpUnifed("", "");
+        HeatmapUnifiedByCell("","");
+    }
+
     if ($('#displayPlotMarkers').text() !== "") {
         HeatmapMarkerGenes("","","","", "","");
         DotplotProportionExpMarker("","","","","","", "");
@@ -227,6 +233,7 @@ $("#selectDataOrder").change(function() {
     dataProportionExp['celltypeOrder'] = (order === 'clustered');
     dataForPlotsDataset['celltypeOrder'] = (order === 'clustered');
     dataForPlotsUnified['celltypeOrder'] = (order === 'clustered');
+    plotDataUnifiedByCell['geneOrder'] = (order === 'clustered')
 
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
@@ -247,6 +254,11 @@ $("#selectDataOrder").change(function() {
             plotHeatmapUnified("","");
             DotplotProportionExpUnifed("","");
         }
+    }
+
+    if ($('#displayPlotUnifiedByCell').text() !== "") {
+        // DotplotProportionExpUnifed("", "");
+        HeatmapUnifiedByCell("","");
     }
 
     if ($('#dataset_1').text() !== "") {

@@ -3,6 +3,7 @@ plotDataUnifiedByCell = {}
 function HeatmapUnifiedByCell(result,html_element_id) {
     // flags passed by events.js
     let useLog = plotDataUnifiedByCell['useLog'];
+    let geneOrder = plotDataUnifiedByCell['geneOrder'];
     
     if (result === "") {
         result = plotDataUnifiedByCell['result'];
@@ -14,8 +15,13 @@ function HeatmapUnifiedByCell(result,html_element_id) {
         html_element_id = "displayPlotUnifiedByCell";
     }
     let celltype = result['cell_type'];
-    let genes = result['genes']
-    console.log(genes);
+    
+    let genes;
+    if (!geneOrder) {
+        genes = result['genes'];
+    } else {
+        genes = result['clustered_gene_order'];
+    }
     const expression = result['exp_avg'];
     
     // x-axis: celltypes

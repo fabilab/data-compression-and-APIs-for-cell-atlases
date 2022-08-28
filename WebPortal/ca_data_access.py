@@ -302,4 +302,11 @@ def unified_by_cell(celltype,genes):
         dataset_timepoint.append(dt)
     df_filtered.columns = dataset_timepoint
     dt_sorted = sorted([key for key in df_filtered.columns], key=functools.cmp_to_key(timepoint_reorder))
-    return {'exp_avg': json.loads(df_filtered.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': celltype, 'genes': genes.split(',')}
+
+    distance = pdist(df_filtered.values)
+    Z = linkage(distance,optimal_ordering=True)
+    new_order = leaves_list(Z)
+    clustered_gene_exp_df = df_filtered.iloc[new_order]
+    new_gene_order = [ct for ct in clustered_gene_exp_df.index]
+
+    return {'exp_avg': json.loads(df_filtered.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': celltype, 'genes': genes.split(','), 'clustered_gene_order': new_gene_order}

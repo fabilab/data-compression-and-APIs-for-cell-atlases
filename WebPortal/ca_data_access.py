@@ -293,8 +293,8 @@ def dataset_unified(genename):
 
     return {'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'gene': exp_avg['gene'], 'hierarchicalCelltypeOrder':exp_avg['hierarchicalCelltypeOrder']}
 
-def unified_by_cell(celltype,genes):
-    res,df = read_file_average_exp("celltype_dataset_timepoint",genes)
+def unified_by_cell_process(df,celltype,genes):
+
     df_filtered = df.filter(regex=celltype)
     dataset_timepoint = []
     for column in df_filtered.columns:
@@ -309,4 +309,16 @@ def unified_by_cell(celltype,genes):
     clustered_gene_exp_df = df_filtered.iloc[new_order]
     new_gene_order = [ct for ct in clustered_gene_exp_df.index]
 
-    return {'exp_avg': json.loads(df_filtered.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': celltype, 'genes': genes.split(','), 'clustered_gene_order': new_gene_order}
+    return {'exp': json.loads(df_filtered.to_json()), 'dataset_timepoint': dt_sorted, 'cell_type': celltype, 'genes': genes.split(','), 'clustered_gene_order': new_gene_order}
+
+def result_unified_by_cell(celltype,genes):
+    
+    res, df_avg = read_file_average_exp('celltype_dataset_timepoint',genes)
+    res, df_pro = read_file_proportion_exp('celltype_dataset_timepoint',genes)
+
+    exp_avg = unified_by_cell_process(df_avg,celltype,genes)
+    exp_pro = unified_by_cell_process(df_pro,celltype,genes)
+
+    return {'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'genes': exp_avg['genes'], 'clustered_gene_order': exp_avg['clustered_gene_order']}
+
+

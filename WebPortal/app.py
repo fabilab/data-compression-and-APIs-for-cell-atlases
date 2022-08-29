@@ -10,7 +10,7 @@ import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, unified_by_cell, marker_genes_expression
+from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, result_unified_by_cell, marker_genes_expression
 import time
 
 app = Flask(__name__, static_url_path='/static',template_folder='templates')
@@ -226,7 +226,7 @@ class UnifiedByCell(Resource):
         genes = request.args.get('genes')
         print(celltype)
         print("celltype_unified",genes)
-        return unified_by_cell(celltype,genes)
+        return result_unified_by_cell(celltype,genes)
 
 class dataMarkerGenes(Resource):
     def get(self):

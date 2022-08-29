@@ -66,7 +66,6 @@ function DotplotProportionExpUnifed(result,html_element_id) {
                 all_size.push(result_pro[dataset_timepoint][celltypes[k]]*100);
             }
         }
-
     }
     // Generate hover text for each spot
     // Celltype: {ct}, Expression: {exp}, Dataset: {ds}, Timepoint: {tp}, 
@@ -90,7 +89,7 @@ function DotplotProportionExpUnifed(result,html_element_id) {
         }
         // hover_text.push(temp);
     }
-    console.log(celltypes);
+  
     let nTimepoints = y_axis_time.length;
     let data = {
         mode:'markers',

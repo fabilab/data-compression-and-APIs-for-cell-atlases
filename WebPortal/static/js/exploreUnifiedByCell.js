@@ -72,7 +72,7 @@ function HeatmapUnifiedByCell(result,html_element_id) {
     let hover_text = [];
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
         let temp = [];
-        for (var j = 0; j < result['cell_type'].length; j++) {
+        for (var j = 0; j < genes.length; j++) {
             let dt = result['dataset_timepoint'][i];
             let gn = result['genes'][j];
             let exp;
@@ -91,9 +91,6 @@ function HeatmapUnifiedByCell(result,html_element_id) {
 
     let nTimepoints = y_axis.length;
     let nGenes = x_axis.length;
-    let heatmap_width = 100+55*nGenes;
-    let heatmap_height = 200 + 30 * nTimepoints;
-    console.log(nGenes);
     var data = {
         type: 'heatmap',
         hoverinfo: 'text',
@@ -101,6 +98,8 @@ function HeatmapUnifiedByCell(result,html_element_id) {
     };
     var layout = {
         title: result['cell_type'],
+        autosize: false,
+        showlegend:false,
         xaxis: {
             title: '<b>Genes<b>',
             automargin: true,
@@ -112,12 +111,12 @@ function HeatmapUnifiedByCell(result,html_element_id) {
         yaxis: {
             title: '<b>Timepoints<b>',
             automargin: true,
-            scaleanchor: 'x',
-            scaleratio: 1,
+            // scaleanchor: 'x',
+            // scaleratio: 1,
             type: 'category'
         },
-        width: heatmap_width,
-        height: heatmap_height,
+        width: 1000,
+        height: 250+25*nTimepoints,
         hoverongaps: false,
     };
     var tools = {
@@ -129,12 +128,13 @@ function HeatmapUnifiedByCell(result,html_element_id) {
             }
           }]
     };
-    console.log(data_content);
+
     if ($('#'+html_element_id).text() === "") {
         data['z'] = data_content;
         data['x'] = x_axis;
         data['y'] = y_axis;
         data['text'] = hover_text;
+        // console.log(data);
         Plotly.newPlot(document.getElementById(html_element_id), [data], layout,tools);
     } else {
         data['z'] = [data_content];
@@ -181,8 +181,8 @@ function AjaxExploreUnifiedByCell() {
             success: function(result) {
                 $("#displayPlotUnifiedByCell").empty();
                 HeatmapUnifiedByCell(result,"displayPlotUnifiedByCell");
-                // $("#dotPlotUnifiedByCell").empty();
-                // DotplotProportionExpUnifed(result, "dotPlotUnified");
+                $("#dotPlotUnifiedByCell").empty();
+                DotplotUnifiedByCell(result, "dotPlotUnifiedByCell");
             },
             error: function (e) {
                 Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

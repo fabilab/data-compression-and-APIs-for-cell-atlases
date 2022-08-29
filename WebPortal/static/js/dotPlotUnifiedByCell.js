@@ -47,7 +47,7 @@ function DotplotUnifiedByCell(result,htmlElementId) {
         y_axis_dataset.push(dataset);
         
         for (var k = 0; k < genes.length; k++) {
-            if (y_axis.includes(time)) {
+            if (time === 'P7' && dataset === 'ACZ') {
                 y_axis.push(time+'\'\'');
             } else {
                 y_axis.push(time);

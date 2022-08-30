@@ -1,10 +1,10 @@
 dataMarker = {};
 
-function HeatmapMarkerGenes(result_original,result_scaled,html_element_id,selected_cell, gene_order, showNumMarkers) {
+function generateHmMarkers(result_original,result_scaled,html_element_id,selected_cell, gene_order, showNumMarkers) {
     let useLog = dataMarker['useLog'];
 
     if (html_element_id === "") {
-        html_element_id = "displayPlotMarkers";
+        html_element_id = "hm_markers";
     }
 
     if (result_original === '') {
@@ -96,7 +96,7 @@ function HeatmapMarkerGenes(result_original,result_scaled,html_element_id,select
             automargin: true,
             autotick: false,
         },
-        // with: heatmap_width,
+        width: 1000,
         height: heatmap_height,
     };
     var tools = {
@@ -148,7 +148,7 @@ function pagesetup() {
     });
 }
 
-function AjaxExploreMarkers() {
+function AjaxMarkers() {
 
     var selected_cell = $('input[name="celltype_selection"]:checked').val();
 
@@ -159,10 +159,10 @@ function AjaxExploreMarkers() {
             url:'http://127.0.0.1:5000/data_markers',
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
-                $("#displayPlotMarkers").empty();
-                HeatmapMarkerGenes(result['data_original'],result['data_scaled'],'',selected_cell, result['order'], '');
-                $("#dotPlotMarker").empty();
-                DotplotProportionExpMarker(result['data_original'],result['data_scaled'],result['exp_proportion'],'',selected_cell, result['order'], '');
+                $("#hm_markers").empty();
+                generateHmMarkers(result['data_original'],result['data_scaled'],'',selected_cell, result['order'], '');
+                $("#dp_markers").empty();
+                generateDpMarkers(result['data_original'],result['data_scaled'],result['exp_proportion'],'',selected_cell, result['order'], '');
             },
             error: function (e) {
                 alert('Request data fail (no cell types available)')

@@ -41,5 +41,5 @@ function ScatterPlot(result) {
         height: 600
     };
     
-    Plotly.newPlot(document.getElementById('scatterPlot'), data, layout);
+    Plotly.newPlot(document.getElementById('scatter_plot'), data, layout);
 }

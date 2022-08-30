@@ -1,5 +1,5 @@
 var dataProportionExp = {};
-function DotplotProportionExp(result_wrapper, html_element_id) {
+function generateDpCompressed(result_wrapper, html_element_id) {
     let useLog = dataProportionExp['useLog'];
     if (result_wrapper === "") {
       result_wrapper = dataProportionExp['result_wrapper'];
@@ -8,7 +8,7 @@ function DotplotProportionExp(result_wrapper, html_element_id) {
     }
   
     if (html_element_id === "") {
-      html_element_id = "dotPlot";
+      html_element_id = "dp_compressed";
     }
   
     let result_avg = result_wrapper['result_average'];

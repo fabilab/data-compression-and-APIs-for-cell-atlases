@@ -1,6 +1,6 @@
 dataForPlotsUnified = {}
 
-function plotHeatmapUnified(result,html_element_id) {
+function generateHmUnifiedGene(result,html_element_id) {
     // flags passed by events.js
     let useLog = dataForPlotsUnified['useLog'];
     let celltypeOrder = dataForPlotsUnified['celltypeOrder'];
@@ -12,7 +12,7 @@ function plotHeatmapUnified(result,html_element_id) {
     }
 
     if (html_element_id === "") {
-        html_element_id = "displayPlotUnified";
+        html_element_id = "hm_unified_gene";
     }
 
     let celltypes;
@@ -139,7 +139,7 @@ function plotHeatmapUnified(result,html_element_id) {
 };
 
 
-function AjaxExploreUnified() {
+function AjaxUnifiedGene() {
     // action here when clicking the search button
     var gene_name = $('#singleGene').val();
 
@@ -148,10 +148,10 @@ function AjaxExploreUnified() {
             url:'http://127.0.0.1:5000/data_unified',
             data: "gene=" + gene_name,
             success: function(result) {
-                $("#displayPlotUnified").empty();
-                plotHeatmapUnified(result,"displayPlotUnified");
-                $("#dotPlotUnified").empty();
-                DotplotProportionExpUnifed(result, "dotPlotUnified");
+                $("#hm_unified_gene").empty();
+                generateHmUnifiedGene(result,"hm_unified_gene");
+                $("#dp_unified_gene").empty();
+                generateDpUnifiedGene(result, "dp_unified_gene");
             },
             error: function (e) {
                 Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

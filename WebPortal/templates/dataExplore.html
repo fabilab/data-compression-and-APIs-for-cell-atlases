@@ -168,37 +168,43 @@
             <div class="column">  
                 {% include 'explore_info.html' %}  
                 <!-- Display Plots belong this section -->
+                <!-- hm: heatmap -->
+                <!-- dp: dot plot -->
                 <div class="block">
-                  <div class="box mx-3 my-3" id="displayPlot"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="dotPlot"></div>
-                  <div class="box mx-3 my-3" id="scatterPlot"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="displayPlotDataset">
+                  <div class="box mx-3 my-3" id="hm_compressed"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_compressed"></div>
+                  <div class="box mx-3 my-3" id="scatter_plot"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="hm_dataset">
                     <div id="dataset_1"></div>
                     <div id="dataset_2"></div>
                     <div id="dataset_3"></div>
                   </div>
-                  <div class="box mx-3 my-3 is-hidden" id="dotPlotDataset"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="displayPlotUnified"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="dotPlotUnified"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="displayPlotUnifiedByCell"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="dotPlotUnifiedByCell"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="displayPlotMarkers"></div>
-                  <div class="box mx-3 my-3 is-hidden" id="dotPlotMarker"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_dataset"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="hm_unified_gene"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_unified_gene"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="hm_unified_cell"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_unified_cell"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="hm_markers"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_markers"></div>
                 </div>
             </div>
         </div>
     </div> 
   </div>
-  <script src="/js/scatterPlot.js"></script>
-  <script src="/js/dotPlot.js"></script>
-  <script src="/js/exploreGeneral.js"></script>
-  <script src="/js/exploreDatasets.js"></script>
-  <script src="/js/exploreUnified.js"></script>
-  <script src="/js/exploreUnifiedByCell.js"></script>
-  <script src="/js/exploreMarkers.js"></script>
-  <script src="/js/dotPlotMarkers.js"></script>
-  <script src="/js/dotPlotUnified.js"></script>
-  <script src="/js/dotPlotUnifiedByCell.js"></script>
-  <script src="/js/eventsController.js"></script>
+  <!-- js file for ajax and generating heatmaps -->
+  <script src="../js/ajax-compressed.js"></script>
+  <script src="../js/ajax-datasets.js"></script>
+  <script src="../js/ajax-unified-gene.js"></script>
+  <script src="../js/ajax-unified-cell.js"></script>
+  <script src="../js/ajax-markers.js"></script>
+  <!-- js files for generating dot plots -->
+  <script src="../js/dot-plot-compressed.js"></script>
+  <script src="../js/dot-plot-markers.js"></script>
+  <script src="../js/dot-plot-unified-gene.js"></script>
+  <script src="../js/dot-plot-unified-cell.js"></script>
+  <!-- js file for generating scatter plot -->
+  <script src="../js/scatter-plot.js"></script>
+  <!-- js file for controlling the html elements -->
+  <script src="../js/events-controller.js"></script>
 </body>
 </html>

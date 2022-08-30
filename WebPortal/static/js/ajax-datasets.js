@@ -1,6 +1,6 @@
 var dataForPlotsDataset = {};
 
-function plotAll(result_wrapper) {
+function generateHmDatasets(result_wrapper) {
     if (result_wrapper === "") {
         result_wrapper = dataForPlotsDataset['result_wrapper'];
     } else {
@@ -101,7 +101,7 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
     };
 } 
 
-function AjaxExploreDatasets() {
+function AjaxDatasets() {
   
   var gene_name = $('#singleGene').val();
   // sent gene names to the API
@@ -110,8 +110,8 @@ function AjaxExploreDatasets() {
     url:'http://127.0.0.1:5000/data_datasets',
     data: "gene=" + gene_name,
     success: function(result) {
-        // $("#displayPlotDataset").empty();
-        plotAll(result);
+        $("#displayPlotDataset").empty();
+        generateHmDatasets(result);
     },
     error: function (e) {
         Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

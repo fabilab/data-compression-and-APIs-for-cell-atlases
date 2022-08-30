@@ -1,25 +1,25 @@
 function ShowGeneral() {
     $("#tabGeneral").addClass('is-active');
     $("#multiple_genes").removeClass('is-hidden');
-    $("#scatterPlot").removeClass('is-hidden');
+    $("#scatter_plot").removeClass('is-hidden');
     $("#num_genes_div").removeClass('is-hidden');
     $("#timepoint_info").addClass('is-hidden');
-    $("#searchOnClick_list" ).click(AjaxExploreGeneral)
+    $("#searchOnClick_list").click(AjaxCompressed)
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlot").removeClass("is-hidden");
+        $("#dp_compressed").removeClass("is-hidden");
     }
     else {
-        $("#displayPlot").removeClass("is-hidden");
+        $("#hm_compressed").removeClass("is-hidden");
     }
 }
 
 function HideGeneral() {
     $("#tabGeneral").removeClass('is-active');
     $("#multiple_genes").addClass('is-hidden');
-    $("#scatterPlot").addClass('is-hidden');
-    $("#dotPlot").addClass("is-hidden");
-    $("#displayPlot").addClass("is-hidden");
+    $("#scatter_plot").addClass('is-hidden');
+    $("#dp_compressed").addClass("is-hidden");
+    $("#hm_compressed").addClass("is-hidden");
     $("#num_genes_div").addClass('is-hidden');
     $("#timepoint_info").removeClass('is-hidden');
 }
@@ -27,44 +27,44 @@ function HideGeneral() {
 function ShowDataset() {
     $("#tabDataset").addClass('is-active');
     $("#single_gene").removeClass('is-hidden');
-    $("#searchOnClick_single").click(AjaxExploreDatasets);
+    $("#searchOnClick_single").click(AjaxDatasets);
     $("#num_genes_div").addClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlotDataset").removeClass("is-hidden");
+        $("#dp_dataset").removeClass("is-hidden");
     }
     else {
-        $("#displayPlotDataset").removeClass("is-hidden");
+        $("#hm_dataset").removeClass("is-hidden");
     }
 }
 
 function HideDataset() {
     $("#tabDataset").removeClass('is-active');
     $("#single_gene").addClass('is-hidden');
-    $("#displayPlotDataset").addClass('is-hidden');
-    $("#dotPlotDataset").addClass("is-hidden");
+    $("#hm_dataset").addClass('is-hidden');
+    $("#dp_dataset").addClass("is-hidden");
 }
 
 function ShowUnified() {
     $("#tabUnified").addClass('is-active');
     $("#single_gene").removeClass('is-hidden');
     $("#blank_info").removeClass('is-hidden');
-    $("#searchOnClick_single").click(AjaxExploreUnified);
+    $("#searchOnClick_single").click(AjaxUnifiedGene);
     $("#num_genes_div").addClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlotUnified").removeClass("is-hidden");
+        $("#dp_unified_gene").removeClass("is-hidden");
     }
     else {
-        $("#displayPlotUnified").removeClass("is-hidden");
+        $("#hm_unified_gene").removeClass("is-hidden");
     }
 }
 
 function HideUnified() {
     $("#tabUnified").removeClass('is-active');
     $("#single_gene").addClass('is-hidden');
-    $("#displayPlotUnified").addClass('is-hidden');
-    $("#dotPlotUnified").addClass("is-hidden");
+    $("#hm_unified_gene").addClass('is-hidden');
+    $("#dp_unified_gene").addClass("is-hidden");
     $("#blank_info").addClass('is-hidden');
 }
 
@@ -73,14 +73,14 @@ function ShowUnifiedByCell() {
     $("#tabUnifiedByCell").addClass('is-active');
     $("#multiple_genes").removeClass('is-hidden');
     $("#selectCelltypeUnified").removeClass('is-hidden');
-    $("#searchOnClick_list").click(AjaxExploreUnifiedByCell);
+    $("#searchOnClick_list").click(AjaxUnifiedCell);
     $("#blank_info_2").removeClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlotUnifiedByCell").removeClass("is-hidden");
+        $("#dp_unified_cell").removeClass("is-hidden");
     }
     else {
-        $("#displayPlotUnifiedByCell").removeClass("is-hidden");
+        $("#hm_unified_cell").removeClass("is-hidden");
     }
 }
 
@@ -88,9 +88,9 @@ function HideUnifiedByCell() {
     $("#tabUnifiedByCell").removeClass('is-active');
     $("#multiple_genes").addClass('is-hidden');
     $("#selectCelltypeUnified").addClass('is-hidden');
-    $("#displayPlotUnifiedByCell").addClass('is-hidden');
+    $("#hm_unified_cell").addClass('is-hidden');
     $("#blank_info_2").addClass('is-hidden');
-    $("#dotPlotUnifiedByCell").addClass('is-hidden');
+    $("#dp_unified_cell").addClass('is-hidden');
 
 }
 
@@ -103,20 +103,20 @@ function ShowMarker() {
     $("#dataOrder").addClass('is-hidden');
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        $("#dotPlotMarker").removeClass("is-hidden");
+        $("#dp_markers").removeClass("is-hidden");
     }
     else {
-        $("#displayPlotMarkers").removeClass("is-hidden");
+        $("#hm_markers").removeClass("is-hidden");
     }
 }
 
 function HideMarker() {
     $("#tabMarker").removeClass('is-active');
     $("#select_celltype").addClass('is-hidden');
-    $("#displayPlotMarkers").addClass('is-hidden');
+    $("#hm_markers").addClass('is-hidden');
     $("#sum_markers").addClass("is-hidden");
     $("#dataOrder").removeClass('is-hidden');
-    $("#dotPlotMarker").addClass('is-hidden');
+    $("#dp_markers").addClass('is-hidden');
     $("#timepoint_info").removeClass('is-hidden');
 }
 
@@ -165,38 +165,38 @@ $("#selectPlotType").change(function() {
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
         if($("#tabGeneral").hasClass('is-active')) {
-            $("#displayPlot").addClass("is-hidden");
-            $("#dotPlot").removeClass("is-hidden");
+            $("#hm_compressed").addClass("is-hidden");
+            $("#dp_compressed").removeClass("is-hidden");
         } else if($("#tabDataset").hasClass('is-active')) {
-            $("#displayPlotDataset").addClass("is-hidden");
-            $("#dotPlotDataset").removeClass("is-hidden");
+            $("#hm_dataset").addClass("is-hidden");
+            $("#dp_dataset").removeClass("is-hidden");
         } else if($("#tabUnified").hasClass('is-active')) {
-            $("#displayPlotUnified").addClass("is-hidden");
-            $("#dotPlotUnified").removeClass("is-hidden");
+            $("#hm_unified_gene").addClass("is-hidden");
+            $("#dp_unified_gene").removeClass("is-hidden");
         } else if($("#tabUnifiedByCell").hasClass('is-active')) {
-            $("#displayPlotUnifiedByCell").addClass("is-hidden");
-            $("#dotPlotUnifiedByCell").removeClass("is-hidden");
+            $("#hm_unified_cell").addClass("is-hidden");
+            $("#dp_unified_cell").removeClass("is-hidden");
         } else if($("#tabMarker").hasClass('is-active')) {
-            $("#displayPlotMarkers").addClass("is-hidden");
-            $("#dotPlotMarker").removeClass("is-hidden");
+            $("#hm_markers").addClass("is-hidden");
+            $("#dp_markers").removeClass("is-hidden");
         }
     }
     else {
         if($("#tabGeneral").hasClass('is-active')) {
-            $("#displayPlot").removeClass("is-hidden");
-            $("#dotPlot").addClass("is-hidden");
+            $("#hm_compressed").removeClass("is-hidden");
+            $("#dp_compressed").addClass("is-hidden");
         } else if($("#tabDataset").hasClass('is-active')) {
-            $("#displayPlotDataset").removeClass("is-hidden");
-            $("#dotPlotDataset").addClass("is-hidden");
+            $("#hm_dataset").removeClass("is-hidden");
+            $("#dp_dataset").addClass("is-hidden");
         } else if($("#tabUnified").hasClass('is-active')) {
-            $("#displayPlotUnified").removeClass("is-hidden");
-            $("#dotPlotUnified").addClass("is-hidden");
+            $("#hm_unified_gene").removeClass("is-hidden");
+            $("#dp_unified_gene").addClass("is-hidden");
         } else if($("#tabUnifiedByCell").hasClass('is-active')) {
-            $("#displayPlotUnifiedByCell").removeClass("is-hidden");
-            $("#dotPlotUnifiedByCell").addClass("is-hidden");
+            $("#hm_unified_cell").removeClass("is-hidden");
+            $("#dp_unified_cell").addClass("is-hidden");
         } else if($("#tabMarker").hasClass('is-active')) {
-            $("#displayPlotMarkers").removeClass("is-hidden");
-            $("#dotPlotMarker").addClass("is-hidden");
+            $("#hm_markers").removeClass("is-hidden");
+            $("#dp_markers").addClass("is-hidden");
         }
     }
 });
@@ -213,34 +213,34 @@ $("#selectDataType").change(function() {
 
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        if ($('#dotPlot').text() !== "") {
-            DotplotProportionExp("", "");
-            HeatmapAverageExp("", "");
+        if ($('#dp_compressed').text() !== "") {
+            generateDpCompressed("", "");
+            generateHmCompressed("", "");
         }
     } else{
-        if ($('#displayPlot').text() !== "") {
-            DotplotProportionExp("", "");
-            HeatmapAverageExp("", "");
+        if ($('#hm_compressed').text() !== "") {
+            generateDpCompressed("", "");
+            generateHmCompressed("", "");
         }
     }
 
     if ($('#dataset_1').text() !== "") {
-        plotAll("");
+        generateHmDatasets("");
     } 
 
-    if ($('#displayPlotUnified').text() !== "") {
-        DotplotProportionExpUnified("", "");
-        plotHeatmapUnified("","");
+    if ($('#hm_unified_gene').text() !== "") {
+        generateDpUnifiedGene("", "");
+        generateHmUnifiedGene("","");
     }
 
-    if ($('#displayPlotUnifiedByCell').text() !== "") {
-        DotplotUnifiedByCell("", "");
-        HeatmapUnifiedByCell("","");
+    if ($('#hm_unified_cell').text() !== "") {
+        generateDpUnifiedCell("", "");
+        generateHmUnifiedCell("","");
     }
 
-    if ($('#displayPlotMarkers').text() !== "") {
-        HeatmapMarkerGenes("","","","", "","");
-        DotplotProportionExpMarker("","","","","","", "");
+    if ($('#hm_markers').text() !== "") {
+        generateHmMarkers("","","","", "","");
+        generateDpMarkers("","","","","","", "");
     }
 });
 
@@ -255,51 +255,51 @@ $("#selectDataOrder").change(function() {
 
     let plot = $("#selectPlotType option:selected").val();
     if (plot === "dot") {
-        if ($('#dotPlot').text() !== "") {
-            DotplotProportionExp("", "");
-            HeatmapAverageExp("", "");
-        } else if ($('#displayPlotUnified').text() !== "") {
-            plotHeatmapUnified("","");
-            DotplotProportionExpUnified("","");
-        } else if ($('#displayPlotUnifiedByCell').text() !== "") {
-            DotplotUnifiedByCell("", "");
-            HeatmapUnifiedByCell("","");
+        if ($('#dp_compressed').text() !== "") {
+            generateDpCompressed("", "");
+            generateHmCompressed("", "");
+        } else if ($('#hm_unified_gene').text() !== "") {
+            generateHmUnifiedGene("","");
+            generateDpUnifiedGene("","");
+        } else if ($('#hm_unified_cell').text() !== "") {
+            generateDpUnifiedCell("", "");
+            generateHmUnifiedCell("","");
         }
     } else{
-        if ($('#displayPlot').text() !== "") {
-            DotplotProportionExp("", "");
-            HeatmapAverageExp("", "");
-            plotHeatmapUnified("","");
-            DotplotProportionExpUnified("","");
-        } else if ($('#displayPlotUnified').text() !== "") {
-            plotHeatmapUnified("","");
-            DotplotProportionExpUnified("","");
-        } else if ($('#displayPlotUnifiedByCell').text() !== "") {
-            DotplotUnifiedByCell("", "");
-            HeatmapUnifiedByCell("","");
+        if ($('#hm_compressed').text() !== "") {
+            generateDpCompressed("", "");
+            generateHmCompressed("", "");
+            generateHmUnifiedGene("","");
+            generateDpUnifiedGene("","");
+        } else if ($('#hm_unified_gene').text() !== "") {
+            generateHmUnifiedGene("","");
+            generateDpUnifiedGene("","");
+        } else if ($('#hm_unified_cell').text() !== "") {
+            generateDpUnifiedCell("", "");
+            generateHmUnifiedCell("","");
         }
     }
     if ($('#dataset_1').text() !== "") {
-        plotAll("");
+        generateHmDatasets("");
     } 
 });
 
 $("#selectTopMarkers").change(function() {
     let showNum = $("#selectTopMarkers option:selected").val();
     if (showNum === 'top30') {
-        HeatmapMarkerGenes("","","","", "", 30);
-        DotplotProportionExpMarker("","","","","","", 30);
+        generateHmMarkers("","","","", "", 30);
+        generateDpMarkers("","","","","","", 30);
     } else if (showNum === 'top20') {
-        HeatmapMarkerGenes("","","","", "", 20);
-        DotplotProportionExpMarker("","","","","","", 20);
+        generateHmMarkers("","","","", "", 20);
+        generateDpMarkers("","","","","","", 20);
 
     } else if (showNum === 'top10') {
-        HeatmapMarkerGenes("","","","", "", 10);
-        DotplotProportionExpMarker("","","","","","", 10);
+        generateHmMarkers("","","","", "", 10);
+        generateDpMarkers("","","","","","", 10);
     } else {
-        HeatmapMarkerGenes("","","","", "","");
-        DotplotProportionExpMarker("","","","","","", "");
+        generateHmMarkers("","","","", "","");
+        generateDpMarkers("","","","","","", "");
     }
 })
 
-$("#applyOnClick").click(AjaxExploreMarkers);
+$("#applyOnClick").click(AjaxMarkers);

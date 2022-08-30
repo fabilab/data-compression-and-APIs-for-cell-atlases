@@ -1,6 +1,6 @@
 plotDataUnifiedByCell = {}
 
-function HeatmapUnifiedByCell(result,html_element_id) {
+function generateHmUnifiedCell(result,html_element_id) {
     // flags passed by events.js
     let useLog = plotDataUnifiedByCell['useLog'];
     let geneOrder = plotDataUnifiedByCell['geneOrder'];
@@ -12,7 +12,7 @@ function HeatmapUnifiedByCell(result,html_element_id) {
     }
 
     if (html_element_id === "") {
-        html_element_id = "displayPlotUnifiedByCell";
+        html_element_id = "hm_unified_cell";
     }
     let celltype = result['cell_type'];
     
@@ -169,7 +169,7 @@ function pagesetupUnified() {
 
 $(document).ready(pagesetupUnified)
 
-function AjaxExploreUnifiedByCell() {
+function AjaxUnifiedCell() {
     // action here when clicking the search button
     let celltype = $("#celltypeSelection option:selected").val();
     let genes = $('#listGenes').val();
@@ -179,10 +179,10 @@ function AjaxExploreUnifiedByCell() {
             url:'http://127.0.0.1:5000/data_unified_by_cell',
             data: "celltype=" + celltype + "&genes=" + genes,
             success: function(result) {
-                $("#displayPlotUnifiedByCell").empty();
-                HeatmapUnifiedByCell(result,"displayPlotUnifiedByCell");
-                $("#dotPlotUnifiedByCell").empty();
-                DotplotUnifiedByCell(result, "dotPlotUnifiedByCell");
+                $("#hm_unified_cell").empty();
+                generateHmUnifiedCell(result,"hm_unified_cell");
+                $("#dp_unified_cell").empty();
+                generateDpUnifiedCell(result, "dp_unified_cell");
             },
             error: function (e) {
                 Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

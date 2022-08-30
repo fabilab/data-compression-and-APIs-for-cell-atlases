@@ -1,7 +1,7 @@
 var dataAverageExp = {};
 
-function HeatmapAverageExp(result_wrapper, html_element_id) {
-        $("#displayPlot").empty();
+function generateHmCompressed(result_wrapper, html_element_id) {
+        $("#hm_compressed").empty();
         let useLog = dataAverageExp['useLog'];
 
         if (result_wrapper === "") {
@@ -11,7 +11,7 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
         }
 
         if (html_element_id === "") {
-            html_element_id = "displayPlot";
+            html_element_id = "hm_compressed";
         }
         let result = result_wrapper['result_average'];
         let celltypes;
@@ -111,12 +111,11 @@ function HeatmapAverageExp(result_wrapper, html_element_id) {
     } 
 
 
-function AjaxExploreGeneral() {
+function AjaxCompressed() {
 
-  if(! $('#scatterPlot').is('empty')) {
-    $('#scatterPlot').empty();
+  if(! $('#scatter_plot').is('empty')) {
+    $('#scatter_plot').empty();
   }
-
 
   var genes_string = $('#listGenes').val();
   const gene_array = genes_string.split(",")
@@ -137,10 +136,10 @@ function AjaxExploreGeneral() {
     url:'http://127.0.0.1:5000/data_general',
     data: "gene_names=" + genes_string,
     success: function(result) { 
-      $("#displayPlot").empty();
-      HeatmapAverageExp(result, "displayPlot");
-      $("#dotPlot").empty();
-      DotplotProportionExp(result, "dotPlot");
+      $("#hm_compressed").empty();
+      generateHmCompressed(result, "hm_compressed");
+      $("#dp_compressed").empty();
+      generateDpCompressed(result, "dp_compressed");
     },
     error: function (e) {
         Swal.fire('Invalid input', `${e.responseText.substring(1, e.responseText.length - 2)}is invalid, please make sure you type in the correct gene names.`, 'error')
@@ -151,5 +150,5 @@ function AjaxExploreGeneral() {
 function clearTextArea() {
     $("#listGenes").val('');
 }
-
+$("#searchOnClick_list").click(AjaxCompressed)
 $("#clearOnClick_list").click(clearTextArea)

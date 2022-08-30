@@ -1,10 +1,10 @@
 var dataForPlot = {};
 
-function DotplotProportionExpMarker(result_original,result_scaled,exp_proportion,html_element_id,selected_cell, gene_order, showNumMarkers) {
+function generateDpMarkers(result_original,result_scaled,exp_proportion,html_element_id,selected_cell, gene_order, showNumMarkers) {
     let useLog = dataMarker['useLog'];
 
     if (html_element_id === "") {
-        html_element_id = "dotPlotMarker";
+        html_element_id = "dp_markers";
     }
 
     if (result_original === '') {

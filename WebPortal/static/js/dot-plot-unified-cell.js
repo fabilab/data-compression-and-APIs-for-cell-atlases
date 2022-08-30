@@ -1,6 +1,6 @@
 dataForPlotsUnifiedCell = {}
 
-function DotplotUnifiedByCell(result,htmlElementId) {
+function generateDpUnifiedCell(result,htmlElementId) {
     // flags passed by events.js    
     let useLog = dataForPlotsUnifiedCell['useLog'];
     let geneOrder = dataForPlotsUnifiedCell['geneOrder'];
@@ -12,7 +12,7 @@ function DotplotUnifiedByCell(result,htmlElementId) {
     }
 
     if (htmlElementId === "") {
-        htmlElementId = "dotPlotUnifiedByCell";
+        htmlElementId = "dp_unified_cell";
     }
 
     let genes;

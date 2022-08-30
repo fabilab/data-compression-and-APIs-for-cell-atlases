@@ -1,6 +1,6 @@
 var dataForPlotsUnified = {};
 
-function DotplotProportionExpUnifed(result,html_element_id) {
+function generateDpUnifiedGene(result,html_element_id) {
     // flags passed by events.js
     let useLog = dataForPlotsUnified['useLog'];
     let celltypeOrder = dataForPlotsUnified['celltypeOrder'];
@@ -12,7 +12,7 @@ function DotplotProportionExpUnifed(result,html_element_id) {
     }
 
     if (html_element_id === "") {
-        html_element_id = "dotPlotUnified";
+        html_element_id = "dp_unified_gene";
     }
 
     let celltypes;

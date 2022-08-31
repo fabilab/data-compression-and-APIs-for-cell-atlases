@@ -110,7 +110,8 @@ function generateDpMarkers(result_original,result_scaled,exp_proportion,html_ele
             click: function(gd) {
               Plotly.downloadImage(gd, {format: 'svg'})
             }
-          }]
+          }],
+          editable:true,
     };
     // Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
     if ($('#'+html_element_id).text() === "") {

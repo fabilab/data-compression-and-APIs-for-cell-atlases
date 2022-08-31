@@ -106,7 +106,8 @@ function generateHmMarkers(result_original,result_scaled,html_element_id,selecte
             click: function(gd) {
               Plotly.downloadImage(gd, {format: 'svg'})
             }
-          }]
+          }],
+          editable:true,
     };
 
     if ($('#'+html_element_id).text() === "") {

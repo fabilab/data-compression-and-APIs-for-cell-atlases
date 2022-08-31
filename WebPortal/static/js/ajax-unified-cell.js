@@ -126,7 +126,8 @@ function generateHmUnifiedCell(result,html_element_id) {
             click: function(gd) {
               Plotly.downloadImage(gd, {format: 'svg'})
             }
-          }]
+          }],
+          editable:true,
     };
 
     if ($('#'+html_element_id).text() === "") {

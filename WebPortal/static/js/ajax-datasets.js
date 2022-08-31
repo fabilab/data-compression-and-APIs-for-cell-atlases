@@ -84,7 +84,8 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
                 click: function(gd) {
                   Plotly.downloadImage(gd, {format: 'svg'})
                 }
-              }]
+              }],
+              editable:true,
         };
         
         if ($('#'+html_element_id).text() === "") {

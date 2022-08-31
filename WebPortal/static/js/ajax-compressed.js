@@ -92,7 +92,8 @@ function generateHmCompressed(result_wrapper, html_element_id) {
                 click: function(gd) {
                   Plotly.downloadImage(gd, {format: 'svg'})
                 }
-              }]
+              }],
+              editable:true,
         }
 
         // var config = {responsive:true}

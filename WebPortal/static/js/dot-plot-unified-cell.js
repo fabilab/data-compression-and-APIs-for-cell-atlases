@@ -124,7 +124,8 @@ function generateDpUnifiedCell(result,htmlElementId) {
             click: function(gd) {
               Plotly.downloadImage(gd, {format: 'svg'})
             }
-          }]
+          }],
+          editable:true,
     };
     if ($('#'+htmlElementId).text() === "") {
         data['x'] = x_axis;

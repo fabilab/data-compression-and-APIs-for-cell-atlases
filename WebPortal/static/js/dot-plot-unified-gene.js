@@ -129,6 +129,7 @@ function generateDpUnifiedGene(result,html_element_id) {
             }
           }],
           editable:true,
+          responsive: true,
     };
     // Plotly.newPlot(document.getElementById(html_element_id), [data],layout);
     if ($('#'+html_element_id).text() === "") {

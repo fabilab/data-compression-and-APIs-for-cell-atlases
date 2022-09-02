@@ -86,14 +86,40 @@ function generateHmCompressed(result_wrapper, html_element_id) {
         };
         // source code from: https://codepen.io/etpinard/pen/zzzBXv?editors=0010
         var tools = {
-            modeBarButtonsToAdd: [{
-                name: 'Download plot as an SVG',
-                icon: Plotly.Icons.camera,
-                click: function(gd) {
-                  Plotly.downloadImage(gd, {format: 'svg'})
-                }
-              }],
+            modeBarButtonsToAdd: [
+                {
+                    name: 'Download plot as an SVG',
+                    icon: Plotly.Icons.camera,
+                    click: function(gd) {
+                    Plotly.downloadImage(gd, {format: 'svg'})
+                    }
+                },
+                {
+                    name: "downloadCsv",
+                    title: "Download data as csv",
+                    icon: Plotly.Icons.disk,
+                    click: (gd) => {
+                      let data = [
+                        [gd.layout.xaxis.title.text, gd.layout.yaxis.title.text].join(
+                          ","
+                        ),
+                      ];
+                      gd.data[0].x.forEach((xvalue, i) =>
+                        data.push([xvalue, gd.data[0].y[i]].join(","))
+                      );
+                      let blob = new Blob([data.join("\r\n")], { type: "text/csv" });
+                      // import { saveAs } from "file-saver";
+                      saveAs(
+                        blob,
+                        "export.csv"
+                      );
+                    },
+                  }
+            
+            
+            ],
               editable:true,
+              responsive: true,
         }
 
         // var config = {responsive:true}

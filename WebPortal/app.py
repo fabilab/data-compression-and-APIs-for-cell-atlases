@@ -10,10 +10,10 @@ import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-from ca_data_access import read_file_average_exp,read_file_proportion_exp, dataset_by_dataset, dataset_unified, result_unified_by_cell, marker_genes_expression
+from ca_data_access import read_file_average_exp,read_file_proportion_exp, result_datasets, dataset_unified, result_unified_by_cell, marker_genes_expression
 import time
 
-app = Flask(__name__, static_url_path='/static',template_folder='templates')
+app = Flask(__name__, static_url_path='/static', template_folder='templates')
 api = Api(app)
 # Note: this might be unsafe
 CORS(app)
@@ -60,7 +60,11 @@ def userGuide():
 
 @app.route('/package',methods=['GET'])
 def package():
-    return render_template('./showPackage/index.html')
+    return render_template('/showPackage/index.html')
+
+@app.route('/packageModule',methods=['GET'])
+def packageModule():
+    return render_template('/showPackage/modules.html')
 
 @app.route('/heatmap_by_celltypes',methods=['GET'])
 # def helloworld():
@@ -152,8 +156,8 @@ class getAllGeneNames(Resource):
 
 class dataDatasets (Resource):
     def get(self):
-        genename = request.args.get('gene')
-        result = dataset_by_dataset(genename,'celltype_dataset_timepoint')
+        gene = request.args.get('gene')
+        result = result_datasets('celltype_dataset_timepoint',gene)
         return result
 
 class dataGeneral(Resource):

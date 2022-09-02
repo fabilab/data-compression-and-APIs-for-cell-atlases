@@ -225,7 +225,12 @@ $("#selectDataType").change(function() {
     }
 
     if ($('#dataset_1').text() !== "") {
-        generateHmDatasets("");
+        generateHmDatasets("", "");
+        generateDpDatasets("", "");
+    } 
+    if ($('#dp_dataset_1').text() !== "") {
+        generateHmDatasets("", "");
+        generateDpDatasets("", "");
     } 
 
     if ($('#hm_unified_gene').text() !== "") {
@@ -258,6 +263,12 @@ $("#selectDataOrder").change(function() {
         if ($('#dp_compressed').text() !== "") {
             generateDpCompressed("", "");
             generateHmCompressed("", "");
+        } else if ($('#dataset_1').text() !== "") {
+            generateHmDatasets("");
+            generateDpDatasets("");
+        } else if ($('#dp_dataset_1').text() !== "") {
+            generateHmDatasets("");
+            generateDpDatasets("");
         } else if ($('#hm_unified_gene').text() !== "") {
             generateHmUnifiedGene("","");
             generateDpUnifiedGene("","");
@@ -271,6 +282,9 @@ $("#selectDataOrder").change(function() {
             generateHmCompressed("", "");
             generateHmUnifiedGene("","");
             generateDpUnifiedGene("","");
+        } else if ($('#dataset_1').text() !== "") {
+            generateHmDatasets("");
+            generateDpDatasets("");
         } else if ($('#hm_unified_gene').text() !== "") {
             generateHmUnifiedGene("","");
             generateDpUnifiedGene("","");
@@ -279,9 +293,6 @@ $("#selectDataOrder").change(function() {
             generateHmUnifiedCell("","");
         }
     }
-    if ($('#dataset_1').text() !== "") {
-        generateHmDatasets("");
-    } 
 });
 
 $("#selectTopMarkers").change(function() {

@@ -199,12 +199,11 @@ def timepoint_reorder(tp1, tp2):
 #  function that get the cell type dataset timepoint as a dictionary
 # user input a gene name.
 #  for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes 
-def dataset_by_dataset(genename,df_type):
-    # select and pre-preprocessing data
-    res, df_tp = read_file_average_exp(df_type,genename)
+def dataset_pre_process(df,gene):
+# select and pre-preprocessing data
 
     # select data for a given gene name
-    df_filtered=df_tp.loc[[genename]]
+    df_filtered=df.loc[[gene]]
     # for each dataset name, we construct a new dataframe for it (celltypes x timepoints)
     datasets = set([name.split("_")[1] for name in df_filtered.columns])
     dic_per_dataset = {}
@@ -246,6 +245,17 @@ def dataset_by_dataset(genename,df_type):
         dic_per_dataset[i] = json.loads(gene_exp_df.to_json())
     return {"result":dic_per_dataset, "hierarchicalCelltypeOrder":new_cell_type_order}
     # for each of the dataframe in dic_per_dataset, we convert it into json format
+
+def result_datasets(df_type,gene):
+    res, df_avg = read_file_average_exp(df_type,gene)
+    res, df_pro = read_file_proportion_exp(df_type,gene)
+
+    exp_avg = dataset_pre_process(df_avg,gene)
+    exp_pro = dataset_pre_process(df_pro,gene)
+
+    return {"exp_avg":exp_avg['result'], "exp_pro":exp_pro['result'], "hierarchicalCelltypeOrder":exp_avg['hierarchicalCelltypeOrder']}
+
+
     
 # giving a dataframe, extract the information needed for generate the corresponded plot
 def unified_process(df,genename):

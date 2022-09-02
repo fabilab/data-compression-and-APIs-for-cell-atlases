@@ -126,6 +126,7 @@ function generateDpUnifiedCell(result,htmlElementId) {
             }
           }],
           editable:true,
+          responsive: true,
     };
     if ($('#'+htmlElementId).text() === "") {
         data['x'] = x_axis;

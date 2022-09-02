@@ -128,6 +128,7 @@ function generateHmUnifiedCell(result,html_element_id) {
             }
           }],
           editable:true,
+          responsive: true,
     };
 
     if ($('#'+html_element_id).text() === "") {

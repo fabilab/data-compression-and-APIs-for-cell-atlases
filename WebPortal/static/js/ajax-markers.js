@@ -108,6 +108,7 @@ function generateHmMarkers(result_original,result_scaled,html_element_id,selecte
             }
           }],
           editable:true,
+          responsive: true,
     };
 
     if ($('#'+html_element_id).text() === "") {

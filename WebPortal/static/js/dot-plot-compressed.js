@@ -91,6 +91,7 @@ function generateDpCompressed(result_wrapper, html_element_id) {
           }
         }],
         editable:true,
+        responsive: true,
   }
     
     Plotly.newPlot(document.getElementById(html_element_id), [data],layout,tools);

@@ -8,8 +8,8 @@ function generateHmDatasets(result_wrapper) {
     }
     
     let num = 1;
-    for (index in Object.keys(result_wrapper['result'])) {
-        let dataset = Object.keys(result_wrapper['result'])[index];
+    for (index in Object.keys(result_wrapper['exp_avg'])) {
+        let dataset = Object.keys(result_wrapper['exp_avg'])[index];
         let div_id = 'dataset_' + num;
         HeatmapDataset(result_wrapper, div_id, dataset);
         num++;
@@ -19,8 +19,7 @@ function generateHmDatasets(result_wrapper) {
 function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
     let useLog = dataForPlotsDataset['useLog'];
     
-    const result = result_wrapper['result'][dataset_name];
-    
+    let result = result_wrapper['exp_avg'][dataset_name];
     let celltypes;
     let celltypeOrder = dataForPlotsDataset['celltypeOrder'];
 
@@ -86,6 +85,7 @@ function HeatmapDataset(result_wrapper, html_element_id,dataset_name) {
                 }
               }],
               editable:true,
+              responsive: true,
         };
         
         if ($('#'+html_element_id).text() === "") {
@@ -111,8 +111,10 @@ function AjaxDatasets() {
     url:'http://127.0.0.1:5000/data_datasets',
     data: "gene=" + gene_name,
     success: function(result) {
-        $("#displayPlotDataset").empty();
+        // $("#hm_dataset").empty();
         generateHmDatasets(result);
+        // $("#dp_dataset").empty();
+        generateDpDatasets(result);
     },
     error: function (e) {
         Swal.fire('Invalid input','please make sure you type in the correct gene name','error');

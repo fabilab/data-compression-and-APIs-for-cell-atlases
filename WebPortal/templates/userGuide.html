@@ -14,26 +14,26 @@
   </head>
   <body>
   <!-- Navigation Bar -->
-  <nav class="navbar is-fixed-top has-shadow is-spaced is-white" >
+  <nav class="navbar card px-3" >
     <div class="navbar-brand">
       <div class="navbar-item">
         <img src="./logo.png" style="max-height:2.5rem"/>
       </div>
     </div>
     <div class="navbar-end">
-		<a class="navbar-item" href="http://127.0.0.1:5000/">
+		<a class="navbar-item" href="/">
 			About
 		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/dataExplore">     
+		<a class="navbar-item" onclick="window.location.href='/dataExplore'">     
 			Explore Data
 		</a>
-		<a class="navbar-item is-active" href="http://127.0.0.1:5000/userGuide">
+		<a class="navbar-item is-active has-text-link has-background-white-ter" onclick="window.location.href='/userGuide'">
 			User Guide
 		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/resources">     
+		<a class="navbar-item" onclick="window.location.href='/resources'">     
 			Resources
 		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/package">     
+		<a class="navbar-item" onclick="window.location.href='/package'">     
 			Install Package
 		</a>
     </div>

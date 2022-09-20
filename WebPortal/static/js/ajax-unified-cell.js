@@ -23,7 +23,6 @@ function generateHmUnifiedCell(result,html_element_id) {
         genes = result['clustered_gene_order'];
     }
     const expression = result['exp_avg'];
-    
     // x-axis: celltypes
     let x_axis = genes;
     //y-axis: timepoint
@@ -34,6 +33,9 @@ function generateHmUnifiedCell(result,html_element_id) {
     let y_axis_dataset = [];
     // timepoint that with duplicate:
     let y_axis_time = [];
+    let nGenes = x_axis.length;
+    $("#num_genes").empty();
+    $("#num_genes").append(nGenes);
 
     for (var i = 0; i < result['dataset_timepoint'].length; i++) {
         // dataset timepoint combination: e.g TMS_24m
@@ -90,7 +92,6 @@ function generateHmUnifiedCell(result,html_element_id) {
     }
 
     let nTimepoints = y_axis.length;
-    let nGenes = x_axis.length;
     var data = {
         type: 'heatmap',
         hoverinfo: 'text',
@@ -150,7 +151,7 @@ function generateHmUnifiedCell(result,html_element_id) {
 function pagesetupUnified() {
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/all_cell_types',
+        url:`${base_url}/all_cell_types`,
         success: function(result) {
             var celltype_categories = Object.keys(result);
             for(var i=0;i<celltype_categories.length;i++) {
@@ -158,7 +159,6 @@ function pagesetupUnified() {
                 $("#celltypeSelection").append(`<option class='has-text-weight-bold mt-2 has-text-success' disabled>${category}</option><br>`);
                 var celltypes = result[category];
                 for (var j=0;j<celltypes.length;j++) {
-                    // $("#celltypeSelection").append(`<label class='radio'><input type='radio' name='celltype_selection' value='${celltypes[j]}'/> ${celltypes[j]}</label><br>`);
                     $("#celltypeSelection").append(`<option value='${celltypes[j]}'>${celltypes[j]}</option>`);
                 }
             }
@@ -178,7 +178,7 @@ function AjaxUnifiedCell() {
 
     $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/data_unified_by_cell',
+            url:`${base_url}/data_unified_by_cell`,
             data: "celltype=" + celltype + "&genes=" + genes,
             success: function(result) {
                 $("#hm_unified_cell").empty();
@@ -187,7 +187,7 @@ function AjaxUnifiedCell() {
                 generateDpUnifiedCell(result, "dp_unified_cell");
             },
             error: function (e) {
-                Swal.fire('Invalid input','please make sure you type in the correct gene name','error');
+                Swal.fire('Invalid input', `${e.responseText.substring(1, e.responseText.length - 2)}is invalid, please make sure you type in the correct gene names.`, 'error')
             }
         });
         $("#originalTab").addClass('is-active');

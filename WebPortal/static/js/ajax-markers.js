@@ -72,7 +72,7 @@ function generateHmMarkers(result_original,result_scaled,html_element_id,selecte
                 original_exp = Math.log10(original_exp+0.5);
             }
             each_gene_data.push(exp_scaled);
-            temp.push('Celltype: '+ct+'<br>Gene: '+gn+'<br>Actual Expression: '+original_exp.toPrecision(3)+'<br>Scaled Expression: '+exp_scaled.toPrecision(3));
+            temp.push('Celltype: '+ct+'<br>Gene: '+gn+'<br>Expression in CPM: '+original_exp+'<br>Scaled Expression: '+exp_scaled);
         }
         data_content.push(each_gene_data);
         hover_text.push(temp);
@@ -85,7 +85,7 @@ function generateHmMarkers(result_original,result_scaled,html_element_id,selecte
     };
     var layout = {
         autosize: true, 
-        title: 'Expression profile of <b>' + selected_cell +'\'s </b> marker genes in all cell types ',
+        title: 'Heatmap showing expression profile of <b>' + selected_cell +'\'s </b> marker genes',
         xaxis: {
             title: '<b>Cell types<b>',
             automargin: true,
@@ -131,7 +131,7 @@ function pagesetup() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/all_cell_types',
+        url:`${base_url}/all_cell_types`,
         success: function(result) {
             var celltype_categories = Object.keys(result);
 
@@ -158,7 +158,7 @@ function AjaxMarkers() {
     // Generate the plot
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/data_markers',
+            url:`${base_url}/data_markers`,
             data: "celltype=" + selected_cell.replace('+','%2b'),
             success: function(result) {
                 $("#hm_markers").empty();

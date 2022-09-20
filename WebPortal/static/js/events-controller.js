@@ -98,6 +98,7 @@ function ShowMarker() {
     $("#tabMarker").addClass('is-active');
     $("#select_celltype").removeClass('is-hidden');
     $("#sum_markers").removeClass("is-hidden");
+    $("#markers_info").removeClass("is-hidden");
     $("#num_genes_div").addClass('is-hidden');
     $("#timepoint_info").addClass('is-hidden');
     $("#dataOrder").addClass('is-hidden');
@@ -115,6 +116,7 @@ function HideMarker() {
     $("#select_celltype").addClass('is-hidden');
     $("#hm_markers").addClass('is-hidden');
     $("#sum_markers").addClass("is-hidden");
+    $("#markers_info").addClass("is-hidden");
     $("#dataOrder").removeClass('is-hidden');
     $("#dp_markers").addClass('is-hidden');
     $("#timepoint_info").removeClass('is-hidden');

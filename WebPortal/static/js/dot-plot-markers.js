@@ -42,7 +42,6 @@ function generateDpMarkers(result_original,result_scaled,exp_proportion,html_ele
         showNumMarkers = gene_order.length
     }
 
-    let exp_scaled = dataForPlot['result_scaled'];
     let result_proportion = dataForPlot['exp_proportion'];
     let celltypes = Object.keys(result_scaled);
     let genes = gene_order;
@@ -60,15 +59,17 @@ function generateDpMarkers(result_original,result_scaled,exp_proportion,html_ele
     for (var i = showNumMarkers-1; i >= 0; i--) {
       let this_gene = genes[i];
       for (var j = 0; j < ncelltypes; j++) {
-        let exp = exp_scaled[celltypes[j]][this_gene];
+        let exp_scaled = result_scaled[celltypes[j]][this_gene];
+        let exp_original = result_original[celltypes[j]][this_gene];
         if(useLog) {
-            exp = Math.log10(exp+0.5);
+            exp_scaled = Math.log10(exp_scaled+0.5)
+            exp_original = Math.log(exp_original+0.5)
         }
         // marker_color.push(exp);
         all_x.push(celltypes[j])
-        all_hovertext.push(`Gene: ${this_gene}<br>Cell Type: ${celltypes[j]}<br>Avg Exp: ${exp.toPrecision(3)}<br>Proportion: ${result_proportion[celltypes[j]][this_gene].toPrecision(3)*100}%`);
+        all_hovertext.push(`Gene: ${this_gene}<br>Cell Type: ${celltypes[j]}<br>Proportion: ${result_proportion[celltypes[j]][this_gene].toPrecision(3)*100}%<br>Expression in CPM: ${exp_original.toPrecision(3)}<br>Scaled Expression: ${exp_scaled.toPrecision(3)}`);
         all_y.push(`<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${genes[i]}">${genes[i]}</a>`);
-        all_color.push(exp);
+        all_color.push(exp_scaled);
         all_size.push(result_proportion[celltypes[j]][this_gene]*100);
       }
     }
@@ -87,7 +88,7 @@ function generateDpMarkers(result_original,result_scaled,exp_proportion,html_ele
     };
     
     var layout = {
-        title:"Dot Plot showing expression level and population faction of <b>"+selected_cell+"'s</b> marker genes across 41 different cell types",
+        title:"Dot Plot showing expression profile of <b>"+selected_cell+"'s</b> marker genes",
         autosize: false,
         showlegend: false,
         xaxis: {

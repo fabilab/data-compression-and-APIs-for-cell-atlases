@@ -10,33 +10,33 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v6.1.1/css/all.css">
+    <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet"/>
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
   </head>
   <body>
   <!-- Navigation Bar -->
-  <nav class="navbar has-shadow is-spaced is-white" >
-    <div class="navbar-brand">
-      <div class="navbar-item">
-        <img src="./logo.png" style="max-height:2.5rem"/>
+  <nav class="navbar card px-3">
+      <div class="navbar-brand">
+        <div class="navbar-item">
+          <img src="./logo.png" style="max-height:2.5rem"/>
+        </div>
       </div>
-    </div>
-    <div class="navbar-end">
-		<a class="navbar-item" href="http://127.0.0.1:5000/">
-			About
-		</a>
-		<a class="navbar-item is-active" href="http://127.0.0.1:5000/dataExplore">     
-			Explore Data
-		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/userGuide">
-			User Guide
-		</a>
-		<a class="navbar-item" href="http://127.0.0.1:5000/resources">     
-			Resources
-		</a>
-    <a class="navbar-item" href="http://127.0.0.1:5000/package">     
-			Install Package
-		</a>
+      <div class="navbar-end">
+        <a class="navbar-item" onclick="window.location.href='/'">
+          About
+        </a>
+        <a class="navbar-item is-active has-text-link has-background-white-ter" onclick="window.location.href='/dataExplore'">     
+          Explore Data
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/userGuide'">
+          User Guide
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/resources'">     
+          Resources
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/package'">     
+          Install Package
+        </a>
     </div>
   </nav>
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
@@ -46,26 +46,31 @@
         <ul>
           <li id="tabGeneral" class="is-active">
             <a>
+              <span class="icon is-small"><i class="fa-sharp fa-solid fa-minimize"></i></span>
               <span>Compressed</span>
             </a>
           </li>
           <li id="tabDataset">
             <a>
+              <span class="icon is-small"><i class="fa-solid fa-layer-group"></i></span>
               <span>With Dataset</span>
             </a>
           </li >
           <li id="tabUnified">
             <a>
-              <span>Timepoint Unified (by Gene)</span>
+              <span class="icon is-small"><i class="fa-solid fa-timeline"></i></span>
+              <span>Development(by Gene)</span>
             </a>
           </li>
           <li id="tabUnifiedByCell">
             <a>
-              <span>Timepoint Unified (by Celltype)</span>
+              <span class="icon is-small"><i class="fa-solid fa-timeline"></i></span>
+              <span>Development(by Celltype)</span>
             </a>
           </li>
           <li id="tabMarker">
             <a>
+              <span class="icon is-small"><i class="fa-sharp fa-solid fa-flag"></i></span>
               <span>Marker Genes</span>
             </a>
           </li>
@@ -179,7 +184,11 @@
                     <div id="dataset_2"></div>
                     <div id="dataset_3"></div>
                   </div>
-                  <div class="box mx-3 my-3 is-hidden" id="dp_dataset"></div>
+                  <div class="box mx-3 my-3 is-hidden" id="dp_dataset">
+                    <div id="dp_dataset_1"></div>
+                    <div id="dp_dataset_2"></div>
+                    <div id="dp_dataset_3"></div>
+                  </div>
                   <div class="box mx-3 my-3 is-hidden" id="hm_unified_gene"></div>
                   <div class="box mx-3 my-3 is-hidden" id="dp_unified_gene"></div>
                   <div class="box mx-3 my-3 is-hidden" id="hm_unified_cell"></div>
@@ -199,6 +208,7 @@
   <script src="../js/ajax-markers.js"></script>
   <!-- js files for generating dot plots -->
   <script src="../js/dot-plot-compressed.js"></script>
+  <script src="../js/dot-plot-datasets.js"></script>
   <script src="../js/dot-plot-markers.js"></script>
   <script src="../js/dot-plot-unified-gene.js"></script>
   <script src="../js/dot-plot-unified-cell.js"></script>

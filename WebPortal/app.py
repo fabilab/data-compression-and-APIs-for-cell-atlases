@@ -1,17 +1,11 @@
-from base64 import decode
-from importlib.util import resolve_name
-from urllib import response
 from flask import Flask, send_from_directory,request,render_template, send_from_directory
 from flask_restful import Resource, Api
 from flask_cors import CORS
-import pandas as pd
-import h5py
-import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
 from ca_data_access import read_file_average_exp,read_file_proportion_exp, result_datasets, dataset_unified, result_unified_by_cell, marker_genes_expression
-import time
+
 
 app = Flask(__name__, static_url_path='/static', template_folder='templates')
 api = Api(app)
@@ -228,9 +222,10 @@ class UnifiedByCell(Resource):
     def get(self):
         celltype = request.args.get('celltype')
         genes = request.args.get('genes')
-        print(celltype)
-        print("celltype_unified",genes)
-        return result_unified_by_cell(celltype,genes)
+        res, data = result_unified_by_cell(celltype,genes)
+        if not res:
+            return data, 400
+        return data
 
 class dataMarkerGenes(Resource):
     def get(self):
@@ -248,4 +243,5 @@ api.add_resource(UnifiedByCell, '/data_unified_by_cell')
 api.add_resource(dataMarkerGenes, '/data_markers')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+    # app.run(debug=True, host='127.0.0.1', port=5000)

@@ -1,3 +1,5 @@
+var base_url = window.location.href.replace('/dataExplore', '');
+
 var dataAverageExp = {};
 
 function generateHmCompressed(result_wrapper, html_element_id) {
@@ -149,7 +151,7 @@ function AjaxCompressed() {
   if (gene_array.length == 2) {
     $.ajax({
       type:'GET',
-      url:'http://127.0.0.1:5000/data_scatter',
+      url:`${base_url}/data_scatter`,
       data: "gene_names=" + genes_string,
       success: ScatterPlot,
       error: function (e) {
@@ -157,10 +159,9 @@ function AjaxCompressed() {
       }
     });
   }
-  
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data_general',
+    url:`${base_url}/data_general`,
     data: "gene_names=" + genes_string,
     success: function(result) { 
       $("#hm_compressed").empty();

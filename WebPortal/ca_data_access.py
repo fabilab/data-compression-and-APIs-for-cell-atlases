@@ -6,9 +6,8 @@ import re
 import functools
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
-import time
 
-with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+with h5py.File('./static/scData/condensed_lung_atlas_ordered.h5',"r") as h5_data:
     L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
 
 
@@ -45,7 +44,7 @@ def read_file_average_exp(df_type,genes=None):
     invalid_genes = gene_validation(L,genes)
     if len(invalid_genes) > 0:
         return False, invalid_genes
-    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+    with h5py.File('./static/scData/condensed_lung_atlas_ordered.h5',"r") as h5_data:
         # List of genes
         indexs = []
         if isinstance(genes,list):
@@ -85,7 +84,7 @@ def read_file_proportion_exp(df_type,genes=None):
     if len(invalid_genes) > 0:
         return False, invalid_genes
     
-    with h5py.File('./static/scData/condensed_lung_atlas_in_cpm.h5',"r") as h5_data:
+    with h5py.File('./static/scData/condensed_lung_atlas_ordered.h5',"r") as h5_data:
         # List of genes
         indexs = []
         if isinstance(genes,list):
@@ -117,7 +116,7 @@ def get_marker_genes_list(celltype=None):
         Returns:
             a list of gene names (list)
     '''
-    with open('./static/scData/celltypeMarkerGeneList_descending.txt') as f:
+    with open('./static/scData/celltypeMarkerGeneList_descending_ordered.txt') as f:
         data = json.load(f)
 
     return data[celltype]
@@ -255,7 +254,6 @@ def result_datasets(df_type,gene):
 
     return {"exp_avg":exp_avg['result'], "exp_pro":exp_pro['result'], "hierarchicalCelltypeOrder":exp_avg['hierarchicalCelltypeOrder']}
 
-
     
 # giving a dataframe, extract the information needed for generate the corresponded plot
 def unified_process(df,genename):
@@ -323,12 +321,12 @@ def unified_by_cell_process(df,celltype,genes):
 
 def result_unified_by_cell(celltype,genes):
     
-    res, df_avg = read_file_average_exp('celltype_dataset_timepoint',genes)
-    res, df_pro = read_file_proportion_exp('celltype_dataset_timepoint',genes)
-
-    exp_avg = unified_by_cell_process(df_avg,celltype,genes)
-    exp_pro = unified_by_cell_process(df_pro,celltype,genes)
-
-    return {'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'genes': exp_avg['genes'], 'clustered_gene_order': exp_avg['clustered_gene_order']}
-
+    res_avg, df_avg = read_file_average_exp('celltype_dataset_timepoint',genes)
+    res_pro, df_pro = read_file_proportion_exp('celltype_dataset_timepoint',genes)
+    if(res_avg) and (res_pro):
+        exp_avg = unified_by_cell_process(df_avg,celltype,genes)
+        exp_pro = unified_by_cell_process(df_pro,celltype,genes)
+        return res_avg,{'exp_avg': exp_avg['exp'] , 'exp_pro': exp_pro['exp'],'dataset_timepoint': exp_avg['dataset_timepoint'], 'cell_type': exp_avg['cell_type'], 'genes': exp_avg['genes'], 'clustered_gene_order': exp_avg['clustered_gene_order']}
+    else:
+        return res_avg,df_avg
 

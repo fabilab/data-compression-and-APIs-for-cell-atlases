@@ -144,10 +144,9 @@ function generateHmUnifiedGene(result,html_element_id) {
 function AjaxUnifiedGene() {
     // action here when clicking the search button
     var gene_name = $('#singleGene').val();
-
     $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/data_unified',
+            url:`${base_url}/data_unified`,
             data: "gene=" + gene_name,
             success: function(result) {
                 $("#hm_unified_gene").empty();

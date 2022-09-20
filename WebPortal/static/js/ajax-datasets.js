@@ -108,7 +108,7 @@ function AjaxDatasets() {
   // sent gene names to the API
   $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/data_datasets',
+    url:`${base_url}/data_datasets`,
     data: "gene=" + gene_name,
     success: function(result) {
         // $("#hm_dataset").empty();

@@ -20,13 +20,13 @@ def text_to_response(text_raw):
     # Call Google API Speech To Text
     command_dict = interpret_text(text_raw)
 
-    print('Text raw:', text_raw)
-    print('Command interpreted:', command_dict)
+    #print('Text raw:', text_raw)
+    #print('Command interpreted:', command_dict)
 
     # Redirect to the correct endpoint
     response = get_command_response(command_dict)
 
-    print(response)
+    #print(response)
     return response
 
 

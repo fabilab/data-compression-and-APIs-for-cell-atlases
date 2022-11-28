@@ -19,27 +19,37 @@
       <div class="navbar-item">
         <img src="./logo.png" style="max-height:2.5rem"/>
       </div>
+      <a role="button" class="navbar-burger" id="burger">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
     </div>
-    <div class="navbar-end">
-		<a class="navbar-item" href="/">
-			About
-		</a>
-		<a class="navbar-item" onclick="window.location.href='/dataExplore'">     
-			Explore Data
-		</a>
-		<a class="navbar-item is-active has-text-link has-background-white-ter" onclick="window.location.href='/userGuide'">
-			User Guide
-		</a>
-		<a class="navbar-item" onclick="window.location.href='/resources'">     
-			Resources
-		</a>
-		<a class="navbar-item" onclick="window.location.href='/package'">     
-			Install Package
-		</a>
+    <div class="navbar-menu" id="nav-links">
+      <div class="navbar-end">
+        <a class="navbar-item" href="/">
+          <b>About</b>
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/dataExplore'">     
+          <b>Explore Data</b>
+        </a>
+        <a class="navbar-item is-active has-text-link has-background-white-ter" onclick="window.location.href='/userGuide'">
+          <b>User Guide</b>
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/resources'">     
+          <b>Resources</b>
+        </a>
+        <a class="navbar-item" onclick="window.location.href='/package'">     
+          <b>Install Package</b>
+        </a>
+      </div>
     </div>
   </nav>
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
-  <div class="mt-7 has-text-centered" style="background-color:#f5f8fa;padding-top:10%;padding-bottom:10%;">
+  <div class=" has-text-centered" style="background-color:#f5f8fa;padding-top:3%;padding-bottom:3%;">
+    <div class="block my-6">
+      <img src="../static/img/user_guide_screenshot/FAQ.png" style="max-width: 70%";/>
+  </div>
     <div class="block my-6">
         <img src="../static/img/user_guide_screenshot/generalHeatmap.png" style="max-width: 70%";/>
     </div>
@@ -54,5 +64,16 @@
     </div>
 </div>
 {% include 'footer.html' %}
+<script>
+  // mobile menu & navbar burger
+  $("#burger").click(function() {
+    const navMenu = $("#nav-links");
+    if (navMenu.hasClass('is-active')) {
+      navMenu.removeClass('is-active');
+    } else {
+      navMenu.addClass('is-active');
+    }
+  });
+</script>
 </body>
 </html>

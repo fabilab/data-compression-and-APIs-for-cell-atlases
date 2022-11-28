@@ -4,21 +4,22 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to Escellearn’s documentation! &mdash; Escellearn  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <!-- <link rel="stylesheet" href="templates/_static/pygments.css" type="text/css" /> -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='_static/pygments.css') }}" type="text/css" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='_static/css/theme.css') }}" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
+    <script src="templates/_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+        <script data-url_root="./" id="documentation_options" src="{{ url_for('static', filename='_static/documentation_options.js') }}"></script>
+        <script src="{{ url_for('static', filename='_static/jquery.js') }}"></script>
+        <script src="{{ url_for('static', filename='_static/underscore.js') }}"></script>
+        <script src="{{ url_for('static', filename='_static/_sphinx_javascript_frameworks_compat.js') }}"></script>
+        <script src="{{ url_for('static', filename='_static/doctools.js') }}"></script>
+        <script src="{{ url_for('static', filename='_static/js/theme.js') }}"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cell_atlas_portal_2022" href="modules.html" /> 
+    <link rel="next" title="cell_atlas_portal_2022" href="{{ url_for('packageModule') }}" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +39,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">cell_atlas_portal_2022</a></li>
+<li class="toctree-l1"><a class="reference internal" href="{{ url_for('packageModule') }}">cell_atlas_portal_2022</a></li>
 </ul>
 
         </div>

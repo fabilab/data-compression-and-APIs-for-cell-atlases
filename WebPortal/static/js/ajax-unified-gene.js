@@ -74,7 +74,7 @@ function generateHmUnifiedGene(result,html_element_id) {
         let temp = [];
         for (var j = 0; j < result['cell_type'].length; j++) {
             let dt = result['dataset_timepoint'][i];
-            let ct = result['cell_type'][j];
+            let ct = celltypes[j];
             let exp;
             if(useLog && expression[dt][ct] !== null) {
                 exp = Math.log10(expression[dt][ct]+0.5);

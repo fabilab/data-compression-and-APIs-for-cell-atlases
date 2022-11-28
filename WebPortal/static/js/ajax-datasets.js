@@ -123,3 +123,22 @@ function AjaxDatasets() {
     });
   }
 
+  $(document).ready(function() {
+    
+    $.ajax({
+        type:'GET',
+        url:`${base_url}/all_gene_names`,
+        success: function(result) {
+            autoFill(result);
+        },
+    });
+    function autoFill(options) {
+        $('#singleGene').autocomplete({
+            source:options,
+            minLength: 3
+        })
+    }
+
+  })
+
+

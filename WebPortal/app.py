@@ -1,6 +1,8 @@
 from flask import Flask, send_from_directory,request,render_template, send_from_directory
 from flask_restful import Resource, Api
 from flask_cors import CORS
+import h5py
+import numpy as np
 import os
 from scipy.cluster.hierarchy import linkage,leaves_list
 from scipy.spatial.distance import pdist
@@ -22,10 +24,10 @@ def logo():
     return send_from_directory(os.path.join(app.root_path, 'static/img'),
                           'logo.png',mimetype='image/png')
 
-@app.route('/about_img1.png')
+@app.route('/about_img.png')
 def about():
     return send_from_directory(os.path.join(app.root_path, 'static/img'),
-                          'about_img1.png',mimetype='image/png')
+                          'about_img.png',mimetype='image/png')
 
 # this is an endpoint (gives access to the file)
 @app.route('/js/<path:path>')
@@ -144,9 +146,12 @@ class getAllCellTypes(Resource):
 
 class getAllGeneNames(Resource):
     def get(self):
-        _, df = read_file_average_exp('celltype')
-        return list(df.index)
-
+        with h5py.File('./static/scData/condensed_lung_atlas_ordered.h5',"r") as h5_data:
+            L =list(np.array(h5_data['celltype']['gene_expression_average']['axis0'].asstr()))
+        return L
+        # _, df = read_file_average_exp('celltype')
+        # print(df.index)
+        # return list(df.index)
 
 class dataDatasets (Resource):
     def get(self):
@@ -243,5 +248,7 @@ api.add_resource(UnifiedByCell, '/data_unified_by_cell')
 api.add_resource(dataMarkerGenes, '/data_markers')
 
 if __name__ == '__main__':
+    
     app.run(debug=True, host='0.0.0.0', port=5000)
+    # running locally: 127
     # app.run(debug=True, host='127.0.0.1', port=5000)

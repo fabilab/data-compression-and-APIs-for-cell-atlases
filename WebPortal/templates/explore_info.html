@@ -1,6 +1,6 @@
 <!-- explore General -->
 <div id="num_genes_div" class="my-2 mx-3">
-	<span class="has-text-weight-bold has-text-info" id="num_genes"></span>
+	<span class="has-text-weight-bold has-text-info" id="num_genes">0</span>
 	<span>&nbsptotal genes found</span>
 </div>
 <!-- explore dataset and unified -->
@@ -31,11 +31,11 @@
 	</p>
 </div>
 <!-- explore markers -->
-<div class="level is-hidden mx-3" id="sum_markers">
+<div class="level is-hidden mx-3 is-flex is-flex-wrap-nowrap is-flex-direction-row is-align-content-space-between is-align-items-center" id="sum_markers">
 	<!-- Left side -->
 	<div class="level-left">
 		<div class="level-item">
-			<span class="has-text-weight-bold has-text-info" id="num_markers"></span>
+			<span class="has-text-weight-bold has-text-info" id="num_markers">0</span>
 			<span>&nbsptotal marker genes found</span>
 		</div>
 	</div>
@@ -44,12 +44,12 @@
 		<div class="control">
 			<div class="select">
 				<select id="selectTopMarkers">
-				<option value="all" selected>show all</option>
-				<option value="top30">top 30</option>
-				<option value="top20">top 20</option>
-				<option value="top10">top 10</option>
-			</select>
-		</div>
+					<option value="all" selected>show all</option>
+					<option value="top30">top 30</option>
+					<option value="top20">top 20</option>
+					<option value="top10">top 10</option>
+				</select>
+			</div>
 		</div>
 	</div>
 </div>

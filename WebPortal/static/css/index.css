@@ -14,3 +14,9 @@
 footer{
     padding: 1rem 4rem 1rem !important;
 }
+
+max-height: 100px;
+overflow-y: auto;
+/* prevent horizontal scrollbar */
+overflow-x: hidden;
+}

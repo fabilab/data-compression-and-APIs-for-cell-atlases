@@ -282,8 +282,6 @@ $("#selectDataOrder").change(function() {
         if ($('#hm_compressed').text() !== "") {
             generateDpCompressed("", "");
             generateHmCompressed("", "");
-            generateHmUnifiedGene("","");
-            generateDpUnifiedGene("","");
         } else if ($('#dataset_1').text() !== "") {
             generateHmDatasets("");
             generateDpDatasets("");
@@ -316,3 +314,13 @@ $("#selectTopMarkers").change(function() {
 })
 
 $("#applyOnClick").click(AjaxMarkers);
+
+$("#show_suggest_genes").click(function() {
+    $("#listGenes").val('Col1a1,Col2a1,Adh1,Col13a1,Col14a1,Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb,Pecam1,Gja5,Vwf,Car8,Car4,Ptprc,Cd19,Gzma,Cd3d,Cd68,Epcam');
+});
+
+
+function clearTextArea() {
+    $("#listGenes").val('');
+}
+$("#clearOnClick_list").click(clearTextArea);

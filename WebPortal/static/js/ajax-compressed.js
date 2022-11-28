@@ -73,7 +73,7 @@ function generateHmCompressed(result_wrapper, html_element_id) {
         };
         var layout = {
             autosize: true, 
-            title: 'Expression profile of selected genes in all cell types',
+            title: '<b>Expression profile of selected genes in all cell types<b>',
             xaxis: {
                 title: '<b>Cell types<b>',
                 automargin: true,
@@ -175,8 +175,4 @@ function AjaxCompressed() {
     });
   }
 
-function clearTextArea() {
-    $("#listGenes").val('');
-}
 $("#searchOnClick_list").click(AjaxCompressed)
-$("#clearOnClick_list").click(clearTextArea)

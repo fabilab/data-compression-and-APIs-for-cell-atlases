@@ -53,6 +53,31 @@ function HeatmapByCelltype(
         }
     }
 
+    // Add SVG download button
+    var config = {
+      //responsive: true,
+      //displaylogo: false,
+      modeBarButtonsToRemove: ['toImage'],
+      modeBarButtonsToAdd: [
+        {
+          name: 'Download plot as a PNG',
+          icon: Plotly.Icons.camera,
+          click: function(gd) {
+            Plotly.downloadImage(gd, {format: 'png'})
+          }
+        },
+        {
+          name: 'Download plot as an SVG',
+          icon: Plotly.Icons.camera,
+          click: function(gd) {
+            Plotly.downloadImage(gd, {format: 'svg'})
+          }
+        },
+      ],
+        editable:true,
+        responsive: true,
+    }
+
     if (heatDot == "heat") {
         // Heatmap
 
@@ -118,10 +143,32 @@ function HeatmapByCelltype(
                 },
             };
 
+            config["modeBarButtonsToAdd"].push({
+                name: 'Download expression as CSV',
+                icon: Plotly.Icons.disk,
+                click: function(gd) {
+                    var text = '';
+                    let data = gd['data'][0]['z'];
+                    text += 'Gene,' + gd['data'][0]['x'] + '\n';
+                    for(var i = 0; i < data.length; i++){
+                        text += gd['data'][0]['y'][i] + ',' + data[i] + '\n';
+                    };
+                    var blob = new Blob([text], {type: 'text/plain'});
+                    var a = document.createElement('a');
+                    const object_URL = URL.createObjectURL(blob);
+                    a.href = object_URL;
+                    a.download = 'gene_expression.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(object_URL);
+                },
+            });
+
             Plotly.newPlot(
                 document.getElementById(html_element_id),
                 [data],
                 layout,
+                config,
             );
 
         // Update existing plot if present
@@ -226,10 +273,77 @@ function HeatmapByCelltype(
                 },
             };
 
+            config["modeBarButtonsToAdd"].push({
+                name: 'Download expression as CSV',
+                icon: Plotly.Icons.disk,
+                click: function(gd) {
+                    var text = '';
+                    let geneExps = gd['data'][0]['marker']['color'];
+                    const nct = x_axis.length;
+                    // Header with cell type names
+                    text += 'Gene';
+                    for(var i = 0; i < nct; i++){
+                        text += ',' + gd['data'][0]['x'][i];
+                    };
+                    // Gene expression
+                    for (var i = 0; i < geneExps.length; i++) {
+                        if (i % nct == 0) {
+                            text += '\n' + gd['data'][0]['y'][i];
+                        }
+                        text += ',' + geneExps[i];
+                    }
+                    text += '\n';
+
+                    var blob = new Blob([text], {type: 'text/plain'});
+                    var a = document.createElement('a');
+                    const object_URL = URL.createObjectURL(blob);
+                    a.href = object_URL;
+                    a.download = 'gene_expression.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(object_URL);
+                },
+            });
+            config["modeBarButtonsToAdd"].push({
+                name: 'Download fraction of expressing cells as CSV',
+                icon: Plotly.Icons.disk,
+                click: function(gd) {
+                    var text = '';
+                    let markerSizes = gd['data'][0]['marker']['size'];
+                    const nct = x_axis.length;
+                    // Header with cell type names
+                    text += 'Gene';
+                    for(var i = 0; i < nct; i++){
+                        text += ',' + gd['data'][0]['x'][i];
+                    };
+                    // Gene expression
+                    for (var i = 0; i < markerSizes.length; i++) {
+                        if (i % nct == 0) {
+                            text += '\n' + gd['data'][0]['y'][i];
+                        }
+                        let fracExp = (markerSizes[i] - 2) / 18.0;
+                        // The marker radius is prop to the sqrt
+                        fracExp *= fracExp;
+                        text += ',' + fracExp;
+                    }
+                    text += '\n';
+
+                    var blob = new Blob([text], {type: 'text/plain'});
+                    var a = document.createElement('a');
+                    const object_URL = URL.createObjectURL(blob);
+                    a.href = object_URL;
+                    a.download = 'fraction_expressing_cells.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(object_URL);
+                },
+            });
+
             Plotly.newPlot(
                 document.getElementById(html_element_id),
                 [data],
                 layout,
+                config,
             );
 
         } else {

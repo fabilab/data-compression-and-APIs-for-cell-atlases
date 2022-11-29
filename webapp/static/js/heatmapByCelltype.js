@@ -157,8 +157,8 @@ function HeatmapByCelltype(
                     let expFrac = result['data_fractions'][i][j];
                     const gene = y_axis[i];
                     const celltype = x_axis[j];
-                    const ms = 2 + 18 * expFrac;
-                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+(100 * expFrac)+"%";
+                    const ms = 2 + 18 * Math.sqrt(expFrac);
+                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+parseInt(100 * expFrac)+"%";
                     x.push(celltype);
                     y.push(gene);
                     markercolor.push(geneExp);
@@ -178,8 +178,8 @@ function HeatmapByCelltype(
                     let expFrac = result['data_fractions'][ii][jj];
                     const gene = y_axis[ii];
                     const celltype = x_axis[jj];
-                    const ms = 2 + 18 * expFrac;
-                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+(100 * expFrac)+"%";
+                    const ms = 2 + 18 * Math.sqrt(expFrac);
+                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+parseInt(100 * expFrac)+"%";
                     x.push(celltype);
                     y.push(gene);
                     markercolor.push(geneExp);

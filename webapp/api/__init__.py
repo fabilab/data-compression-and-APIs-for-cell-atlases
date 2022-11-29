@@ -78,6 +78,15 @@ class geneExp(Resource):
                     species=species,
                     missing=missing_genes,
                     )
+
+            df_fractions = read_counts_from_file(
+                    "celltype",
+                    genes=gene_names,
+                    species=species,
+                    missing=missing_genes,
+                    key='gene_proportion_expression',
+                    )
+
         except KeyError:
             return None
 
@@ -106,6 +115,7 @@ class geneExp(Resource):
 
         result = {
             'data': df.values.tolist(),
+            'data_fractions': df_fractions.values.tolist(),
             'genes': df.index.tolist(),
             'celltypes': df.columns.tolist(),
             'celltypes_hierarchical': idx_ct_hierarchical,

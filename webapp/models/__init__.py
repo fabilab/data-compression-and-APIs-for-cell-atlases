@@ -50,17 +50,24 @@ gene_orderd = {key: read_gene_order(species=key) for key in fn_atlasd}
 celltypes = read_cell_types()
 
 
-def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw'):
+def read_counts_from_file(
+        df_type, genes=None, species='mouse', missing='throw',
+        key="gene_expression_average",
+        ):
     '''Read the h5 file with the compressed atlas
 
     gives the name of dataset we want as an input
     celltype / celltype_dataset / celltype_dataset_timepoint
+
+    Args:
+        key: Whether to return the gene expression average or the fraction
+          of expressing cells.
     '''
     gene_order = gene_orderd[species]
 
     fn_atlas = fn_atlasd[species]
     with h5py.File(fn_atlas, "r") as h5_data:
-        columns = np.array(h5_data[df_type]["gene_expression_average"]["axis1"].asstr())
+        columns = np.array(h5_data[df_type][key]["axis1"].asstr())
         # For mouse, the cell types used for compression are not the final
         # ones we want to show
         if species == "mouse":
@@ -68,7 +75,7 @@ def read_counts_from_file(df_type, genes=None, species='mouse', missing='throw')
         else:
             idx_cols = np.arange(len(columns))
 
-        counts = h5_data[df_type]["gene_expression_average"]["block0_values"]
+        counts = h5_data[df_type][key]["block0_values"]
         if genes is not None:
             index = []
             for gene in genes:

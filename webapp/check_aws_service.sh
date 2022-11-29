@@ -42,5 +42,8 @@ https://lightsail.aws.amazon.com/ls/webapp/us-west-2/container-services/compress
 # Check out the result (public endpoint)
 https://compressed-atlas-service.vphsnedioc8ke.us-west-2.cs.amazonlightsail.com/
 
+# Check the domain
+https://neonatallungatlas.org
+
 # Delete service
 #aws lightsail delete-container-service --service-name compressed-atlas

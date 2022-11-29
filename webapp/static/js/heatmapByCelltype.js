@@ -2,7 +2,12 @@
 // Use global variables to store persistent data
 var heatmapData = {};
 
-function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
+function HeatmapByCelltype(
+    result,
+    html_element_id,
+    dataScale,
+    celltypeOrder,
+    heatDot) {
     if (!result) {
         alert("Error: no data to plot");
         return;
@@ -48,93 +53,211 @@ function HeatmapByCelltype(result, html_element_id, dataScale, celltypeOrder) {
         }
     }
 
-    // Fill heatmap data
-    let data_content = [];
-    if (celltypeOrder == "original") {
-        for (let i = 0; i < y_axis.length; i++) {
-            data_content.push([]);
-            for (let j = 0; j < x_axis.length; j++) {
-                let geneExp = result['data'][i][j];
-                if (dataScale == "log10") {
-                    geneExp = Math.log10(geneExp + 0.5);
+    if (heatDot == "heat") {
+        // Heatmap
+
+        // Fill data
+        let data_content = [];
+        if (celltypeOrder == "original") {
+            for (let i = 0; i < y_axis.length; i++) {
+                data_content.push([]);
+                for (let j = 0; j < x_axis.length; j++) {
+                    let geneExp = result['data'][i][j];
+                    if (dataScale == "log10") {
+                        geneExp = Math.log10(geneExp + 0.5);
+                    }
+                    data_content[i].push(geneExp);
                 }
-                data_content[i].push(geneExp);
+            }
+        } else {
+            for (let i = 0; i < y_axis.length; i++) {
+                const ii = result['genes_hierarchical'][i];
+                data_content.push([]);
+                for (let j = 0; j < x_axis.length; j++) {
+                    const jj = result['celltypes_hierarchical'][j];
+                    let geneExp = result['data'][ii][jj];
+                    if (dataScale == "log10") {
+                        geneExp = Math.log10(geneExp + 0.5);
+                    }
+                    data_content[i].push(geneExp);
+                }
             }
         }
-    } else {
-        for (let i = 0; i < y_axis.length; i++) {
-            const ii = result['genes_hierarchical'][i];
-            data_content.push([]);
-            for (let j = 0; j < x_axis.length; j++) {
-                const jj = result['celltypes_hierarchical'][j];
-                let geneExp = result['data'][ii][jj];
-                if (dataScale == "log10") {
-                    geneExp = Math.log10(geneExp + 0.5);
-                }
-                data_content[i].push(geneExp);
-            }
-        }
-    }
-    var data = {
-        type: 'heatmap',
-        hoverongaps: false,
-        colorscale: 'Reds',
-    };
-
-    // Make new plot if none is present
-    if ($('#'+html_element_id).html() === "") {
-
-        data['z'] = data_content;
-        data['x'] = x_axis;
-        data['y'] = y_axis;
-
-        var layout = {
-            autosize: true,
-            width: graph_width,
-            height: graph_height,
-            title: 'Heatmap of gene expression level in selected cell types',
-            xaxis: {
-                //title: 'Cell types',
-                automargin: true,
-                tickangle: 70,
-                scaleanchor: 'y',
-                scaleratio: 1,
-                type: 'category',
-            },
-            yaxis: {
-                //title: 'Genes',
-                automargin: true,
-                autorange: "reversed",
-                type: 'category',
-                tickvals: y_axis,
-                ticktext: yticktext,
-            },
+        var data = {
+            type: 'heatmap',
+            hoverongaps: false,
+            colorscale: 'Reds',
         };
 
-        Plotly.newPlot(
-            document.getElementById(html_element_id),
-            [data],
-            layout,
-        );
+        // Make new plot if none is present
+        if (($('#'+html_element_id).html() === "") || (plotForceRefresh == true)) {
+            data['z'] = data_content;
+            data['x'] = x_axis;
+            data['y'] = y_axis;
 
-    // Update existing plot if present
-    } else {
-        data['z'] = [data_content];
-        data['x'] = [x_axis];
-        data['y'] = [y_axis];
-        Plotly.update(
-            document.getElementById(html_element_id),
-            data,
-            {
+            var layout = {
+                autosize: true,
+                width: graph_width,
                 height: graph_height,
+                title: 'Heatmap of gene expression level in selected cell types',
+                xaxis: {
+                    //title: 'Cell types',
+                    automargin: true,
+                    tickangle: 70,
+                    scaleanchor: 'y',
+                    scaleratio: 1,
+                    type: 'category',
+                },
                 yaxis: {
+                    //title: 'Genes',
+                    automargin: true,
                     autorange: "reversed",
+                    type: 'category',
                     tickvals: y_axis,
                     ticktext: yticktext,
                 },
+            };
+
+            Plotly.newPlot(
+                document.getElementById(html_element_id),
+                [data],
+                layout,
+            );
+
+        // Update existing plot if present
+        } else {
+            data['z'] = [data_content];
+            data['x'] = [x_axis];
+            data['y'] = [y_axis];
+            Plotly.update(
+                document.getElementById(html_element_id),
+                data,
+                {
+                    height: graph_height,
+                    yaxis: {
+                        autorange: "reversed",
+                        tickvals: y_axis,
+                        ticktext: yticktext,
+                    },
+                },
+                [0],
+            );
+        }
+    } else {
+        // Dot plot
+
+        let x = [], y = [], tooltips = [], markersize = [], markercolor = [];
+        if (celltypeOrder == "original") {
+            for (let i = 0; i < y_axis.length; i++) {
+                for (let j = 0; j < x_axis.length; j++) {
+                    let geneExp = result['data'][i][j];
+                    if (dataScale == "log10") {
+                        geneExp = Math.log10(geneExp + 0.5);
+                    }
+                    let expFrac = result['data_fractions'][i][j];
+                    const gene = y_axis[i];
+                    const celltype = x_axis[j];
+                    const ms = 2 + 18 * expFrac;
+                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+(100 * expFrac)+"%";
+                    x.push(celltype);
+                    y.push(gene);
+                    markercolor.push(geneExp);
+                    markersize.push(ms);
+                    tooltips.push(tooltip);
+                }
+            }
+        } else {
+            for (let i = 0; i < y_axis.length; i++) {
+                const ii = result['genes_hierarchical'][i];
+                for (let j = 0; j < x_axis.length; j++) {
+                    const jj = result['celltypes_hierarchical'][j];
+                    let geneExp = result['data'][ii][jj];
+                    if (dataScale == "log10") {
+                        geneExp = Math.log10(geneExp + 0.5);
+                    }
+                    let expFrac = result['data_fractions'][ii][jj];
+                    const gene = y_axis[ii];
+                    const celltype = x_axis[jj];
+                    const ms = 2 + 18 * expFrac;
+                    const tooltip = "Expression: "+geneExp+", Fraction expressing: "+(100 * expFrac)+"%";
+                    x.push(celltype);
+                    y.push(gene);
+                    markercolor.push(geneExp);
+                    markersize.push(ms);
+                    tooltips.push(tooltip);
+                }
+            }
+        }
+        var data = {
+            mode: 'markers',
+            marker: {
+                symbol: 'circle',
+                colorscale: 'Reds',
+                colorbar: {},
             },
-            [0],
-        );
+            'hoverinfo': 'text',
+        };
+
+        if (($('#'+html_element_id).html() === "") || (plotForceRefresh == true)) {
+            data['x'] = x;
+            data['y'] = y;
+            data['text'] = tooltips;
+            data['marker']['color'] = markercolor;
+            data['marker']['size'] = markersize;
+
+            var layout = {
+                autosize: true,
+                width: graph_width,
+                height: graph_height,
+                xaxis: {
+                    autorange: true,
+                    automargin: true,
+                    tickangle: 70,
+                    scaleanchor: 'y',
+                    scaleratio: 1,
+                    type: 'category',
+                },
+                yaxis: {
+                    automargin: true,
+                    autorange: "reversed",
+                    type: 'category',
+                    tickvals: y_axis,
+                    ticktext: yticktext,
+                },
+            };
+
+            Plotly.newPlot(
+                document.getElementById(html_element_id),
+                [data],
+                layout,
+            );
+
+        } else {
+            data['x'] = [x];
+            data['y'] = [y];
+            data['text'] = [tooltips];
+            data['marker']['color'] = markercolor;
+            data['marker']['size'] = markersize;
+            Plotly.update(
+                document.getElementById(html_element_id),
+                data,
+                {
+                    height: graph_height,
+                    yaxis: {
+                        autorange: "reversed",
+                        type: 'category',
+                        tickvals: result['yticks'],
+                        ticktext: result['yticktext'],
+                    },
+                    xaxis: {
+                        autorange: true,
+                        type: 'category',
+                    },
+
+                },
+                [0],
+            );
+        }
     }
 
     // Add tooltips to gene names
@@ -185,6 +308,10 @@ function updatePlot() {
     if (!$("#originalOrderTab").hasClass('is-active')) {
         celltypeOrder = "hierarchical";
     }
+    let heatDot = "heat";
+    if (!$("#heatTab").hasClass('is-active')) {
+        heatDot = "dot";
+    }
 
     // NOTE: heatmapData is the global persistent object
     HeatmapByCelltype(
@@ -192,6 +319,7 @@ function updatePlot() {
         heatmapData['div'],
         dataScale,
         celltypeOrder,
+        heatDot,
     );
 }
 
@@ -355,12 +483,14 @@ $("#log10OnClick" ).click(function() {
     // otherwise use the default data
     $("#logTab").addClass('is-active');
     $("#cpmTab").removeClass('is-active');
+    plotForceRefresh = false;
     updatePlot();
 });
 
 $("#CPMOnClick" ).click(function() {
     $("#logTab").removeClass('is-active');
     $("#cpmTab").addClass('is-active');
+    plotForceRefresh = false;
     updatePlot();
 });
 
@@ -370,6 +500,7 @@ $("#hClusterOnClick" ).click(function() {
     // otherwise use the default data
     $("#hierachicalTab").addClass('is-active');
     $("#originalOrderTab").removeClass('is-active');
+    plotForceRefresh = false;
     updatePlot();
 });
 
@@ -377,6 +508,22 @@ $("#hClusterOnClick" ).click(function() {
 $("#originalOnClick" ).click(function() {
     $("#originalOrderTab").addClass('is-active');
     $("#hierachicalTab").removeClass('is-active');
+    plotForceRefresh = false;
+    updatePlot();
+});
+
+// Third set of buttons
+$("#heatOnClick").click(function() {
+    $("#heatTab").addClass('is-active');
+    $("#dotTab").removeClass('is-active');
+    plotForceRefresh = true;
+    updatePlot();
+});
+
+$("#dotOnClick").click(function() {
+    $("#dotTab").addClass('is-active');
+    $("#heatTab").removeClass('is-active');
+    plotForceRefresh = true;
     updatePlot();
 });
 

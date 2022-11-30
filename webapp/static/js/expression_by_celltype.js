@@ -54,9 +54,7 @@ function HeatmapByCelltype(
     }
 
     // Add SVG download button
-    var config = {
-      //responsive: true,
-      //displaylogo: false,
+    let config = {
       modeBarButtonsToRemove: ['toImage'],
       modeBarButtonsToAdd: [
         {
@@ -74,8 +72,6 @@ function HeatmapByCelltype(
           }
         },
       ],
-        editable:true,
-        responsive: true,
     }
 
     if (heatDot == "heat") {

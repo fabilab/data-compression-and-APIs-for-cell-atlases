@@ -28,13 +28,16 @@
       <a href="/" class="button is-ghost">
         <i id="homeButton" class="fa-solid fa-house"></i>
       </a>
-      <a href="{{ url_for('heatmap_by_celltype') }}" class="button is-ghost has-text-info">
+      <a href="{{ url_for('expression_by_celltype') }}" class="button is-ghost has-text-info">
          By celltype
       </a>
-      <a href="{{ url_for('heatmap_development') }}" class="button is-ghost has-text-info">
-          Development
+      <a href="{{ url_for('expression_overtime_1gene') }}" class="button is-ghost has-text-info">
+          Over time (1 gene)
       </a>
-      <a href="{{ url_for('heatmap_hyperoxia') }}" class="button is-ghost has-text-info">
+      <a href="{{ url_for('expression_overtime_1celltype') }}" class="button is-ghost has-text-info">
+          Over time (1 cell type)
+      </a>
+      <a href="{{ url_for('expression_hyperoxia') }}" class="button is-ghost has-text-info">
           Hyperoxia
       </a>
       <!--
@@ -70,8 +73,10 @@
   <div class="overlay"></div>
 
   <!-- voice control -->
+  <!--
   <script src="/js/recorder.js"></script>
   <script src="/js/voice_control.js"></script>
+  -->
   <script>
     var species = "{{ species | safe }}";
 

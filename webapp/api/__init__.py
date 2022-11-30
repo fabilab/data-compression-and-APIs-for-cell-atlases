@@ -15,11 +15,11 @@ import plotly
 # Helper functions
 from models import (
         read_counts_from_file,
-        dataset_by_timepoint,
-        dataset_unified,
+        get_data_overtime_1gene,
+        get_data_overtime_1celltype,
+        get_data_hyperoxia,
         get_friends,
         get_marker_genes,
-        get_data_hyperoxia,
         get_celltype_abundances,
         get_data_differential,
         get_data_species_comparison,
@@ -32,7 +32,7 @@ from validation.genes import validate_correct_genestr
 from validation.celltypes import validate_correct_celltypestr
 
 
-class geneExp(Resource):
+class expressionByCelltype(Resource):
     '''API for the compressed atlas data, to be visualized as a heatmap'''
     def post(self):
         '''No data is actually posted, but this is uncached and can be longer
@@ -127,7 +127,7 @@ class geneExp(Resource):
         return result
 
 
-class geneExpTimeUnified(Resource):
+class expressionOvertime1Gene(Resource):
     def get(self):
         gene_name = request.args.get("gene")
         species = request.args.get("species")
@@ -151,7 +151,7 @@ class geneExpTimeUnified(Resource):
 
         gene_id = get_gene_ids([gene_name], species=species)[gene_name]
 
-        data = dataset_unified(gene_name, species=species)
+        data = get_data_overtime_1gene(gene_name, species=species)
         data['gene_id'] = gene_id
 
         similar_genes = get_friends([gene_name], species=species).split(',')
@@ -162,7 +162,57 @@ class geneExpTimeUnified(Resource):
         return data
 
 
-class geneExpHyperoxia(Resource):
+class expressionOvertime1Celltype(Resource):
+    def get(self):
+        species = request.args.get("species")
+
+        celltype = request.args.get("celltype")
+        celltype_validated = validate_correct_celltypestr(celltype)
+
+        genestring = request.args.get("gene_names")
+
+        # A cap on gene names to avoid overload is reasonable
+        genestring = ','.join(genestring.replace(' ', '').split(',')[:500])
+
+        genestring = validate_correct_genestr(
+                genestring, species=species, missing='skip')
+
+        if genestring is None or genestring == '':
+            return None
+        gene_names = genestring.split(',')
+
+        # If we are switching species, get orthologs
+        new_species = request.args.get("newSpecies")
+        if new_species is not None:
+            gene_names = get_orthologs(
+                gene_names, species, new_species,
+            )[new_species]
+
+            if len(gene_names) == 0:
+                return None
+
+            species = new_species
+            missing_genes = 'skip'
+
+        else:
+            missing_genes = 'throw'
+
+        gene_ids = get_gene_ids(gene_names, species=species)
+
+        data = get_data_overtime_1celltype(celltype_validated, gene_names, species=species)
+        data['gene_ids'] = gene_ids
+        data['celltype'] = celltype
+
+        similar_genes = get_friends(gene_names, species=species).split(',')
+        # Exclude from similar genes the ones you have already
+        similar_genes = [g for g in similar_genes if g not in gene_names]
+
+        data['similarGenes'] = similar_genes
+
+        return data
+
+
+class expressionHyperoxia(Resource):
     '''API for hyperoxia data'''
     def get(self):
         genestring = request.args.get("gene_names")

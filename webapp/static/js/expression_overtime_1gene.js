@@ -1,6 +1,6 @@
 var plotData = {};
 
-function plotHeatmapUnified(result, scaleData, celltypeOrder) {
+function plotExpressionOvertime1Gene(result, scaleData, celltypeOrder) {
     let geneName = result['gene'];
     let geneId = result['gene_id'];
     let x_axis;
@@ -43,16 +43,16 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             }
             const labelArray = label.split("_");
             const tooltip = "Expression: "+ge+", Dataset: "+labelArray[0]+", Time point: "+labelArray[1];
-            if (nc < 5) {
+            if (nc == 0) {
+                ms = 2;
+            } else if (nc < 5) {
                 ms = 8;
-                opacity = 0.5;
             } else if (nc < 40) {
                 ms = 13;
-                opacity = 0.7;
             } else {
                 ms = 20;
-                opacity = 0.9;
             }
+            opacity = 1.0;
             x.push(celltype)
             y.push(label)
             markercolor.push(ge);
@@ -72,8 +72,28 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
         'hoverinfo': 'text',
     };
 
+    let config = {
+        modeBarButtonsToRemove: ['toImage'],
+        modeBarButtonsToAdd: [
+          {
+            name: 'Download plot as a PNG',
+            icon: Plotly.Icons.camera,
+            click: function(gd) {
+              Plotly.downloadImage(gd, {format: 'png'})
+            }
+          },
+          {
+            name: 'Download plot as an SVG',
+            icon: Plotly.Icons.camera,
+            click: function(gd) {
+              Plotly.downloadImage(gd, {format: 'svg'})
+            }
+          },
+        ],
+    }
+
     // Make new plot if none is present
-    if ($('#heatmapUnified').html() === "") {
+    if ($('#expressionPlot').html() === "") {
         data['x'] = x;
         data['y'] = y;
         data['text'] = tooltips;
@@ -106,10 +126,43 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
             },
         };
 
+        config["modeBarButtonsToAdd"].push({
+            name: 'Download expression as CSV',
+            icon: Plotly.Icons.disk,
+            click: function(gd) {
+                var text = '';
+                let geneExps = gd['data'][0]['marker']['color'];
+                const nct = x_axis.length;
+                // Header with cell type names
+                text += 'Gene';
+                for(var i = 0; i < nct; i++){
+                    text += ',' + gd['data'][0]['x'][i];
+                };
+                // Gene expression
+                for (var i = 0; i < geneExps.length; i++) {
+                    if (i % nct == 0) {
+                        text += '\n' + gd['data'][0]['y'][i];
+                    }
+                    text += ',' + geneExps[i];
+                }
+                text += '\n';
+
+                var blob = new Blob([text], {type: 'text/plain'});
+                var a = document.createElement('a');
+                const object_URL = URL.createObjectURL(blob);
+                a.href = object_URL;
+                a.download = 'gene_expression.csv';
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(object_URL);
+            },
+        });
+
         Plotly.newPlot(
-            document.getElementById('heatmapUnified'),
+            document.getElementById('expressionPlot'),
             [data],
             layout,
+            config,
         ); 
 
     // Update existing plot if present
@@ -121,7 +174,7 @@ function plotHeatmapUnified(result, scaleData, celltypeOrder) {
         data['marker']['size'] = markersize;
         data['marker']['opacity'] = opacity;
         Plotly.update(
-            document.getElementById('heatmapUnified'),
+            document.getElementById('expressionPlot'),
             data,
             {
                 title: {
@@ -147,7 +200,7 @@ function AssembleAjaxRequest() {
     }
     $.ajax({
         type:'GET',
-        url:'/data/development',
+        url:'/data/overtime_1gene',
         data: $.param(requestData),
         dataType:'json',
         success: function(result) {
@@ -248,7 +301,7 @@ function updatePlot() {
         celltypeOrder = "hierarchical";
     }
 
-    plotHeatmapUnified(plotData, scaleData, celltypeOrder);
+    plotExpressionOvertime1Gene(plotData, scaleData, celltypeOrder);
 }
 
 $("#searchOnClick").click(AssembleAjaxRequest);

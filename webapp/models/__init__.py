@@ -129,44 +129,7 @@ def read_number_cells_from_file(df_type, species='mouse'):
     return ncells
 
 
-def dataset_by_timepoint(genename, df_type, datatype, plottype, species='mouse'):
-    '''get the cell type dataset timepoint as a dictionary
-
-    user input a gene name.
-    for each unique dataset of this gene, we plot a heatmap of all timepoint vs celltypes
-    select and pre-preprocessing data
-    '''
-    df_filtered = read_counts_from_file(df_type, genes=[genename]).iloc[0]
-
-    # split into separate unstacked dataframes using a multi-index
-    df_filtered.index = df_filtered.index.str.split('_', expand=True).swaplevel(0, 1)
-
-    # for each dataset name, we construct a new dataframe for it (celltypes x timepoints)
-    datasets = set(df_filtered.index.get_level_values(0))
-    dic_per_dataset = {}
-    timepoint_order = {
-        'ACZ': ['E18.5', 'P1', 'P7', 'P21'],
-        'TMS': ['3m', '18m', '24m'],
-        'Hurskainen2021': ['P3', 'P7', 'P14'],
-    }
-    for dsname in datasets:
-        gene_exp_df = df_filtered.loc[dsname].unstack(1, fill_value=-1)
-        gene_exp_df = gene_exp_df.loc[:, timepoint_order[dsname][::-1]]
-
-        if datatype == "log10":
-            gene_exp_df = np.log10(0.1 + gene_exp_df)
-        if plottype == "hierachical":
-            distance = pdist(gene_exp_df.values)
-            Z = linkage(distance, optimal_ordering=True)
-            new_order = leaves_list(Z)
-            gene_exp_df = gene_exp_df.iloc[new_order]
-
-        # convert dataframe into json format
-        dic_per_dataset[dsname] = json.loads(gene_exp_df.to_json())
-    return dic_per_dataset
-
-
-def dataset_unified(gene, species='mouse'):
+def get_data_overtime_1gene(gene, species='mouse'):
     '''Get JS plotly code for big heatmap
 
     NOTE: this technically breaks the API concept. Let's keep it in mind
@@ -237,6 +200,92 @@ def dataset_unified(gene, species='mouse'):
         'ncells': ncells.T.to_dict(),
         'celltypes': celltypes,
         'celltypes_hierarchical': celltypes_hierarchical,
+        'row_labels': row_labels,
+        'xticks': xticks,
+        'yticks': yticks,
+        'yticktext': yticktext,
+        }
+
+
+def get_data_overtime_1celltype(celltype, genes, species='mouse'):
+    '''Get JS plotly code for big heatmap
+
+    NOTE: this technically breaks the API concept. Let's keep it in mind
+    and see what we can do. The positive is that a bunch of computations
+    happen on the server... wait, is that good?
+    '''
+    from plotly import colors as pcolors
+
+    ncells = read_number_cells_from_file(
+            'celltype_dataset_timepoint',
+            species=species,
+            )
+    countg = read_counts_from_file(
+            'celltype_dataset_timepoint', genes=genes,
+            species=species,
+            ).T
+
+    # Only select rows with the correct cell type
+    idx = []
+    for label in countg.index:
+        celltype_row = label.split('_')[0]
+        celltype_row_validated = validate_correct_celltypestr(celltype_row)
+        if celltype_row_validated == celltype:
+            idx.append(label)
+    countg = countg.loc[idx]
+
+    # Same selection for the number of cells
+    idx = []
+    for label in ncells.index:
+        celltype_row = label.split('_')[0]
+        celltype_row_validated = validate_correct_celltypestr(celltype_row)
+        if celltype_row_validated == celltype:
+            idx.append(label)
+    ncells = ncells.loc[idx]
+
+    # Sort the rows
+    if species == 'mouse':
+        timepoint_order = [
+            'E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
+        dataset_order = ['ACZ', 'Hurskainen2021', 'TMS']
+    else:
+        timepoint_order = ['31wk', '3yr', '31yr', '~60yr']
+        dataset_order = ['Wang et al 2020', 'TS']
+
+    countg['_n_cells'] = ncells.loc[countg.index]
+    countg['_idx1'] = [timepoint_order.index(x.split('_')[2]) for x in countg.index]
+    countg['_idx2'] = [dataset_order.index(x.split('_')[1]) for x in countg.index]
+    countg = countg.sort_values(['_idx1', '_idx2'])
+    ncells = countg['_n_cells']
+    del countg['_idx1']
+    del countg['_idx2']
+    del countg['_n_cells']
+
+    # Sort the columns
+    distance = pdist(countg.T.values)
+    Z = linkage(distance, optimal_ordering=True)
+    new_order = leaves_list(Z)
+
+    genes = countg.columns.tolist()
+    genes_hierarchical = countg.columns[new_order].tolist()
+    row_labels = ncells.index.tolist()
+
+    xticks = list(countg.columns)
+    yticks = list(ncells.index)
+    yticktext = []
+    for i, label in enumerate(ncells.index):
+        tp = label.split('_')[2]
+        if (i == 0) or (tp != yticktext[-1]):
+            yticktext.append(tp)
+        else:
+            yticktext.append('')
+
+    return {
+        'celltype': celltype,
+        'genes': genes,
+        'genes_hierarchical': genes_hierarchical,
+        'gene_expression': countg.T.to_dict(),
+        'ncells': ncells.T.to_dict(),
         'row_labels': row_labels,
         'xticks': xticks,
         'yticks': yticks,

@@ -15,16 +15,16 @@ from models import get_marker_genes, get_de_url
 
 command_dict = {
     'expression_by_celltype': {
-        'url_func': lambda sfx: url_for('heatmap_by_celltype')+'?genestring='+sfx,
+        'url_func': lambda sfx: url_for('expression_by_celltype')+'?genestring='+sfx,
     },
     'expression_unified_heatmap': {
-        'url_func': lambda sfx: url_for('heatmap_development')+'?genestring='+sfx,
+        'url_func': lambda sfx: url_for('expression_overtime_1gene')+'?genestring='+sfx,
     },
     'gene_friends': {
         'url_func': 'TODO',  # TODO
     },
     'marker_genes': {
-        'url_func': lambda sfx: url_for('heatmap_by_celltype') + '?' + \
+        'url_func': lambda sfx: url_for('expression_by_celltype') + '?' + \
                 'genestring='+get_marker_genes(sfx),
     },
     'differentially_expressed_genes': {

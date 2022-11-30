@@ -20,12 +20,13 @@ from flask_cors import CORS
 import numpy as np
 
 from api import (
-    geneExp,
+    expressionByCelltype,
+    expressionOvertime1Gene,
+    expressionOvertime1Celltype,
+    expressionHyperoxia,
     plotsForSeachGenes,
     geneFriends,
     genesInGOTerm,
-    geneExpTimeUnified,
-    geneExpHyperoxia,
     geneExpDifferential,
     geneExpSpeciesComparison,
     checkGenenames,
@@ -45,6 +46,7 @@ from models import (
 )
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
+from validation.celltypes import celltypes_validated
 from voice_recognition import mod as voice_control_blueprint
 from text_recognition import mod as text_control_blueprint
 
@@ -75,16 +77,17 @@ def text_control():
         "text_control.html",
         )
 
-@app.route("/voice_control", methods=["GET"])
-def voice_control():
-    """Name says it all"""
-    return render_template(
-            "voice_control.html",
-            )
+# FIXME
+#@app.route("/voice_control", methods=["GET"])
+#def voice_control():
+#    """Name says it all"""
+#    return render_template(
+#            "voice_control.html",
+#            )
 
 
 @app.route("/heatmap_by_celltype", methods=['GET'])
-def heatmap_by_celltype():
+def expression_by_celltype():
     species = request.args.get('species')
     if species is None:
         species = 'mouse'
@@ -113,14 +116,14 @@ def heatmap_by_celltype():
         genestring = ','.join(genes)
     searchstring = genestring.replace(" ", "")
     return render_template(
-            "heatmap_by_celltype.html",
+            "expression_by_celltype.html",
             searchstring=searchstring,
             species=species,
             )
 
 
 @app.route("/heatmap_development", methods=['GET'])
-def heatmap_development():
+def expression_overtime_1gene():
     species = request.args.get('species')
     if species is None:
         species = 'mouse'
@@ -134,15 +137,41 @@ def heatmap_development():
         similar_genes = similar_genes[1:]
 
     return render_template(
-            "heatmap_unified.html",
+            "expression_overtime_1gene.html",
             searchstring=searchstring,
             species=species,
             similarGenes=similar_genes,
             )
 
 
+@app.route("/expression_over_time_1celltype", methods=['GET'])
+def expression_overtime_1celltype():
+    species = request.args.get('species')
+    if species is None:
+        species = 'mouse'
+    celltype = request.args.get("celltype")
+    if celltype is None:
+        celltype = "Adventitial FB"
+    genestring = request.args.get("genestring")
+    if genestring is None:
+        genestring = 'Car4,Car8'
+    searchstring = genestring.replace(" ", "")
+
+    similar_genes = get_friends(searchstring.split(',')).split(',')
+
+    return render_template(
+            "expression_overtime_1celltype.html",
+            celltype=celltype,
+            searchstring=searchstring,
+            species=species,
+            similarGenes=similar_genes,
+            # FIXME: this should depend on the species...
+            celltypes=celltypes_validated,
+            )
+
+
 @app.route("/heatmap_hyperoxia", methods=["GET"])
-def heatmap_hyperoxia():
+def expression_hyperoxia():
     """A sort of heatmap with hyperoxia"""
     genestring = request.args.get("genestring")
     if genestring is None:
@@ -160,7 +189,7 @@ def heatmap_hyperoxia():
         'ACZ_P7', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14',
     ]
     return render_template(
-            "heatmap_hyperoxia.html",
+            "expression_hyperoxia.html",
             searchstring=searchstring,
             datasetTimepoints=dataset_timepoints,
             )
@@ -398,11 +427,12 @@ app.register_blueprint(voice_control_blueprint)
 
 
 # API endpoints
-app_api.add_resource(geneExp, "/data/by_celltype")
+app_api.add_resource(expressionByCelltype, "/data/by_celltype")
+app_api.add_resource(expressionOvertime1Gene, "/data/overtime_1gene")
+app_api.add_resource(expressionOvertime1Celltype, "/data/overtime_1celltype")
+app_api.add_resource(expressionHyperoxia, "/data/hyperoxia")
 app_api.add_resource(geneFriends, "/data/gene_friends")
 app_api.add_resource(genesInGOTerm, "/data/genes_in_go_term")
-app_api.add_resource(geneExpTimeUnified, "/data/development")
-app_api.add_resource(geneExpHyperoxia, "/data/hyperoxia")
 app_api.add_resource(geneExpDifferential, "/data/differential")
 app_api.add_resource(geneExpSpeciesComparison, "/data/speciescomparison")
 app_api.add_resource(checkGenenames, "/check_genenames")

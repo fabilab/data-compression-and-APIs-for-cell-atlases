@@ -60,6 +60,12 @@ for ct in celltype_tuples:
     else:
         celltype_dict[ct[0]] = ct[1]
 celltype_dict_inv = {val: key for key, val in celltype_dict.items()}
+celltypes_validated = []
+for ct in celltype_tuples:
+    if isinstance(ct, str):
+        celltypes_validated.append(ct)
+    else:
+        celltypes_validated.append(ct[1])
 
 
 def adjust_celltypes(celltypes_raw, species='mouse'):

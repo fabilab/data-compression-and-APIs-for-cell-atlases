@@ -8,6 +8,7 @@ import re
 from scipy.cluster.hierarchy import linkage, leaves_list
 from scipy.spatial.distance import pdist
 
+from config import configuration as config
 from validation.celltypes import (
         adjust_celltypes,
         rename_celltypes,
@@ -16,18 +17,9 @@ from validation.celltypes import (
 from validation.differential_expression import get_deg_conditions
 
 
-fdn_data = "./static/scData/"
-fn_atlasd = {
-    'mouse': fdn_data + "condensed_lung_atlas_ordered.h5",
-    'lemur': fdn_data + "mouselemur_condensed_lung_atlas_in_cpm.h5",
-    'human': fdn_data + "human_condensed_lung_atlas_in_cpm.h5",
-}
-fn_GO = fdn_data + 'mouse_GO_tables.pkl'
-fn_friendsd = {
-    'mouse': 'gene_friends.h5',
-    'human': 'human_gene_friends.h5',
-    'lemur': 'mouselemur_gene_friends.h5',
-}
+fn_atlasd = config['paths']['compressed_atlas']
+fn_GO = config['paths']['pathways']['GO']['mouse']
+fn_friendsd = config['paths']['friend_genes']
 
 
 def read_gene_order(data_type='celltype', species='mouse'):
@@ -148,13 +140,8 @@ def get_data_overtime_1gene(gene, species='mouse'):
             ).iloc[0]
 
     # Sort the rows
-    if species == 'mouse':
-        timepoint_order = [
-            'E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
-        dataset_order = ['ACZ', 'Hurskainen2021', 'TMS']
-    else:
-        timepoint_order = ['31wk', '3yr', '31yr', '~60yr']
-        dataset_order = ['Wang et al 2020', 'TS']
+    timepoint_order = config['order']['timepoint'][species]
+    dataset_order = config['order']['dataset'][species]
 
     timepoint_orderd = {x: i for i, x in enumerate(timepoint_order)}
     dataset_orderd = {x: i for i, x in enumerate(dataset_order)}
@@ -244,13 +231,8 @@ def get_data_overtime_1celltype(celltype, genes, species='mouse'):
     ncells = ncells.loc[idx]
 
     # Sort the rows
-    if species == 'mouse':
-        timepoint_order = [
-            'E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
-        dataset_order = ['ACZ', 'Hurskainen2021', 'TMS']
-    else:
-        timepoint_order = ['31wk', '3yr', '31yr', '~60yr']
-        dataset_order = ['Wang et al 2020', 'TS']
+    timepoint_order = config['order']['timepoint'][species]
+    dataset_order = config['order']['dataset'][species]
 
     countg['_n_cells'] = ncells.loc[countg.index]
     countg['_idx1'] = [timepoint_order.index(x.split('_')[2]) for x in countg.index]
@@ -262,9 +244,12 @@ def get_data_overtime_1celltype(celltype, genes, species='mouse'):
     del countg['_n_cells']
 
     # Sort the columns
-    distance = pdist(countg.T.values)
-    Z = linkage(distance, optimal_ordering=True)
-    new_order = leaves_list(Z)
+    if len(genes) <= 2:
+        new_order = list(range(len(genes)))
+    else:
+        distance = pdist(countg.T.values)
+        Z = linkage(distance, optimal_ordering=True)
+        new_order = leaves_list(Z)
 
     genes = countg.columns.tolist()
     genes_hierarchical = countg.columns[new_order].tolist()
@@ -299,7 +284,7 @@ def get_friends(genes, species="mouse"):
     if len(genes) == 0:
         return ''
 
-    with h5py.File(fdn_data + fn_friendsd[species], "r") as h5_data:
+    with h5py.File(fn_friendsd[species], "r") as h5_data:
         for gene in genes:
             friends.append(gene)
             # We only took decently expressed genes, but this might appear
@@ -327,7 +312,7 @@ def get_marker_genes(celltypes, species='mouse'):
         celltypes = celltypes.split(',')
 
     markers = []
-    with h5py.File(fdn_data + "marker_genes.h5", "r") as h5_data:
+    with h5py.File(config['paths']['marker_genes'][species], "r") as h5_data:
         group = h5_data['celltype']
         for celltype in celltypes:
             if celltype not in celltype_dict_inv:
@@ -518,7 +503,7 @@ def get_celltype_abundances(timepoint, dataset='ACZ', kind='qualitative', specie
 def get_gene_ids(genes, species='mouse'):
     '''Get the ids (MGI/GeneCards) of a list of genes'''
     if species == 'mouse':
-        fn = fdn_data+'mouse_gene_names.tsv'
+        fn = config['paths']['gene_ids']
         df = pd.read_csv(fn, sep='\t', index_col=0)
         mgi_dict = df['MGI_id'].to_dict()
         human_dict = df['HumanGeneName'].fillna('').to_dict()
@@ -587,13 +572,13 @@ def get_orthologs(genes, species, new_species):
         dic[new_species] = dic.pop('human')
         return dic
     elif (species == 'mouse') and (new_species == 'human'):
-        fn = fdn_data+'mouse_gene_names.tsv'
+        fn = config['paths']['gene_ids']
         conv = pd.read_csv(fn, sep='\t', index_col=0, usecols=[0, 3])
         conv = conv.squeeze("columns")
         genes = [g for g in genes if g in conv.index]
         dic = conv.loc[genes].fillna('')
     elif (species == 'human') and (new_species == 'mouse'):
-        fn = fdn_data+'human_mouse_gene_orthologs.tsv'
+        fn = config['paths']['ortholog_genes']
         conv = pd.read_csv(fn, sep='\t', index_col=0)
         conv = conv.squeeze("columns")
         genes = [g for g in genes if g in conv.index]
@@ -683,7 +668,7 @@ def get_gsea(genes, species='mouse', gene_set='GO_Biological_Process_2021'):
 def get_kegg_urls(pathways):
     '''Get URLs to KEGG pathways by name'''
     kegg_df = pd.read_csv(
-        fdn_data+'kegg_pathway_dataframe.tsv', sep='\t', index_col='name')
+        config['paths']['pathways']['KEGG'], sep='\t', index_col='name')
     kegg_url = kegg_df['url'].to_dict()
 
     urls = [kegg_url.get(x, '') for x in pathways]

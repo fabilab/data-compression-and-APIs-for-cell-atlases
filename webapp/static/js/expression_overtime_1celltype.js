@@ -221,7 +221,7 @@ function AssembleAjaxRequest( genestring = "") {
 
 function updateSimilarGenes() {
     let similarGenes = plotData['similarGenes'];
-    $('#geneSuggestions').text('Similar genes:');
+    $('#geneSuggestions').text('Add genes:');
     for (let i = 0; i < similarGenes.length; i++) {
         const gene = similarGenes[i];
         $('#geneSuggestions').append(
@@ -234,16 +234,17 @@ function updateSimilarGenes() {
 
 // Check another species, same gene
 function onClickSpeciesSuggestions() {
-    var geneName = $('#searchGeneName').val();
+    const genestring = $('#searchGeneName').val();
     const newSpecies = this.id.slice("suggest".length);
     let requestData = {
+        celltype: celltype,
         newSpecies: newSpecies,
-        gene: geneName,
+        gene_names: genestring,
         species: species,
     }
     $.ajax({
         type:'GET',
-        url:'/data/development',
+        url:'/data/overtime_1celltype',
         data: $.param(requestData),
         success: function(result) {
             // Store global variable

@@ -4,11 +4,11 @@ author:     Fabio Zanini
 date:       09/05/22
 content:    Interpret text about differential expression.
 '''
-from .timepoints import timepoints as timepoints_all
 from .celltypes import (
         validate_correct_celltypestr,
         rename_celltypes,
         )
+from config import configuration as config
 
 
 def get_deg_conditions(suffix):
@@ -17,6 +17,9 @@ def get_deg_conditions(suffix):
         (' versus ' not in suffix) and
         ('hyperoxia' not in suffix)):
         raise ValueError('Conditions not recognized')
+
+    # Default to mouse, TODO: enable other species here
+    timepoints_all = config['order']['timepoints']['mouse']
 
     # Default to hyperoxia vs normoxia for a specific time point,
     # cell type, and dataset

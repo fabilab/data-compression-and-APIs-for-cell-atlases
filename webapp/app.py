@@ -19,6 +19,7 @@ from flask_restful import Api
 from flask_cors import CORS
 import numpy as np
 
+from config import configuration as config
 from api import (
     expressionByCelltype,
     expressionOvertime1Gene,
@@ -103,14 +104,7 @@ def expression_by_celltype():
                 return abort(404)
 
         else:
-            genes = [
-                'Col1a1,Col2a1',
-                'Adh1,Col13a1,Col14a1',
-                'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
-                'Pecam1,Gja5,Vwf,Car8,Car4',
-                'Ptprc,Cd19,Gzma,Cd3d,Cd68',
-                'Epcam',
-                ]
+            genes = config['defaults']['genestring'].split(',')
             if species in ('human', 'lemur'):
                 genes = get_orthologs(genes, 'mouse', species)
         genestring = ','.join(genes)
@@ -126,10 +120,10 @@ def expression_by_celltype():
 def expression_overtime_1gene():
     species = request.args.get('species')
     if species is None:
-        species = 'mouse'
+        species = config['defaults']['species']
     genestring = request.args.get("genestring")
     if genestring is None:
-        genestring = 'Car4'
+        genestring = config['defaults']['gene']
     searchstring = genestring.replace(" ", "")
 
     similar_genes = get_friends([searchstring]).split(',')
@@ -151,13 +145,15 @@ def expression_overtime_1celltype():
         species = 'mouse'
     celltype = request.args.get("celltype")
     if celltype is None:
-        celltype = "Adventitial FB"
+        celltype = config['defaults']['celltype']
     genestring = request.args.get("genestring")
     if genestring is None:
-        genestring = 'Car4,Car8'
+        genestring = config['defaults']['genestring']
     searchstring = genestring.replace(" ", "")
 
     similar_genes = get_friends(searchstring.split(',')).split(',')
+    # Limit to a few
+    similar_genes = similar_genes[:15]
 
     return render_template(
             "expression_overtime_1celltype.html",
@@ -175,19 +171,10 @@ def expression_hyperoxia():
     """A sort of heatmap with hyperoxia"""
     genestring = request.args.get("genestring")
     if genestring is None:
-        genestring = ','.join([
-            'Col1a1,Col2a1',
-            'Adh1,Col13a1,Col14a1',
-            'Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb',
-            'Pecam1,Gja5,Vwf,Car8,Car4',
-            'Ptprc,Cd19,Gzma,Cd3d,Cd68',
-            'Epcam',
-            ])
+        genestring = config['defaults']['genestring']
     searchstring = genestring.replace(" ", "")
     # Default dataset/timepoints combos
-    dataset_timepoints = [
-        'ACZ_P7', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14',
-    ]
+    dataset_timepoints = config['defaults']['disease']['dataset_timepoint']
     return render_template(
             "expression_hyperoxia.html",
             searchstring=searchstring,

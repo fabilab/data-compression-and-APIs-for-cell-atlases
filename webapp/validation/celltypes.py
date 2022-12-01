@@ -5,54 +5,18 @@ date:       27/04/22
 content:    Some quirks of the celltypes in the data.
 '''
 import numpy as np
+from config import configuration as config
 
 
-celltype_tuples = [
-    ('Adventitial fibroblast', 'Adventitial FB'),
-    ('Early adventitial fibroblast', 'Early adventitial FB'),
-    ('Fibroblast precursor', 'FB precursor'),
-    ('Early alveolar fibroblast', 'Early alveolar FB'),
-    ('Alveolar fibroblast', 'Alveolar FB'),
-    ('Proliferating fibroblast', 'Proliferating FB'),
-    ('Proliferating myofibroblast', 'Proliferating MyoF'),
-    ('Myofibroblast', 'MyoF'),
-    ('Myofibroblast and smooth muscle precursor', 'MyoF/ASM precursor'),
-    ('Early airway smooth muscle', 'Early ASM'),
-    ('Airway smooth muscle', 'ASM'),
-    ('Vascular smooth muscle', 'VSM'),
-    'Pericyte',
-    'Proliferating pericyte',
-    'Striated muscle',
-    ('Lymphatic EC', 'Lymphatic'),
-    ('Arterial EC II', 'Arterial II'),
-    ('Arterial EC I', 'Arterial I'),
-    ('Venous EC', 'Venous'),
-    ('Nonproliferative embryonic EC', 'Embryonic cap'),
-    ('Proliferative EC', 'Proliferative cap'),
-    ('Early Car4- capillaries', 'Early gCap'),
-    ('Late Car4- capillaries', 'gCap'),
-    ('Car4+ capillaries', 'Aerocyte'),
-    'B cell',
-    'NK cell',
-    'T cell',
-    'IL cell',
-    'DC I',
-    'DC II',
-    'DC III',
-    'Mac I',
-    'Mac II',
-    ('Mac III', 'Alveolar mac'),
-    ('Mac IV', 'Interstitial mac'),
-    ('Mac V', 'Monocyte'),
-    ('basophil', 'Basophil'),
-    ('mast cell', 'Mast cell'),
-    ('neutrophil', 'Neutrophil'),
-    'Alveolar type I',
-    'Alveolar type II',
-    'Club',
-    'Ciliated',
-    'Basal',
-]
+# A few globals with cell type manipulation data structures
+celltypes_validated = list(config['order']['celltypes'])
+
+celltype_tuples = list(celltypes_validated)
+if ('conversions' in config) and ('celltypes' in config['conversions']):
+    for celltype_sloppy, celltype in config['conversions']['celltypes'].items():
+        idx = celltype_tuples.index(celltype)
+        celltype_tuples[idx] = (celltype_sloppy, celltype)
+
 celltype_dict = {}
 for ct in celltype_tuples:
     if isinstance(ct, str):
@@ -60,12 +24,6 @@ for ct in celltype_tuples:
     else:
         celltype_dict[ct[0]] = ct[1]
 celltype_dict_inv = {val: key for key, val in celltype_dict.items()}
-celltypes_validated = []
-for ct in celltype_tuples:
-    if isinstance(ct, str):
-        celltypes_validated.append(ct)
-    else:
-        celltypes_validated.append(ct[1])
 
 
 def adjust_celltypes(celltypes_raw, species='mouse'):

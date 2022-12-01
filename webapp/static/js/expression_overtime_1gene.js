@@ -241,7 +241,7 @@ function onClickSpeciesSuggestions() {
     }
     $.ajax({
         type:'GET',
-        url:'/data/development',
+        url:'/data/overtime_1gene',
         data: $.param(requestData),
         success: function(result) {
             // Store global variable

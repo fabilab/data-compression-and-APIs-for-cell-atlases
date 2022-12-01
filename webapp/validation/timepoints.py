@@ -4,7 +4,6 @@ author:     Fabio Zanini
 date:       03/05/22
 content:    Validate time points.
 '''
-timepoints = ['E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
 
 
 def validate_correct_timepoint(text):

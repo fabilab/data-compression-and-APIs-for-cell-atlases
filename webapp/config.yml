@@ -1,0 +1,127 @@
+paths:
+  compressed_atlas:
+    "mouse": "./static/scData/condensed_lung_atlas_ordered.h5"
+    "human": "./static/scData/human_condensed_lung_atlas_in_cpm.h5"
+    "lemur": "./static/scData/mouselemur_condensed_lung_atlas_in_cpm.h5"
+
+  # NOTE: this one is used for all species, depending on the column
+  gene_ids: "./static/scData/mouse_gene_names.tsv"
+
+  ortholog_genes: "./static/scData/human_mouse_gene_orthologs.tsv"
+      
+  friend_genes:
+    "mouse": "./static/scData/gene_friends.h5"
+    "human": "./static/scData/human_gene_friends.h5"
+    "lemur": "./static/scData/mouselemur_gene_friends.h5"
+
+  marker_genes:
+    "mouse": "./static/scData/marker_genes.h5"
+
+  pathways:
+    GO:
+      "mouse": "./static/scData/mouse_GO_tables.pkl"
+    KEGG: "./static/scData/kegg_pathway_dataframe.tsv"
+
+pathways:
+  KEGG:
+    gene_set:
+      "mouse": "KEGG_2019_Mouse"
+      "human": "KEGG_2021_Human"
+      "lemur": "KEGG_2021_Human"
+
+conversions:
+  celltypes:
+    "Adventitial fibroblast": "Adventitial FB"
+    "Early adventitial fibroblast": "Early adventitial FB"
+    "Fibroblast precursor": "FB precursor"
+    "Early alveolar fibroblast": "Early alveolar FB"
+    "Alveolar fibroblast": "Alveolar FB"
+    "Proliferating fibroblast": "Proliferating FB"
+    "Proliferating myofibroblast": "Proliferating MyoF"
+    "Myofibroblast": "MyoF"
+    "Myofibroblast and smooth muscle precursor": "MyoF/ASM precursor"
+    "Early airway smooth muscle": "Early ASM"
+    "Airway smooth muscle": "ASM"
+    "Vascular smooth muscle": "VSM"
+    "Lymphatic EC": "Lymphatic"
+    "Arterial EC II": "Arterial II"
+    "Arterial EC I": "Arterial I"
+    "Venous EC": "Venous"
+    "Nonproliferative embryonic EC": "Embryonic cap"
+    "Proliferative EC": "Proliferative cap"
+    "Early Car4- capillaries": "Early gCap"
+    "Late Car4- capillaries": "gCap"
+    "Car4+ capillaries": "Aerocyte"
+    "Mac III": "Alveolar mac"
+    "Mac IV": "Interstitial mac"
+    "Mac V": "Monocyte"
+    "basophil": "Basophil"
+    "mast cell": "Mast cell"
+    "neutrophil": "Neutrophil"
+
+
+order:
+  celltypes: [
+    "Adventitial FB",
+    "Early adventitial FB",
+    "FB precursor",
+    "Early alveolar FB",
+    "Alveolar FB",
+    "Proliferating FB",
+    "Proliferating MyoF",
+    "MyoF",
+    "MyoF/ASM precursor",
+    "Early ASM",
+    "ASM",
+    "VSM",
+    "Pericyte",
+    "Proliferating pericyte",
+    "Striated muscle",
+    "Lymphatic",
+    "Arterial II",
+    "Arterial I",
+    "Venous",
+    "Embryonic cap",
+    "Proliferative cap",
+    "Early gCap",
+    "gCap",
+    "Aerocyte",
+    "B cell",
+    "NK cell",
+    "T cell",
+    "IL cell",
+    "DC I",
+    "DC II",
+    "DC III",
+    "Mac I",
+    "Mac II",
+    "Alveolar mac",
+    "Interstitial mac",
+    "Monocyte",
+    "Basophil",
+    "Mast cell",
+    "Neutrophil",
+    "Alveolar type I",
+    "Alveolar type II",
+    "Club",
+    "Ciliated",
+    "Basal",
+  ]
+
+  timepoint:
+    "mouse": ['E18.5', 'P1', 'P3', 'P7', 'P14', 'P21', '3m', '18m', '24m']
+    "human": ['31wk', '3yr', '31yr', '~60yr']
+
+  dataset:
+    "mouse": ['ACZ', 'Hurskainen2021', 'TMS']
+    "human": ['Wang et al 2020', 'TS']
+
+defaults:
+  species: "mouse"
+  celltype: "Venous"
+  gene: "Car4"
+  genestring: "Col1a1,Col2a1,Adh1,Col13a1,Col14a1,Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb,Pecam1,Gja5,Vwf,Car8,Car4,Ptprc,Cd19,Gzma,Cd3d,Cd68,Epcam"
+  disease:
+    dataset_timepoint:
+        ['ACZ_P7', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14']
+

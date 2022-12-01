@@ -206,6 +206,8 @@ class expressionOvertime1Celltype(Resource):
         similar_genes = get_friends(gene_names, species=species).split(',')
         # Exclude from similar genes the ones you have already
         similar_genes = [g for g in similar_genes if g not in gene_names]
+        # Limit to a few
+        similar_genes = similar_genes[:15]
 
         data['similarGenes'] = similar_genes
 

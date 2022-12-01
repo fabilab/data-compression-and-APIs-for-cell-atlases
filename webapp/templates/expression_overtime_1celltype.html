@@ -46,7 +46,7 @@
   </div>
 
   <!-- Tabs enable user to visualise heat map with normalisation method and hierachical clustered -->
-  <div class="columns is-mobile is-centered tab-area">
+  <div class="columns is-mobile is-centered tab-area" style="margin-top: 0px;">
     <div class="field column is-one-quarter">
       <label class="label">Data values</label>
       <div class="control">
@@ -81,26 +81,27 @@
   <!-- Plots below -->
   
   <div class="container" id="dataDisplay">
-    <div id="timepoint_info">
-      <span class="has-text-weight-bold">Timepoints:&nbsp&nbsp</span>
-      <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
-        <i class=" far fa-question-circle"></i>
-        <span>P&nbsp&nbsp&nbsp</span>
-      </span>
-      <span class="E has-tooltip-bottom" data-tooltip="Embrioic Day">
-        <i class="far fa-question-circle"></i>
-        <span>E&nbsp&nbsp&nbsp</span>
-      </span>
-      <span class="m has-tooltip-bottom" data-tooltip="Months">
-        <i class="far fa-question-circle"></i>
-        <span>m</span>
-      </span>
-    </div>
+    <div id="expressionPlotWrapper" class="columns tab-area is-centered is-mobile" style="margin-top: 0px;">
+      <div id="timepointPlusPlot">
+        <div id="timepoint_info">
+          <span class="has-text-weight-bold">Timepoints:&nbsp&nbsp</span>
+          <span class="P has-tooltip-bottom" data-tooltip="Postnatal Day">
+            <i class=" far fa-question-circle"></i>
+            <span>P&nbsp&nbsp&nbsp</span>
+          </span>
+          <span class="E has-tooltip-bottom" data-tooltip="Embrioic Day">
+            <i class="far fa-question-circle"></i>
+            <span>E&nbsp&nbsp&nbsp</span>
+          </span>
+          <span class="m has-tooltip-bottom" data-tooltip="Months">
+            <i class="far fa-question-circle"></i>
+            <span>m</span>
+          </span>
+        </div>
 
-    <div id="expressionPlotWrapper">
-      <div id="expressionPlot"></div>
+        <div id="expressionPlot"></div>
+      </div>
     </div>
-
   </div>
   <script>
     let celltype = "{{celltype}}";

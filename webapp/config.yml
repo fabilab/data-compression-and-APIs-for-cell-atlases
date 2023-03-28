@@ -1,6 +1,7 @@
 paths:
   compressed_atlas:
-    "mouse": "./static/scData/condensed_lung_atlas_ordered.h5"
+    #"mouse": "./static/scData/condensed_lung_atlas_ordered.h5"
+    "mouse": "./static/scData/230323_condensed_lung_atlas_treatment.h5"
     "human": "./static/scData/human_condensed_lung_atlas_in_cpm.h5"
     "lemur": "./static/scData/mouselemur_condensed_lung_atlas_in_cpm.h5"
 

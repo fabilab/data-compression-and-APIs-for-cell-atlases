@@ -441,7 +441,7 @@ def get_data_hyperoxia(genes=None):
     result = []
 
     datasets = ['ACZ', 'Hurskainen2021']
-    timepointd = {'ACZ': ['P7'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
+    timepointd = {'ACZ': ['P7', 'P21'], 'Hurskainen2021': ['P3', 'P7', 'P14']}
     for ds in datasets:
         for tp in timepointd[ds]:
             item = {

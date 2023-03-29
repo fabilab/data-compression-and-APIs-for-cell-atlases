@@ -124,5 +124,5 @@ defaults:
   genestring: "Col1a1,Col2a1,Adh1,Col13a1,Col14a1,Tgfbi,Pdgfra,Crh,Hhip,Pdgfrb,Pecam1,Gja5,Vwf,Car8,Car4,Ptprc,Cd19,Gzma,Cd3d,Cd68,Epcam"
   disease:
     dataset_timepoint:
-        ['ACZ_P7', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14']
+        ['ACZ_P7', 'ACZ_P21', 'Hurskainen2021_P3', 'Hurskainen2021_P7', 'Hurskainen2021_P14']
 

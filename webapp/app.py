@@ -48,7 +48,6 @@ from models import (
 from validation.genes import validate_correct_genestr
 from validation.timepoints import validate_correct_timepoint
 from validation.celltypes import celltypes_validated
-from voice_recognition import mod as voice_control_blueprint
 from text_recognition import mod as text_control_blueprint
 
 
@@ -77,14 +76,6 @@ def text_control():
     return render_template(
         "text_control.html",
         )
-
-# FIXME
-#@app.route("/voice_control", methods=["GET"])
-#def voice_control():
-#    """Name says it all"""
-#    return render_template(
-#            "voice_control.html",
-#            )
 
 
 @app.route("/heatmap_by_celltype", methods=['GET'])
@@ -410,7 +401,6 @@ def favicon():
 
 # Blueprints
 app.register_blueprint(text_control_blueprint)
-app.register_blueprint(voice_control_blueprint)
 
 
 # API endpoints

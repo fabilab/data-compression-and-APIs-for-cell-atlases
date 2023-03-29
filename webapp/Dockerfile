@@ -25,12 +25,6 @@ ADD api api
 ADD models models
 ADD text_recognition text_recognition
 ADD validation validation
-ADD voice_recognition voice_recognition
-
-# Google cloud key (NOTE: careful!!)
-# NOTE: CAREFUL CAREFUL
-ADD gcloud_key gcloud_key
-# NOTE: CAREFUL CAREFUL
 
 # App file
 COPY app.py .

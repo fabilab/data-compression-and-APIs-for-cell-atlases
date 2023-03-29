@@ -111,7 +111,7 @@ function HeatmapByCelltype(
         };
 
         // Make new plot if none is present
-        if (($('#'+html_element_id).html() === "") || (plotForceRefresh == true)) {
+        if ($('#'+html_element_id).html() === "") {
             data['z'] = data_content;
             data['x'] = x_axis;
             data['y'] = y_axis;
